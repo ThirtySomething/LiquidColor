@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Liquid Color</title>
+    <link rel="stylesheet" type="text/css" href="./liquidcolor.css">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./liquidcolor.js"></script>
+    <script>
+        $(document).ready(function() {
+            LiquidColor.Init("gamearea");
+        });
+    </script>
+</head>
+
+<body>
+    <div id="gameinfo">
+        This is Liquid Color, a simple game written in JavaScript. The goal is to get as much as possible cells in a contiguous color. To reach this goal, you have to select one color of the surrounding cells. You cannot select the current color of your opponent,
+        and of course you cannot select the your current color. All other colors are available to select.
+    </div>
+    <div id="setup" class="setup">
+        <div>Dimension X: <input type="text" name="dimx"></div>
+        <div>Dimension Y: <input type="text" name="dimy"></div>
+        <div>Cell width: <input type="text" name="cellwidth"></div>
+        <div><button id="btn_draw" type="button">Draw</button></div><br>
+    </div>
+    <div id="gameaream" class="gameaream">
+        <canvas id="gamearea" class="gamearea"></canvas>
+    </div>
+</body>
+
+</html>

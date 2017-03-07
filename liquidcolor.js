@@ -1,9 +1,9 @@
 var LiquidColor = {
     Config: {
-        DimensionX: 10,
-        DimensionY: 10,
-        CellSize: 10,
-        Colors: ["red", "green", "blue", "yellow", "lightgrey", "cyan", "orange", "lightblue"],
+        DimensionX: 5,
+        DimensionY: 5,
+        CellSize: 30,
+        Colors: ["red", "green", "blue", "yellow", "lightgray", "cyan", "orange", "lightblue"],
     },
     Playground: {
         Cells: [],
@@ -29,14 +29,17 @@ var LiquidColor = {
     CellCreateAll: function () {
         this.Playground.Cells = new Array;
 
-        for (var LoopY = 0; LoopY < this.Config.DimensionY; LoopY++) {
-            for (var LoopX = 0; LoopX < this.Config.DimensionX; LoopX++) {
-                var PosX = LoopX * this.Config.CellSize;
-                var PosY = LoopY * this.Config.CellSize;
+        for (var LoopX = 0; LoopX < this.Config.DimensionX; LoopX++) {
+            for (var LoopY = 0; LoopY < this.Config.DimensionY; LoopY++) {
+                var Size = this.Config.CellSize;
+                var PosX = LoopX * Size;
+                var PosY = LoopY * Size;
                 var ColorIndex = Math.floor((Math.random() * this.Config.Colors.length) + 1);
 
+                console.log("PosX[" + PosX + "], PosY[" + PosY + "], CellSize[" + Size + "]");
+
                 this.Playground.CanvasElement.beginPath();
-                this.Playground.CanvasElement.rect(PosX, PosY, this.Config.CellSize, this.Config.CellSize);
+                this.Playground.CanvasElement.rect(PosX, PosY, Size, Size);
                 this.Playground.CanvasElement.fillStyle = this.Config.Colors[ColorIndex];
                 this.Playground.CanvasElement.fill();
                 this.Playground.CanvasElement.lineWidth = 1;

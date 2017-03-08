@@ -7,9 +7,8 @@ function LQCell(PosX, PosY, CellSize) {
     this.Config.Color = "white";
     // ------------------------------------------------------------
     this.Draw = function (CanvasElement) {
-        // console.log(JSON.stringify(this.Config));
         CanvasElement.beginPath();
-        CanvasElement.rect(parseInt(this.Config.PosX), parseInt(this.Config.PosY), parseInt(this.Config.CellSize), parseInt(this.Config.CellSize));
+        CanvasElement.rect(this.Config.PosX, this.Config.PosY, this.Config.CellSize, this.Config.CellSize);
         CanvasElement.fillStyle = this.Config.Color;
         CanvasElement.fill();
         CanvasElement.lineWidth = 1;

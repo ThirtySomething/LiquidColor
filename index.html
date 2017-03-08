@@ -10,40 +10,36 @@
     <script type="text/javascript" src="./lqboard.js"></script>
     <script>
         var Board = new LQBoard(20, 20, 20);
-        $(document).ready(function () {
+        $(document).ready(function() {
             $("#compare").css("display", "none");
-            Board.Init("gamearea");
+            Board.Init("gamearea", "playbuttons");
         });
     </script>
 </head>
 
 <body>
     <div id="gameinfo" class="gameinfo">
-        This is Liquid Color, a simple game written in JavaScript. The goal is to get as much as possible cells in a contiguous color.
-        To reach this goal, you have to select one color of the surrounding cells. You cannot select the current color of
-        your opponent, and of course you cannot select the your current color. All other colors are available to select.
+        <!-- Rough game information. -->
+        This is Liquid Color, a simple game written in JavaScript. The goal is to get as much as possible cells in a contiguous color. To reach this goal, you have to select one color of the surrounding cells. You cannot select the current color of your opponent,
+        and of course you cannot select the your current color. All other colors are available to select.
     </div>
     <div id="setup" class="setup">
+        <!-- On a later step user can change cell and board size. -->
         <div>Dimension X: <input type="text" name="dimx"></div>
         <div>Dimension Y: <input type="text" name="dimy"></div>
         <div>Cell width: <input type="text" name="cellwidth"></div>
         <div><button id="btn_draw" type="button">Draw</button></div><br>
     </div>
     <div id="playground" class="playground">
-        <canvas id="gamearea" class="gamearea"></canvas>
+        <div id="playbuttons" class="gamearea">
+            <!-- Buttons for selecting colors are placed here. -->
+        </div>
+        <canvas id="gamearea" class="gamearea">
+            <!-- Game matrix is placed here. -->            
+        </canvas>
     </div>
-    <div id="compare" class="playground">
-        <canvas id="CanvasTest" width="1024" height="1024"></canvas>
-        <script>
-            var canvas = document.getElementById('CanvasTest');
-            var context = canvas.getContext('2d');
-            var imageObj = new Image();
-
-            imageObj.onload = function () {
-                context.drawImage(imageObj, 0, 0);
-            };
-            imageObj.src = './Grid.png';
-        </script>
+    <div id="fakebtn" class="gamebtn" style="display: none;">
+        <!-- Used to retrieve class attribute of margin for button height calculation. -->
     </div>
 </body>
 

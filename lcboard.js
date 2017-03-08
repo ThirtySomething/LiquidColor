@@ -8,7 +8,7 @@ function LCBoard(DimX, DimY, CellSize) {
     this.Config.DimensionY = parseInt(DimY);
     this.Config.CellSize = parseInt(CellSize);
     this.Config.Colors = ["blue", "cyan", "gray", "green", "red", "yellow"];
-    this.Config.Cells = new Array();
+    this.Config.Cells = [];
     this.Config.CanvasElement = null;
     // ------------------------------------------------------------
     this.Init = function (GameField, ButtonField) {
@@ -28,33 +28,49 @@ function LCBoard(DimX, DimY, CellSize) {
         }
     };
     // ------------------------------------------------------------
+    this.BaseGetHuman = function () {
+        var Index = this.Config.DimensionY - 1;
+        var Base = this.Config.Cells[Index][0];
+
+        return Base;
+    };
+    // ------------------------------------------------------------
+    this.BaseGetComputer = function () {
+        var Index = this.Config.DimensionX - 1;
+        var Base = this.Config.Cells[0][Index];
+
+        return Base;
+    };
+    // ------------------------------------------------------------
     this.BoardInit = function () {
-        this.Config.Cells = new Array();
+        this.Config.Cells = [];
 
         for (var LoopY = 0; LoopY < this.Config.DimensionY; LoopY++) {
-            this.Config.Cells[LoopY] = new Array();
+            this.Config.Cells[LoopY] = [];
             for (var LoopX = 0; LoopX < this.Config.DimensionX; LoopX++) {
                 var PosX = LoopX * this.Config.CellSize;
                 var PosY = LoopY * this.Config.CellSize;
-                var CurrentCell = new LCCell(PosX, PosY, this.Config.CellSize);
+                var CurrentCell = new LCCell(LoopX, LoopY);
                 CurrentCell.ColorSet(this.CellColorRandomGet());
-                CurrentCell.Draw(this.Config.CanvasElement);
+                CurrentCell.Draw(this.Config);
                 this.Config.Cells[LoopY].push(CurrentCell);
             }
         }
 
         // ToDo: Update surrounding cells of same color with owner and occupy flag
+        var BaseComputer = this.BaseGetComputer();
+        var BaseHuman = this.BaseGetHuman();
 
-        var IndexComputer = this.Config.DimensionX - 1;
-        var IndexPlayer = this.Config.DimensionY - 1;
+        BaseComputer.OwnerSet("computer");
+        BaseHuman.OwnerSet("human");
 
-        this.Config.Cells[0][IndexComputer].OwnerSet("computer");
-        this.Config.Cells[IndexPlayer][0].OwnerSet("human");
-
-        while (this.Config.Cells[0][IndexComputer].ColorGet() === this.Config.Cells[IndexPlayer][0].ColorGet()) {
-            this.Config.Cells[IndexPlayer][0].ColorSet(this.CellColorRandomGet());
-            this.Config.Cells[IndexPlayer][0].Draw(this.Config.CanvasElement);
+        while (BaseComputer.ColorGet() === BaseHuman.ColorGet()) {
+            BaseHuman.ColorSet(this.CellColorRandomGet());
+            BaseHuman.Draw(this.Config);
         }
+
+        this.CellMarkOwner(BaseComputer);
+        this.CellMarkOwner(BaseHuman);
     };
     // ------------------------------------------------------------
     this.BoardButtonsInit = function (ButtonField) {
@@ -68,12 +84,14 @@ function LCBoard(DimX, DimY, CellSize) {
         for (var Loop = 0; Loop < NumberOfButtons; Loop++) {
             var CurCol = this.Config.Colors[Loop];
             var Button = $("#" + ButtonField).append("<div id=\"" + CurCol + "\"></div>");
+
             $("#" + CurCol).css("width", BtnWidth);
             $("#" + CurCol).css("height", BtnHeight);
             $("#" + CurCol).css("background-color", CurCol);
             $("#" + CurCol).addClass("gamebtn");
-            $("#" + CurCol).unbind("click").bind("click", function () {
-                console.log("Button for color [" + this.id + "]")
+            $("#" + CurCol).unbind("click").bind("click", { Owner: "human", Board: this, PosY: this.Config.DimensionY - 1 }, function (event) {
+                var Data = event.data;
+                Data.Board.CellMarkOwner(Data.Owner, Data.PosY, 0);
             });
         }
     };
@@ -87,5 +105,62 @@ function LCBoard(DimX, DimY, CellSize) {
         var ColorName = this.Config.Colors[ColorIndex];
 
         return ColorName;
+    };
+    // ------------------------------------------------------------
+    this.CellExists = function (PosX, PosY) {
+        var CellExists = false;
+
+        if (("undefined" !== typeof this.Config.Cells[PosY]) &&
+            ("undefined" !== typeof this.Config.Cells[PosY][PosX])) {
+            CellExists = true;
+        }
+
+        return CellExists;
+    };
+    // ------------------------------------------------------------
+    this.CellNeighboursGet = function (PosX, PosY) {
+        var Neighbours = [];
+
+        if (true === this.CellExists(PosX - 1, PosY)) {
+            Neighbours.push(this.Config.Cells[PosY][PosX - 1]);
+        }
+        if (true === this.CellExists(PosX + 1, PosY)) {
+            Neighbours.push(this.Config.Cells[PosY][PosX + 1]);
+        }
+
+        if (true === this.CellExists(PosX, PosY - 1)) {
+            Neighbours.push(this.Config.Cells[PosY - 1][PosX]);
+        }
+        if (true === this.CellExists(PosX, PosY + 1)) {
+            Neighbours.push(this.Config.Cells[PosY + 1][PosX]);
+        }
+
+        return Neighbours;
+    };
+    // ------------------------------------------------------------
+    this.CellMarkOwner = function (BaseCell) {
+        var Neighbours = this.CellNeighboursGet(BaseCell.Config.PosX, BaseCell.Config.PosY);
+
+        for (var Loop = 0; Loop < Neighbours.length; Loop++) {
+            var CurrentCell = Neighbours[Loop];
+            var CurrentState = CurrentCell.StateGet(BaseCell);
+
+            switch (CurrentState) {
+            case CurrentCell.EnumState.FREE_COLOR_DIFFERENT:
+                break;
+            case CurrentCell.EnumState.FREE_COLOR_EQUAL:
+                CurrentCell.OwnerSet(BaseCell.Config.Owner);
+                this.CellMarkOwner(CurrentCell);
+                break;
+            case CurrentCell.EnumState.OCCUPIED_OWNER_DIFFERENT:
+                break;
+            case CurrentCell.EnumState.OCCUPIED_OWNER_EQUAL:
+                break;
+            case CurrentCell.EnumState.UNDEFINED:
+            default:
+                console.log("Got undefined state for cell[" + PosX + "][" + PosY + "]");
+                break;
+            }
+        }
     };
 }

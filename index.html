@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Liquid Color</title>
-    <link rel="stylesheet" type="text/css" href="./liquidcolor.css">
+    <link rel="stylesheet" type="text/css" href="./lc.css">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script type="text/javascript" src="./lqcell.js"></script>
-    <script type="text/javascript" src="./lqboard.js"></script>
-    <script type="text/javascript" src="./lqplayer.js"></script>
+    <script type="text/javascript" src="./lccell.js"></script>
+    <script type="text/javascript" src="./lcboard.js"></script>
+    <script type="text/javascript" src="./lcplayer.js"></script>
     <script>
-        var Human = new LQPlayer("human");
-        var Computer = new LQPlayer("computer");
-        var Board = new LQBoard(20, 20, 20);
+        var Human = new LCPlayer("human");
+        var Computer = new LCPlayer("computer");
+        var Board = new LCBoard(60, 40, 10);
         $(document).ready(function() {
             $("#compare").css("display", "none");
             Board.Init("gamearea", "playbuttons");

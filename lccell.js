@@ -1,6 +1,6 @@
 "use strict";
 
-function LQCell(PosX, PosY, CellSize) {
+function LCCell(PosX, PosY, CellSize) {
     // ------------------------------------------------------------
     // Cell data
     this.Config = {};
@@ -23,6 +23,10 @@ function LQCell(PosX, PosY, CellSize) {
     // ------------------------------------------------------------
     this.ColorSet = function (NewColor) {
         this.Config.Color = NewColor;
+    };
+    // ------------------------------------------------------------
+    this.ColorGet = function () {
+        return this.Config.Color;
     };
     // ------------------------------------------------------------
     this.OwnerSet = function (NewOwner) {

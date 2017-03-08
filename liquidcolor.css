@@ -22,12 +22,36 @@
     padding: 10px;
 }
 
-.gamearea {
+.left {
     float: left;
+}
+
+.right {
+    float: right;
 }
 
 .gamebtn {
     margin: 10px;
     padding: 0px;
     border: 1px solid black;
+}
+
+.gamebtn:hover {
+    cursor: pointer;
+}
+
+.clear {
+    clear: both;
+}
+
+.ml10 {
+    margin-left: 10px;
+}
+
+.mr10 {
+    margin-right: 10px;
+}
+
+.pt10 {
+    padding-top: 10px;
 }

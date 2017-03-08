@@ -8,11 +8,18 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script type="text/javascript" src="./lqcell.js"></script>
     <script type="text/javascript" src="./lqboard.js"></script>
+    <script type="text/javascript" src="./lqplayer.js"></script>
     <script>
+        var Human = new LQPlayer("human");
+        var Computer = new LQPlayer("computer");
         var Board = new LQBoard(20, 20, 20);
         $(document).ready(function() {
             $("#compare").css("display", "none");
             Board.Init("gamearea", "playbuttons");
+
+            var BoardConfig = Board.BoardConfigGet();
+            Human.CounterUpdate(BoardConfig);
+            Computer.CounterUpdate(BoardConfig);
         });
     </script>
 </head>
@@ -21,7 +28,7 @@
     <div id="gameinfo" class="gameinfo">
         <!-- Rough game information. -->
         This is Liquid Color, a simple game written in JavaScript. The goal is to get as much as possible cells in a contiguous color. To reach this goal, you have to select one color of the surrounding cells. You cannot select the current color of your opponent,
-        and of course you cannot select the your current color. All other colors are available to select.
+        and of course you cannot also select your own current color. All other colors are available to select. The computer will start on the upper right corner, the human player will start on the lower left corner.
     </div>
     <div id="setup" class="setup">
         <!-- On a later step user can change cell and board size. -->
@@ -31,12 +38,26 @@
         <div><button id="btn_draw" type="button">Draw</button></div><br>
     </div>
     <div id="playground" class="playground">
-        <div id="playbuttons" class="gamearea">
+        <div id="playbuttons" class="left">
             <!-- Buttons for selecting colors are placed here. -->
         </div>
-        <canvas id="gamearea" class="gamearea">
-            <!-- Game matrix is placed here. -->            
-        </canvas>
+        <div class="left">
+            <canvas id="gamearea" class="left">
+                <!-- Game matrix is placed here. -->            
+            </canvas>
+            <div class="clear pt10">
+                <div class="left">
+                    <!-- Displays number of occupied cells for human -->
+                    <div class="left mr10">Human</div>
+                    <div id="human" class="right">0</div>
+                </div>
+                <div class="right">
+                    <!-- Displays number of occupied cells for computer -->
+                    <div id="computer" class="left">0</div>
+                    <div class="right ml10">Computer</div>
+                </div>
+            </div>
+        </div>
     </div>
     <div id="fakebtn" class="gamebtn" style="display: none;">
         <!-- Used to retrieve class attribute of margin for button height calculation. -->

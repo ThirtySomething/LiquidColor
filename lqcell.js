@@ -1,10 +1,15 @@
+"use strict";
+
 function LQCell(PosX, PosY, CellSize) {
     // ------------------------------------------------------------
+    // Cell data
     this.Config = {};
     this.Config.PosX = parseInt(PosX);
     this.Config.PosY = parseInt(PosY);
     this.Config.CellSize = parseInt(CellSize);
     this.Config.Color = "white";
+    this.Config.Owner = "";
+    this.Config.Occupied = false;
     // ------------------------------------------------------------
     this.Draw = function (CanvasElement) {
         CanvasElement.beginPath();
@@ -18,5 +23,18 @@ function LQCell(PosX, PosY, CellSize) {
     // ------------------------------------------------------------
     this.ColorSet = function (NewColor) {
         this.Config.Color = NewColor;
+    };
+    // ------------------------------------------------------------
+    this.OwnerSet = function (NewOwner) {
+        this.Config.Owner = NewOwner;
+        this.Config.Occupied = true;
+    };
+    // ------------------------------------------------------------
+    this.OwnerGet = function () {
+        return this.Config.Owner;
+    };
+    // ------------------------------------------------------------
+    this.IsOccupied = function () {
+        return this.Config.Occupied;
     };
 }

@@ -14,16 +14,18 @@ function LCDefinitions(DimX, DimY, CellSize) {
         "red",
         "yellow"
     ];
-};
-
-Array.prototype.unique = function () {
-    var a = this.concat();
-    for (var i = 0; i < a.length; ++i) {
-        for (var j = i + 1; j < a.length; ++j) {
-            if (a[i] === a[j])
-                a.splice(j--, 1);
-        }
-    }
-
-    return a;
+    // ------------------------------------------------------------
+    this.Offsets = [{
+        DX: 0,
+        DY: 1
+    }, {
+        DX: 1,
+        DY: 0
+    }, {
+        DX: 0,
+        DY: -1
+    }, {
+        DX: -1,
+        DY: 0
+    }];
 };

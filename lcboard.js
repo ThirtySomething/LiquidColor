@@ -30,20 +30,16 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
     this.PlayerInit = function () {
         this.m_PlayerComputer.m_BaseCell = this.m_Cells[0][this.m_Definitions.DimensionX - 1];
         this.m_PlayerComputer.m_BaseCell.OwnerSet(this.m_PlayerComputer.m_PlayerName);
-        this.m_PlayerComputer.m_OffsetX = -1;
-        this.m_PlayerComputer.m_OffsetY = 1;
 
         this.m_PlayerHuman.m_BaseCell = this.m_Cells[this.m_Definitions.DimensionY - 1][0];
         this.m_PlayerHuman.m_BaseCell.OwnerSet(this.m_PlayerHuman.m_PlayerName);
-        this.m_PlayerHuman.m_OffsetX = 1;
-        this.m_PlayerHuman.m_OffsetY = -1;
 
         while (this.m_PlayerComputer.m_BaseCell.m_Color === this.m_PlayerHuman.m_BaseCell.m_Color) {
             this.m_PlayerHuman.m_BaseCell.m_Color = this.CellColorRandomGet();
             this.m_PlayerHuman.m_BaseCell.Draw(this);
         }
 
-        this.CellMarkOwner(this.m_PlayerComputer);
+        // this.CellMarkOwner(this.m_PlayerComputer);
         this.CellMarkOwner(this.m_PlayerHuman);
     };
     // ------------------------------------------------------------
@@ -97,37 +93,16 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
         return ColorName;
     };
     // ------------------------------------------------------------
-    this.CellsFind = function (BaseCell, OffsetX, OffsetY) {
-        var Cells = [];
-
-        if (("undefined" !== typeof this.m_Cells[BaseCell.m_PosY + OffsetY]) &&
-            ("undefined" !== typeof this.m_Cells[BaseCell.m_PosY + OffsetY][BaseCell.m_PosX]) &&
-            (BaseCell.m_Color === this.m_Cells[BaseCell.m_PosY + OffsetY][BaseCell.m_PosX].m_Color)) {
-            Cells.push(this.m_Cells[BaseCell.m_PosY + OffsetY][BaseCell.m_PosX]);
-        }
-
-        if (("undefined" !== typeof this.m_Cells[BaseCell.m_PosY]) &&
-            ("undefined" !== typeof this.m_Cells[BaseCell.m_PosY][BaseCell.m_PosX + OffsetX]) &&
-            (BaseCell.m_Color === this.m_Cells[BaseCell.m_PosY][BaseCell.m_PosX + OffsetX].m_Color)) {
-            Cells.push(this.m_Cells[BaseCell.m_PosY][BaseCell.m_PosX + OffsetX]);
-        }
-
-        return Cells;
-    };
-    // ------------------------------------------------------------
     this.CellMarkOwner = function (Player) {
-        var CellsWork = this.CellsFind(Player.m_BaseCell, Player.m_OffsetX, Player.m_OffsetY);
         var CellsCollect = [];
+        var CellsWork = Player.m_BaseCell.NeighboursGet(this.m_Cells, this.m_Definitions.Offsets);
 
         do {
             for (var Loop = 0; Loop < CellsWork.length; Loop += 1) {
-                var CurrentCell = CellsWork[Loop];
-                if ((false == CurrentCell.m_Occupied) ||
-                    (Player.m_PlayerName === CurrentCell.m_Owner)) {
-                    CurrentCell.OwnerSet(Player.m_BaseCell.m_PlayerName);
-                    CurrentCell.Draw(this);
-                    CellsCollect.concat(this.CellsFind(CurrentCell, Player.m_OffsetX, Player.m_OffsetY));
-                }
+                CellsWork[Loop].m_Color = Player.m_BaseCell.m_Color;
+                CellsWork[Loop].OwnerSet(Player.m_BaseCell.m_PlayerName);
+                CellsWork[Loop].Draw(this);
+                CellsCollect.concat(CellsWork[Loop].NeighboursGet(this.m_Cells, this.m_Definitions.Offsets));
             }
             CellsWork = CellsCollect;
             CellsCollect = [];

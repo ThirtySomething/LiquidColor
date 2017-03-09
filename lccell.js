@@ -26,4 +26,20 @@ function LCCell(PosX, PosY) {
         this.m_Owner = NewOwner;
         this.m_Occupied = true;
     };
+    // ------------------------------------------------------------
+    this.NeighboursGet = function (CellsComplete, Offsets) {
+        var Neighbours = [];
+
+        for (var Loop = 0; Loop < Offsets.length; Loop += 1) {
+            var CurrentOffsets = Offsets[Loop];
+            if (("undefined" !== typeof CellsComplete[this.m_PosY + CurrentOffsets.DY]) &&
+                ("undefined" !== typeof CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX]) &&
+                (this.m_Color === CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX].m_Color) &&
+                (false === CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX].m_Occupied)) {
+                Neighbours.push(CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX]);
+            }
+        }
+
+        return Neighbours;
+    };
 }

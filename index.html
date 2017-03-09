@@ -14,12 +14,10 @@
         var Definitions = new LCDefinitions(60, 40, 10);
         var Human = new LCPlayer("human");
         var Computer = new LCPlayer("computer");
-        var Board = new LCBoard(Definitions);
+        var Board = new LCBoard(Definitions, Human, Computer);
         $(document).ready(function() {
             $("#compare").css("display", "none");
             Board.Init("gamearea", "playbuttons");
-            Human.CounterUpdate(Board);
-            Computer.CounterUpdate(Board);
         });
     </script>
 </head>
@@ -43,7 +41,7 @@
         </div>
         <div class="left">
             <canvas id="gamearea" class="left">
-                <!-- Game matrix is placed here. -->            
+                <!-- Game matrix is placed here. -->
             </canvas>
             <div class="clear pt10">
                 <div class="left">

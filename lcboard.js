@@ -1,11 +1,13 @@
 "use strict";
 
-function LCBoard(Definitions) {
+function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
     // ------------------------------------------------------------
     // Board config
     this.m_Cells = [];
     this.m_CanvasElement = null;
     this.m_Definitions = Definitions;
+    this.m_PlayerHuman = PlayerHuman;
+    this.m_PlayerComputer = PlayerComputer;
     // ------------------------------------------------------------
     this.Init = function (GameField, ButtonField) {
         var BoardWidth = this.m_Definitions.DimensionX * this.m_Definitions.CellSize;
@@ -21,21 +23,27 @@ function LCBoard(Definitions) {
             this.m_CanvasElement = Graphics.getContext("2d");
             this.BoardInit();
             this.BoardButtonsInit(ButtonField);
+            this.PlayerInit();
         }
     };
     // ------------------------------------------------------------
-    this.BaseGetHuman = function () {
-        var Index = this.m_Definitions.DimensionY - 1;
-        var Base = this.m_Cells[Index][0];
+    this.PlayerInit = function () {
+        this.m_PlayerHuman.m_BaseCell = this.m_Cells[this.m_Definitions.DimensionY - 1][0];
+        this.m_PlayerHuman.m_BaseCell.OwnerSet(this.m_PlayerHuman.m_PlayerName);
 
-        return Base;
-    };
-    // ------------------------------------------------------------
-    this.BaseGetComputer = function () {
-        var Index = this.m_Definitions.DimensionX - 1;
-        var Base = this.m_Cells[0][Index];
+        this.m_PlayerComputer.m_BaseCell = this.m_Cells[0][this.m_Definitions.DimensionX - 1];
+        this.m_PlayerComputer.m_BaseCell.OwnerSet(this.m_PlayerComputer.m_PlayerName);
 
-        return Base;
+        while (this.m_PlayerComputer.m_BaseCell.m_Color === this.m_PlayerHuman.m_BaseCell.m_Color) {
+            this.m_PlayerHuman.m_BaseCell.m_Color = this.CellColorRandomGet();
+            this.m_PlayerHuman.m_BaseCell.Draw(this);
+        }
+
+        this.CellMarkOwner(this.m_PlayerComputer.m_BaseCell);
+        this.CellMarkOwner(this.m_PlayerHuman.m_BaseCell);
+
+        this.m_PlayerComputer.CounterUpdate(this);
+        this.m_PlayerHuman.CounterUpdate(this);
     };
     // ------------------------------------------------------------
     this.BoardInit = function () {
@@ -52,20 +60,6 @@ function LCBoard(Definitions) {
                 this.m_Cells[LoopY].push(CurrentCell);
             }
         }
-
-        var BaseComputer = this.BaseGetComputer();
-        var BaseHuman = this.BaseGetHuman();
-
-        BaseComputer.OwnerSet("computer");
-        BaseHuman.OwnerSet("human");
-
-        while (BaseComputer.m_Color === BaseHuman.m_Color) {
-            BaseHuman.m_Color = this.CellColorRandomGet();
-            BaseHuman.Draw(this);
-        }
-
-        this.CellMarkOwner(BaseComputer);
-        this.CellMarkOwner(BaseHuman);
     };
     // ------------------------------------------------------------
     this.BoardButtonsInit = function (ButtonField) {
@@ -83,9 +77,11 @@ function LCBoard(Definitions) {
             $("#" + CurCol).css("height", BtnHeight);
             $("#" + CurCol).css("background-color", CurCol);
             $("#" + CurCol).addClass("gamebtn");
-            $("#" + CurCol).unbind("click").bind("click", { Owner: "human", Board: this, PosY: this.m_Definitions.DimensionX - 1 }, function (event) {
-                var Data = event.data;
-                Data.Board.CellMarkOwner(Data.Owner, Data.PosY, 0);
+            $("#" + CurCol).unbind("click").bind("click", { Owner: this.m_PlayerHuman, Board: this, Color: CurCol }, function (event) {
+                event.data.Owner.m_BaseCell.m_Color = event.data.Color;
+                event.data.Owner.m_BaseCell.Draw(event.data.Board);
+                event.data.Board.CellMarkOwner(event.data.Owner.m_BaseCell);
+                event.data.Owner.CounterUpdate(event.data.Board);
             });
         }
     };
@@ -130,27 +126,38 @@ function LCBoard(Definitions) {
     // ------------------------------------------------------------
     this.CellMarkOwner = function (BaseCell) {
         var Neighbours = this.CellNeighboursGet(BaseCell.m_PosX, BaseCell.m_PosY);
+        var CellMarks = [];
 
         for (var Loop = 0; Loop < Neighbours.length; Loop++) {
             var CurrentCell = Neighbours[Loop];
             var CurrentState = CurrentCell.StateGet(BaseCell, this.m_Definitions);
+            var Recurse = false;
 
             switch (CurrentState) {
             case this.m_Definitions.EnumState.FREE_COLOR_DIFFERENT:
                 break;
             case this.m_Definitions.EnumState.FREE_COLOR_EQUAL:
                 CurrentCell.OwnerSet(BaseCell.m_Owner);
-                this.CellMarkOwner(CurrentCell);
+                CurrentCell.Draw(this);
+                CellMarks.push(CurrentCell);
                 break;
             case this.m_Definitions.EnumState.OCCUPIED_OWNER_DIFFERENT:
                 break;
             case this.m_Definitions.EnumState.OCCUPIED_OWNER_EQUAL:
+                CurrentCell.OwnerSet(BaseCell.m_Owner);
+                CurrentCell.Draw(this);
+                CellMarks.push(CurrentCell);
                 break;
             case this.m_Definitions.EnumState.UNDEFINED:
             default:
                 console.log("Got undefined state for cell[" + PosX + "][" + PosY + "]");
                 break;
             }
+        }
+
+        for (var Loop = 0; Loop < CellMarks.length; Loop++) {
+            var CurrentCell = CellMarks[Loop];
+            // this.CellMarkOwner(CurrentCell);
         }
     };
 }

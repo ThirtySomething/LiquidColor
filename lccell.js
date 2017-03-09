@@ -49,4 +49,9 @@ function LCCell(PosX, PosY) {
 
         return Neighbours;
     };
+    // ------------------------------------------------------------
+    this.CellColorRandomSet = function (Colors) {
+        var ColorIndex = Math.floor((Math.random() * Colors.length));
+        this.m_Color = Colors[ColorIndex];
+    };
 }

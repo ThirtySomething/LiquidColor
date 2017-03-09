@@ -26,24 +26,4 @@ function LCCell(PosX, PosY) {
         this.m_Owner = NewOwner;
         this.m_Occupied = true;
     };
-    // ------------------------------------------------------------
-    this.StateGet = function (CellCompare, Definitions) {
-        var State = Definitions.EnumState.UNDEFINED;
-
-        if ((false === this.m_Occupied) &&
-            (CellCompare.m_Color !== this.m_Color)) {
-            State = Definitions.EnumState.FREE_COLOR_DIFFERENT;
-        } else if ((false === this.m_Occupied) &&
-            (CellCompare.m_Color === this.m_Color)) {
-            State = Definitions.EnumState.FREE_COLOR_EQUAL;
-        } else if ((true === this.m_Occupied) &&
-            (CellCompare.m_Owner !== this.m_Owner)) {
-            State = Definitions.EnumState.OCCUPIED_OWNER_DIFFERENT;
-        } else if ((true === this.m_Occupied) &&
-            (CellCompare.m_Owner === this.m_Owner)) {
-            State = Definitions.EnumState.OCCUPIED_OWNER_EQUAL;
-        }
-
-        return State;
-    };
 }

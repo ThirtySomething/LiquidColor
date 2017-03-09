@@ -14,12 +14,16 @@ function LCDefinitions(DimX, DimY, CellSize) {
         "red",
         "yellow"
     ];
-    // ------------------------------------------------------------
-    this.EnumState = {
-        UNDEFINED: -1,
-        FREE_COLOR_DIFFERENT: 0,
-        FREE_COLOR_EQUAL: 1,
-        OCCUPIED_OWNER_DIFFERENT: 2,
-        OCCUPIED_OWNER_EQUAL: 3
-    };
-}
+};
+
+Array.prototype.unique = function () {
+    var a = this.concat();
+    for (var i = 0; i < a.length; ++i) {
+        for (var j = i + 1; j < a.length; ++j) {
+            if (a[i] === a[j])
+                a.splice(j--, 1);
+        }
+    }
+
+    return a;
+};

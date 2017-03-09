@@ -1,18 +1,15 @@
 "use strict";
 
-function LCBoard(Definitions, DimX, DimY, CellSize) {
+function LCBoard(Definitions) {
     // ------------------------------------------------------------
     // Board config
-    this.m_DimensionX = parseInt(DimX);
-    this.m_DimensionY = parseInt(DimY);
-    this.m_CellSize = parseInt(CellSize);
     this.m_Cells = [];
     this.m_CanvasElement = null;
     this.m_Definitions = Definitions;
     // ------------------------------------------------------------
     this.Init = function (GameField, ButtonField) {
-        var BoardWidth = this.m_DimensionX * this.m_CellSize;
-        var BoardHeight = this.m_DimensionY * this.m_CellSize;
+        var BoardWidth = this.m_Definitions.DimensionX * this.m_Definitions.CellSize;
+        var BoardHeight = this.m_Definitions.DimensionY * this.m_Definitions.CellSize;
         $("#" + GameField).css("width", BoardWidth);
         $("#" + GameField).css("height", BoardHeight);
         $("#" + GameField).css("border", "1px solid black");
@@ -28,14 +25,14 @@ function LCBoard(Definitions, DimX, DimY, CellSize) {
     };
     // ------------------------------------------------------------
     this.BaseGetHuman = function () {
-        var Index = this.m_DimensionY - 1;
+        var Index = this.m_Definitions.DimensionY - 1;
         var Base = this.m_Cells[Index][0];
 
         return Base;
     };
     // ------------------------------------------------------------
     this.BaseGetComputer = function () {
-        var Index = this.m_DimensionX - 1;
+        var Index = this.m_Definitions.DimensionX - 1;
         var Base = this.m_Cells[0][Index];
 
         return Base;
@@ -44,11 +41,11 @@ function LCBoard(Definitions, DimX, DimY, CellSize) {
     this.BoardInit = function () {
         this.m_Cells = [];
 
-        for (var LoopY = 0; LoopY < this.m_DimensionY; LoopY++) {
+        for (var LoopY = 0; LoopY < this.m_Definitions.DimensionY; LoopY++) {
             this.m_Cells[LoopY] = [];
-            for (var LoopX = 0; LoopX < this.m_DimensionX; LoopX++) {
-                var PosX = LoopX * this.m_CellSize;
-                var PosY = LoopY * this.m_CellSize;
+            for (var LoopX = 0; LoopX < this.m_Definitions.DimensionX; LoopX++) {
+                var PosX = LoopX * this.m_Definitions.CellSize;
+                var PosY = LoopY * this.m_Definitions.CellSize;
                 var CurrentCell = new LCCell(LoopX, LoopY);
                 CurrentCell.m_Color = this.CellColorRandomGet();
                 CurrentCell.Draw(this);
@@ -56,7 +53,6 @@ function LCBoard(Definitions, DimX, DimY, CellSize) {
             }
         }
 
-        // ToDo: Update surrounding cells of same color with owner and occupy flag
         var BaseComputer = this.BaseGetComputer();
         var BaseHuman = this.BaseGetHuman();
 
@@ -76,9 +72,8 @@ function LCBoard(Definitions, DimX, DimY, CellSize) {
         // Retrive margin size from CSS classn
         var BtnMargin = parseInt($(".gamebtn").css("margin"));
         var NumberOfButtons = this.m_Definitions.Colors.length;
-        var BtnWidth = Math.floor((this.m_DimensionX * this.m_CellSize) / 5);
-        var DimMulCell = Math.floor(this.m_DimensionY * this.m_CellSize);
-        var BtnHeight = Math.floor(((this.m_DimensionY * this.m_CellSize) - ((NumberOfButtons + 1) * BtnMargin)) / NumberOfButtons);
+        var BtnWidth = Math.floor((this.m_Definitions.DimensionX * this.m_Definitions.CellSize) / 5);
+        var BtnHeight = Math.floor(((this.m_Definitions.DimensionY * this.m_Definitions.CellSize) - ((NumberOfButtons + 1) * BtnMargin)) / NumberOfButtons);
 
         for (var Loop = 0; Loop < NumberOfButtons; Loop++) {
             var CurCol = this.m_Definitions.Colors[Loop];
@@ -88,15 +83,11 @@ function LCBoard(Definitions, DimX, DimY, CellSize) {
             $("#" + CurCol).css("height", BtnHeight);
             $("#" + CurCol).css("background-color", CurCol);
             $("#" + CurCol).addClass("gamebtn");
-            $("#" + CurCol).unbind("click").bind("click", { Owner: "human", Board: this, PosY: this.m_DimensionY - 1 }, function (event) {
+            $("#" + CurCol).unbind("click").bind("click", { Owner: "human", Board: this, PosY: this.m_Definitions.DimensionX - 1 }, function (event) {
                 var Data = event.data;
                 Data.Board.CellMarkOwner(Data.Owner, Data.PosY, 0);
             });
         }
-    };
-    // ------------------------------------------------------------
-    this.BoardConfigGet = function () {
-        return this.Config;
     };
     // ------------------------------------------------------------
     this.CellColorRandomGet = function () {

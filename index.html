@@ -11,14 +11,13 @@
     <script type="text/javascript" src="./lcboard.js"></script>
     <script type="text/javascript" src="./lcplayer.js"></script>
     <script>
-        var Definitions = new LCDefinitions();
+        var Definitions = new LCDefinitions(60, 40, 10);
         var Human = new LCPlayer("human");
         var Computer = new LCPlayer("computer");
-        var Board = new LCBoard(Definitions, 60, 40, 10);
+        var Board = new LCBoard(Definitions);
         $(document).ready(function() {
             $("#compare").css("display", "none");
             Board.Init("gamearea", "playbuttons");
-
             Human.CounterUpdate(Board);
             Computer.CounterUpdate(Board);
         });

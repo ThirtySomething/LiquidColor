@@ -1,19 +1,18 @@
 "use strict";
 
-function LCBoard(DimX, DimY, CellSize) {
+function LCBoard(Definitions, DimX, DimY, CellSize) {
     // ------------------------------------------------------------
     // Board config
-    this.Config = {};
-    this.Config.DimensionX = parseInt(DimX);
-    this.Config.DimensionY = parseInt(DimY);
-    this.Config.CellSize = parseInt(CellSize);
-    this.Config.Colors = ["blue", "cyan", "gray", "green", "red", "yellow"];
-    this.Config.Cells = [];
-    this.Config.CanvasElement = null;
+    this.m_DimensionX = parseInt(DimX);
+    this.m_DimensionY = parseInt(DimY);
+    this.m_CellSize = parseInt(CellSize);
+    this.m_Cells = [];
+    this.m_CanvasElement = null;
+    this.m_Definitions = Definitions;
     // ------------------------------------------------------------
     this.Init = function (GameField, ButtonField) {
-        var BoardWidth = this.Config.DimensionX * this.Config.CellSize;
-        var BoardHeight = this.Config.DimensionY * this.Config.CellSize;
+        var BoardWidth = this.m_DimensionX * this.m_CellSize;
+        var BoardHeight = this.m_DimensionY * this.m_CellSize;
         $("#" + GameField).css("width", BoardWidth);
         $("#" + GameField).css("height", BoardHeight);
         $("#" + GameField).css("border", "1px solid black");
@@ -22,38 +21,38 @@ function LCBoard(DimX, DimY, CellSize) {
 
         var Graphics = document.getElementById(GameField);
         if (Graphics.getContext) {
-            this.Config.CanvasElement = Graphics.getContext("2d");
-            this.BoardButtonsInit(ButtonField)
+            this.m_CanvasElement = Graphics.getContext("2d");
             this.BoardInit();
+            this.BoardButtonsInit(ButtonField);
         }
     };
     // ------------------------------------------------------------
     this.BaseGetHuman = function () {
-        var Index = this.Config.DimensionY - 1;
-        var Base = this.Config.Cells[Index][0];
+        var Index = this.m_DimensionY - 1;
+        var Base = this.m_Cells[Index][0];
 
         return Base;
     };
     // ------------------------------------------------------------
     this.BaseGetComputer = function () {
-        var Index = this.Config.DimensionX - 1;
-        var Base = this.Config.Cells[0][Index];
+        var Index = this.m_DimensionX - 1;
+        var Base = this.m_Cells[0][Index];
 
         return Base;
     };
     // ------------------------------------------------------------
     this.BoardInit = function () {
-        this.Config.Cells = [];
+        this.m_Cells = [];
 
-        for (var LoopY = 0; LoopY < this.Config.DimensionY; LoopY++) {
-            this.Config.Cells[LoopY] = [];
-            for (var LoopX = 0; LoopX < this.Config.DimensionX; LoopX++) {
-                var PosX = LoopX * this.Config.CellSize;
-                var PosY = LoopY * this.Config.CellSize;
+        for (var LoopY = 0; LoopY < this.m_DimensionY; LoopY++) {
+            this.m_Cells[LoopY] = [];
+            for (var LoopX = 0; LoopX < this.m_DimensionX; LoopX++) {
+                var PosX = LoopX * this.m_CellSize;
+                var PosY = LoopY * this.m_CellSize;
                 var CurrentCell = new LCCell(LoopX, LoopY);
-                CurrentCell.ColorSet(this.CellColorRandomGet());
-                CurrentCell.Draw(this.Config);
-                this.Config.Cells[LoopY].push(CurrentCell);
+                CurrentCell.m_Color = this.CellColorRandomGet();
+                CurrentCell.Draw(this);
+                this.m_Cells[LoopY].push(CurrentCell);
             }
         }
 
@@ -64,9 +63,9 @@ function LCBoard(DimX, DimY, CellSize) {
         BaseComputer.OwnerSet("computer");
         BaseHuman.OwnerSet("human");
 
-        while (BaseComputer.ColorGet() === BaseHuman.ColorGet()) {
-            BaseHuman.ColorSet(this.CellColorRandomGet());
-            BaseHuman.Draw(this.Config);
+        while (BaseComputer.m_Color === BaseHuman.m_Color) {
+            BaseHuman.m_Color = this.CellColorRandomGet();
+            BaseHuman.Draw(this);
         }
 
         this.CellMarkOwner(BaseComputer);
@@ -76,20 +75,20 @@ function LCBoard(DimX, DimY, CellSize) {
     this.BoardButtonsInit = function (ButtonField) {
         // Retrive margin size from CSS classn
         var BtnMargin = parseInt($(".gamebtn").css("margin"));
-        var NumberOfButtons = this.Config.Colors.length;
-        var BtnWidth = Math.floor((this.Config.DimensionX * this.Config.CellSize) / 5);
-        var DimMulCell = Math.floor(this.Config.DimensionY * this.Config.CellSize);
-        var BtnHeight = Math.floor(((this.Config.DimensionY * this.Config.CellSize) - ((NumberOfButtons + 1) * BtnMargin)) / NumberOfButtons);
+        var NumberOfButtons = this.m_Definitions.Colors.length;
+        var BtnWidth = Math.floor((this.m_DimensionX * this.m_CellSize) / 5);
+        var DimMulCell = Math.floor(this.m_DimensionY * this.m_CellSize);
+        var BtnHeight = Math.floor(((this.m_DimensionY * this.m_CellSize) - ((NumberOfButtons + 1) * BtnMargin)) / NumberOfButtons);
 
         for (var Loop = 0; Loop < NumberOfButtons; Loop++) {
-            var CurCol = this.Config.Colors[Loop];
+            var CurCol = this.m_Definitions.Colors[Loop];
             var Button = $("#" + ButtonField).append("<div id=\"" + CurCol + "\"></div>");
 
             $("#" + CurCol).css("width", BtnWidth);
             $("#" + CurCol).css("height", BtnHeight);
             $("#" + CurCol).css("background-color", CurCol);
             $("#" + CurCol).addClass("gamebtn");
-            $("#" + CurCol).unbind("click").bind("click", { Owner: "human", Board: this, PosY: this.Config.DimensionY - 1 }, function (event) {
+            $("#" + CurCol).unbind("click").bind("click", { Owner: "human", Board: this, PosY: this.m_DimensionY - 1 }, function (event) {
                 var Data = event.data;
                 Data.Board.CellMarkOwner(Data.Owner, Data.PosY, 0);
             });
@@ -101,8 +100,8 @@ function LCBoard(DimX, DimY, CellSize) {
     };
     // ------------------------------------------------------------
     this.CellColorRandomGet = function () {
-        var ColorIndex = Math.floor((Math.random() * this.Config.Colors.length));
-        var ColorName = this.Config.Colors[ColorIndex];
+        var ColorIndex = Math.floor((Math.random() * this.m_Definitions.Colors.length));
+        var ColorName = this.m_Definitions.Colors[ColorIndex];
 
         return ColorName;
     };
@@ -110,8 +109,8 @@ function LCBoard(DimX, DimY, CellSize) {
     this.CellExists = function (PosX, PosY) {
         var CellExists = false;
 
-        if (("undefined" !== typeof this.Config.Cells[PosY]) &&
-            ("undefined" !== typeof this.Config.Cells[PosY][PosX])) {
+        if (("undefined" !== typeof this.m_Cells[PosY]) &&
+            ("undefined" !== typeof this.m_Cells[PosY][PosX])) {
             CellExists = true;
         }
 
@@ -122,41 +121,41 @@ function LCBoard(DimX, DimY, CellSize) {
         var Neighbours = [];
 
         if (true === this.CellExists(PosX - 1, PosY)) {
-            Neighbours.push(this.Config.Cells[PosY][PosX - 1]);
+            Neighbours.push(this.m_Cells[PosY][PosX - 1]);
         }
         if (true === this.CellExists(PosX + 1, PosY)) {
-            Neighbours.push(this.Config.Cells[PosY][PosX + 1]);
+            Neighbours.push(this.m_Cells[PosY][PosX + 1]);
         }
 
         if (true === this.CellExists(PosX, PosY - 1)) {
-            Neighbours.push(this.Config.Cells[PosY - 1][PosX]);
+            Neighbours.push(this.m_Cells[PosY - 1][PosX]);
         }
         if (true === this.CellExists(PosX, PosY + 1)) {
-            Neighbours.push(this.Config.Cells[PosY + 1][PosX]);
+            Neighbours.push(this.m_Cells[PosY + 1][PosX]);
         }
 
         return Neighbours;
     };
     // ------------------------------------------------------------
     this.CellMarkOwner = function (BaseCell) {
-        var Neighbours = this.CellNeighboursGet(BaseCell.Config.PosX, BaseCell.Config.PosY);
+        var Neighbours = this.CellNeighboursGet(BaseCell.m_PosX, BaseCell.m_PosY);
 
         for (var Loop = 0; Loop < Neighbours.length; Loop++) {
             var CurrentCell = Neighbours[Loop];
-            var CurrentState = CurrentCell.StateGet(BaseCell);
+            var CurrentState = CurrentCell.StateGet(BaseCell, this.m_Definitions);
 
             switch (CurrentState) {
-            case CurrentCell.EnumState.FREE_COLOR_DIFFERENT:
+            case this.m_Definitions.EnumState.FREE_COLOR_DIFFERENT:
                 break;
-            case CurrentCell.EnumState.FREE_COLOR_EQUAL:
-                CurrentCell.OwnerSet(BaseCell.Config.Owner);
+            case this.m_Definitions.EnumState.FREE_COLOR_EQUAL:
+                CurrentCell.OwnerSet(BaseCell.m_Owner);
                 this.CellMarkOwner(CurrentCell);
                 break;
-            case CurrentCell.EnumState.OCCUPIED_OWNER_DIFFERENT:
+            case this.m_Definitions.EnumState.OCCUPIED_OWNER_DIFFERENT:
                 break;
-            case CurrentCell.EnumState.OCCUPIED_OWNER_EQUAL:
+            case this.m_Definitions.EnumState.OCCUPIED_OWNER_EQUAL:
                 break;
-            case CurrentCell.EnumState.UNDEFINED:
+            case this.m_Definitions.EnumState.UNDEFINED:
             default:
                 console.log("Got undefined state for cell[" + PosX + "][" + PosY + "]");
                 break;

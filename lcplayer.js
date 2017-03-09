@@ -3,33 +3,19 @@
 function LCPlayer(PlayerName) {
     // ------------------------------------------------------------
     // Player data
-    this.Config = {};
-    this.Config.PlayerName = PlayerName;
+    this.m_PlayerName = PlayerName;
     // ------------------------------------------------------------
-    this.CounterUpdate = function (BoardData) {
+    this.CounterUpdate = function (Board) {
         var CellCounter = 0;
-        if ((BoardData.hasOwnProperty("DimensionX")) &&
-            (BoardData.hasOwnProperty("DimensionY")) &&
-            (BoardData.hasOwnProperty("Cells")) &&
-            (Array.isArray(BoardData.Cells)) &&
-            (Array.isArray(BoardData.Cells[0]))) {
-            for (var LoopY = 0; LoopY < BoardData.DimensionY; LoopY++) {
-                for (var LoopX = 0; LoopX < BoardData.DimensionX; LoopX++) {
-                    if ((typeof BoardData.Cells[LoopY][LoopX].IsOccupied === "function") &&
-                        (typeof BoardData.Cells[LoopY][LoopX].OwnerGet === "function")) {
-                        if ((true === BoardData.Cells[LoopY][LoopX].IsOccupied()) &&
-                            (this.Config.PlayerName === BoardData.Cells[LoopY][LoopX].OwnerGet())) {
-                            CellCounter++;
-                        }
-                    } else {
-                        console.log("No cell object for index[" + LoopY + "][" + LoopX + "]");
-                    }
+        for (var LoopY = 0; LoopY < Board.m_DimensionY; LoopY++) {
+            for (var LoopX = 0; LoopX < Board.m_DimensionX; LoopX++) {
+                if ((true === Board.m_Cells[LoopY][LoopX].m_Occupied) &&
+                    (this.m_PlayerName === Board.m_Cells[LoopY][LoopX].m_Owner)) {
+                    CellCounter++;
                 }
             }
-        } else {
-            console.log("No board config data object passed!");
         }
 
-        $("#" + this.Config.PlayerName).html(CellCounter);
+        $("#" + this.m_PlayerName).html(CellCounter);
     };
 }

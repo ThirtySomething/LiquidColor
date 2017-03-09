@@ -6,20 +6,21 @@
     <title>Liquid Color</title>
     <link rel="stylesheet" type="text/css" href="./lc.css">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./lcdefinitions.js"></script>
     <script type="text/javascript" src="./lccell.js"></script>
     <script type="text/javascript" src="./lcboard.js"></script>
     <script type="text/javascript" src="./lcplayer.js"></script>
     <script>
+        var Definitions = new LCDefinitions();
         var Human = new LCPlayer("human");
         var Computer = new LCPlayer("computer");
-        var Board = new LCBoard(60, 40, 10);
+        var Board = new LCBoard(Definitions, 60, 40, 10);
         $(document).ready(function() {
             $("#compare").css("display", "none");
             Board.Init("gamearea", "playbuttons");
 
-            var BoardConfig = Board.BoardConfigGet();
-            Human.CounterUpdate(BoardConfig);
-            Computer.CounterUpdate(BoardConfig);
+            Human.CounterUpdate(Board);
+            Computer.CounterUpdate(Board);
         });
     </script>
 </head>

@@ -3,79 +3,45 @@
 function LCCell(PosX, PosY) {
     // ------------------------------------------------------------
     // Cell data
-    this.Config = {};
-    this.Config.PosX = parseInt(PosX);
-    this.Config.PosY = parseInt(PosY);
-    this.Config.CellSize = 0;
-    this.Config.Color = "white";
-    this.Config.Owner = "";
-    this.Config.Occupied = false;
-    // ------------------------------------------------------------
-    this.EnumState = {
-        UNDEFINED: -1,
-        FREE_COLOR_DIFFERENT: 0,
-        FREE_COLOR_EQUAL: 1,
-        OCCUPIED_OWNER_DIFFERENT: 2,
-        OCCUPIED_OWNER_EQUAL: 3
-    };
+    this.m_PosX = parseInt(PosX);
+    this.m_PosY = parseInt(PosY);
+    this.m_Color = "white";
+    this.m_Owner = "";
+    this.m_Occupied = false;
     // ------------------------------------------------------------
     this.Draw = function (BoardData) {
-        if ((BoardData.hasOwnProperty("DimensionX")) &&
-            (BoardData.hasOwnProperty("DimensionY")) &&
-            (BoardData.hasOwnProperty("CellSize")) &&
-            (BoardData.hasOwnProperty("CanvasElement"))) {
+        var PosX = BoardData.m_CellSize * this.m_PosX;
+        var PosY = BoardData.m_CellSize * this.m_PosY;
 
-            var PosX = BoardData.CellSize * this.Config.PosX;
-            var PosY = BoardData.CellSize * this.Config.PosY;
-
-            BoardData.CanvasElement.beginPath();
-            BoardData.CanvasElement.rect(PosX, PosY, BoardData.CellSize, BoardData.CellSize);
-            BoardData.CanvasElement.fillStyle = this.Config.Color;
-            BoardData.CanvasElement.fill();
-            BoardData.CanvasElement.lineWidth = 1;
-            BoardData.CanvasElement.strokeStyle = "black";
-            BoardData.CanvasElement.stroke();
-        } else {
-            console.log("No board config data object passed!");
-        }
-    };
-    // ------------------------------------------------------------
-    this.ColorSet = function (NewColor) {
-        this.Config.Color = NewColor;
-    };
-    // ------------------------------------------------------------
-    this.ColorGet = function () {
-        return this.Config.Color;
+        BoardData.m_CanvasElement.beginPath();
+        BoardData.m_CanvasElement.rect(PosX, PosY, BoardData.m_CellSize, BoardData.m_CellSize);
+        BoardData.m_CanvasElement.fillStyle = this.m_Color;
+        BoardData.m_CanvasElement.fill();
+        BoardData.m_CanvasElement.lineWidth = 1;
+        BoardData.m_CanvasElement.strokeStyle = "black";
+        BoardData.m_CanvasElement.stroke();
     };
     // ------------------------------------------------------------
     this.OwnerSet = function (NewOwner) {
-        this.Config.Owner = NewOwner;
-        this.Config.Occupied = true;
+        this.m_Owner = NewOwner;
+        this.m_Occupied = true;
     };
     // ------------------------------------------------------------
-    this.OwnerGet = function () {
-        return this.Config.Owner;
-    };
-    // ------------------------------------------------------------
-    this.IsOccupied = function () {
-        return this.Config.Occupied;
-    };
-    // ------------------------------------------------------------
-    this.StateGet = function (CellCompare) {
-        var State = this.EnumState.UNDEFINED;
+    this.StateGet = function (CellCompare, Definitions) {
+        var State = Definitions.EnumState.UNDEFINED;
 
-        if ((false === this.Config.Occupied) &&
-            (CellCompare.Config.Color !== this.Config.Color)) {
-            State = this.EnumState.FREE_COLOR_DIFFERENT;
-        } else if ((false === this.Config.Occupied) &&
-            (CellCompare.Config.Color === this.Config.Color)) {
-            State = this.EnumState.FREE_COLOR_EQUAL;
-        } else if ((true === this.Config.Occupied) &&
-            (CellCompare.Config.Owner !== this.Config.Owner)) {
-            State = this.EnumState.OCCUPIED_OWNER_DIFFERENT;
-        } else if ((true === this.Config.Occupied) &&
-            (CellCompare.Config.Owner === this.Config.Owner)) {
-            State = this.EnumState.OCCUPIED_OWNER_EQUAL;
+        if ((false === this.m_Occupied) &&
+            (CellCompare.m_Color !== this.m_Color)) {
+            State = Definitions.EnumState.FREE_COLOR_DIFFERENT;
+        } else if ((false === this.m_Occupied) &&
+            (CellCompare.m_Color === this.m_Color)) {
+            State = Definitions.EnumState.FREE_COLOR_EQUAL;
+        } else if ((true === this.m_Occupied) &&
+            (CellCompare.m_Owner !== this.m_Owner)) {
+            State = Definitions.EnumState.OCCUPIED_OWNER_DIFFERENT;
+        } else if ((true === this.m_Occupied) &&
+            (CellCompare.m_Owner === this.m_Owner)) {
+            State = Definitions.EnumState.OCCUPIED_OWNER_EQUAL;
         }
 
         return State;

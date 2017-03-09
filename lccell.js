@@ -33,10 +33,17 @@ function LCCell(PosX, PosY) {
         for (var Loop = 0; Loop < Offsets.length; Loop += 1) {
             var CurrentOffsets = Offsets[Loop];
             if (("undefined" !== typeof CellsComplete[this.m_PosY + CurrentOffsets.DY]) &&
-                ("undefined" !== typeof CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX]) &&
-                (this.m_Color === CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX].m_Color) &&
-                (false === CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX].m_Occupied)) {
-                Neighbours.push(CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX]);
+                ("undefined" !== typeof CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX])) {
+                var DoPush = false;
+                if ((false === CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX].m_Occupied) &&
+                    (this.m_Color === CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX].m_Color)) {
+                    DoPush = true;
+                } else if (this.m_Owner === CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX].m_Owner) {
+                    DoPush = true;
+                }
+                if (true === DoPush) {
+                    Neighbours.push(CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX]);
+                }
             }
         }
 

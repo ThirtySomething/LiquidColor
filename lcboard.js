@@ -36,10 +36,10 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
 
         while (this.m_PlayerHuman.m_BaseCell.m_Color === this.m_PlayerComputer.m_BaseCell.m_Color) {
             this.m_PlayerComputer.m_BaseCell.CellColorRandomSet(this.m_Definitions.Colors);
-            this.m_PlayerComputer.m_BaseCell.Draw(this);
         }
+        this.m_PlayerComputer.m_BaseCell.Draw(this);
 
-        // this.CellMarkOwner(this.m_PlayerComputer);
+        this.CellMarkOwner(this.m_PlayerComputer);
         this.CellMarkOwner(this.m_PlayerHuman);
     };
     // ------------------------------------------------------------
@@ -57,7 +57,6 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
                 this.m_Cells[LoopY].push(CurrentCell);
             }
         }
-        this.SetDebugData();
     };
     // ------------------------------------------------------------
     this.SetDebugData = function () {
@@ -87,17 +86,7 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
                 Board: this,
                 Color: CurCol
             }, function (event) {
-                if (event.data.Color === event.data.Board.m_PlayerHuman.m_BaseCell.m_Color) {
-                    alert("You cannot select the color of yourself.");
-                    return;
-                }
-                if (event.data.Color === event.data.Board.m_PlayerComputer.m_BaseCell.m_Color) {
-                    alert("You cannot select the color of your opponent.");
-                    return;
-                }
-                event.data.Board.m_PlayerHuman.m_BaseCell.m_Color = event.data.Color;
-                event.data.Board.m_PlayerHuman.m_BaseCell.Draw(event.data.Board);
-                event.data.Board.CellMarkOwner(event.data.Board.m_PlayerHuman);
+                event.data.Board.PerformMove(event.data.Color);
             });
         }
     };
@@ -108,16 +97,40 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
 
         do {
             for (var Loop = 0; Loop < CellsWork.length; Loop += 1) {
-                CellsWork[Loop].m_Color = Player.m_BaseCell.m_Color;
-                CellsWork[Loop].OwnerSet(Player.m_PlayerName);
-                CellsWork[Loop].Draw(this);
-                var NewNeighbours = CellsWork[Loop].NeighboursGet(this.m_Cells, this.m_Definitions.Offsets);
-                CellsCollect.concat(NewNeighbours);
+                var CurrentCell = CellsWork[Loop];
+                CurrentCell.m_Color = Player.m_BaseCell.m_Color;
+                CurrentCell.OwnerSet(Player.m_PlayerName);
+                CurrentCell.Draw(this);
+                var NewNeighbours = CurrentCell.NeighboursGet(this.m_Cells, this.m_Definitions.Offsets);
+                NewNeighbours.forEach(function (NewCell) {
+                    CellsCollect.push(NewCell)
+                });
             }
             CellsWork = CellsCollect;
             CellsCollect = [];
         } while (0 < CellsWork.length);
 
         Player.CounterUpdate(this);
+    };
+    // ------------------------------------------------------------
+    this.PerformMove = function (NewColor) {
+        if (NewColor === this.m_PlayerHuman.m_BaseCell.m_Color) {
+            alert("You cannot select the color of yourself.");
+            return;
+        }
+        if (NewColor === this.m_PlayerComputer.m_BaseCell.m_Color) {
+            alert("You cannot select the color of your opponent.");
+            return;
+        }
+        this.m_PlayerHuman.m_BaseCell.m_Color = NewColor;
+        this.m_PlayerHuman.m_BaseCell.Draw(this);
+        this.CellMarkOwner(this.m_PlayerHuman);
+
+        this.m_PlayerComputer.m_BaseCell.CellColorRandomSet(this.m_Definitions.Colors);
+        while (this.m_PlayerHuman.m_BaseCell.m_Color === this.m_PlayerComputer.m_BaseCell.m_Color) {
+            this.m_PlayerComputer.m_BaseCell.CellColorRandomSet(this.m_Definitions.Colors);
+        }
+        this.m_PlayerComputer.m_BaseCell.Draw(this);
+        this.CellMarkOwner(this.m_PlayerComputer);
     };
 }

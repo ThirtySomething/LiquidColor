@@ -5,6 +5,7 @@ function LCPlayer(PlayerName) {
     // Player data
     this.m_PlayerName = PlayerName;
     this.m_BaseCell = null;
+    this.m_Offsets = [];
     // ------------------------------------------------------------
     this.CounterUpdate = function (Board) {
         var CellCounter = 0;

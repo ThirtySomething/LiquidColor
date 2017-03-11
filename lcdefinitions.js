@@ -14,18 +14,4 @@ function LCDefinitions(DimX, DimY, CellSize) {
         "red",
         "yellow"
     ];
-    // ------------------------------------------------------------
-    this.Offsets = [{
-        DX: 0,
-        DY: 1
-    }, {
-        DX: 1,
-        DY: 0
-    }, {
-        DX: 0,
-        DY: -1
-    }, {
-        DX: -1,
-        DY: 0
-    }];
 };

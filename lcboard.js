@@ -30,9 +30,25 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
     this.PlayerInit = function () {
         this.m_PlayerComputer.m_BaseCell = this.m_Cells[0][this.m_Definitions.DimensionX - 1];
         this.m_PlayerComputer.m_BaseCell.OwnerSet(this.m_PlayerComputer.m_PlayerName);
+        this.m_PlayerComputer.m_Offsets.push({
+            DX: -1,
+            DY: 0
+        });
+        this.m_PlayerComputer.m_Offsets.push({
+            DX: 0,
+            DY: 1
+        });
 
         this.m_PlayerHuman.m_BaseCell = this.m_Cells[this.m_Definitions.DimensionY - 1][0];
         this.m_PlayerHuman.m_BaseCell.OwnerSet(this.m_PlayerHuman.m_PlayerName);
+        this.m_PlayerHuman.m_Offsets.push({
+            DX: 1,
+            DY: 0
+        });
+        this.m_PlayerHuman.m_Offsets.push({
+            DX: 0,
+            DY: -1
+        });
 
         while (this.m_PlayerHuman.m_BaseCell.m_Color === this.m_PlayerComputer.m_BaseCell.m_Color) {
             this.m_PlayerComputer.m_BaseCell.CellColorRandomSet(this.m_Definitions.Colors);
@@ -59,20 +75,13 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
         }
     };
     // ------------------------------------------------------------
-    this.SetDebugData = function () {
-        for (var Loop = 0; Loop < this.m_Definitions.DebugData.length; Loop += 1) {
-            var RawData = this.m_Definitions.DebugData[Loop];
-            this.m_Cells[RawData.PY][RawData.PX].m_Color = RawData.COL;
-            this.m_Cells[RawData.PY][RawData.PX].Draw(this);
-        }
-    };
-    // ------------------------------------------------------------
     this.BoardButtonsInit = function (ButtonField) {
         // Retrive margin size from CSS classn
         var BtnMargin = parseInt($(".gamebtn").css("margin"));
         var NumberOfButtons = this.m_Definitions.Colors.length;
         var BtnWidth = Math.floor((this.m_Definitions.DimensionX * this.m_Definitions.CellSize) / 5);
         var BtnHeight = Math.floor(((this.m_Definitions.DimensionY * this.m_Definitions.CellSize) - ((NumberOfButtons + 1) * BtnMargin)) / NumberOfButtons);
+        var GameBoard = this;
 
         for (var Loop = 0; Loop < NumberOfButtons; Loop++) {
             var CurCol = this.m_Definitions.Colors[Loop];
@@ -93,19 +102,20 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
     // ------------------------------------------------------------
     this.CellMarkOwner = function (Player) {
         var CellsCollect = [];
-        var CellsWork = Player.m_BaseCell.NeighboursGet(this.m_Cells, this.m_Definitions.Offsets);
+        var CellsWork = Player.m_BaseCell.NeighboursGet(this.m_Cells, Player.m_Offsets);
+        var Board = this;
 
         do {
-            for (var Loop = 0; Loop < CellsWork.length; Loop += 1) {
-                var CurrentCell = CellsWork[Loop];
+            CellsWork.forEach(function (CurrentCell) {
                 CurrentCell.m_Color = Player.m_BaseCell.m_Color;
                 CurrentCell.OwnerSet(Player.m_PlayerName);
-                CurrentCell.Draw(this);
-                var NewNeighbours = CurrentCell.NeighboursGet(this.m_Cells, this.m_Definitions.Offsets);
+                CurrentCell.Draw(Board);
+                var NewNeighbours = CurrentCell.NeighboursGet(Board.m_Cells, Player.m_Offsets);
                 NewNeighbours.forEach(function (NewCell) {
                     CellsCollect.push(NewCell)
                 });
-            }
+
+            });
             CellsWork = CellsCollect;
             CellsCollect = [];
         } while (0 < CellsWork.length);

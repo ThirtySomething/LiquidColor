@@ -29,25 +29,25 @@ function LCCell(PosX, PosY) {
     // ------------------------------------------------------------
     this.NeighboursGet = function (CellsComplete, Offsets) {
         var Neighbours = [];
+        var CurrentCell = this;
 
-        for (var Loop = 0; Loop < Offsets.length; Loop += 1) {
-            var CurrentOffsets = Offsets[Loop];
-            if (("undefined" !== typeof CellsComplete[this.m_PosY + CurrentOffsets.DY]) &&
-                ("undefined" !== typeof CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX])) {
-                var CurrentCell = CellsComplete[this.m_PosY + CurrentOffsets.DY][this.m_PosX + CurrentOffsets.DX];
-                var DoPush = false;
-                if ((false === CurrentCell.m_Occupied) &&
-                    (this.m_Color === CurrentCell.m_Color)) {
-                    DoPush = true;
-                } else if ((this.m_Owner === CurrentCell.m_Owner) &&
-                    (this.m_Color !== CurrentCell.m_Color)) {
-                    DoPush = true;
+        Offsets.forEach(function (CurrentOffset) {
+            if (("undefined" !== typeof CellsComplete[CurrentCell.m_PosY + CurrentOffset.DY]) &&
+                ("undefined" !== typeof CellsComplete[CurrentCell.m_PosY + CurrentOffset.DY][CurrentCell.m_PosX + CurrentOffset.DX])) {
+                var CurrentNeighbour = CellsComplete[CurrentCell.m_PosY + CurrentOffset.DY][CurrentCell.m_PosX + CurrentOffset.DX];
+                var IsOfInterest = false;
+                if ((false === CurrentNeighbour.m_Occupied) &&
+                    (CurrentCell.m_Color === CurrentNeighbour.m_Color)) {
+                    IsOfInterest = true;
+                } else if ((CurrentCell.m_Owner === CurrentNeighbour.m_Owner) &&
+                    (CurrentCell.m_Color !== CurrentNeighbour.m_Color)) {
+                    IsOfInterest = true;
                 }
-                if (true === DoPush) {
-                    Neighbours.push(CurrentCell);
+                if (true === IsOfInterest) {
+                    Neighbours.push(CurrentNeighbour);
                 }
             }
-        }
+        });
 
         return Neighbours;
     };

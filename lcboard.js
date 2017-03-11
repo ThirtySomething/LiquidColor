@@ -12,11 +12,9 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
     this.Init = function (GameField, ButtonField) {
         var BoardWidth = this.m_Definitions.DimensionX * this.m_Definitions.CellSize;
         var BoardHeight = this.m_Definitions.DimensionY * this.m_Definitions.CellSize;
-        $("#" + GameField).css("width", BoardWidth);
-        $("#" + GameField).css("height", BoardHeight);
+
+        ElementSetSize($("#" + GameField), BoardWidth, BoardHeight);
         $("#" + GameField).css("border", "1px solid black");
-        $("#" + GameField).attr("width", BoardWidth);
-        $("#" + GameField).attr("height", BoardHeight);
 
         var Graphics = document.getElementById(GameField);
         if (Graphics.getContext) {
@@ -79,16 +77,15 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
         // Retrive margin size from CSS classn
         var BtnMargin = parseInt($(".gamebtn").css("margin"));
         var NumberOfButtons = this.m_Definitions.Colors.length;
-        var BtnWidth = Math.floor((this.m_Definitions.DimensionX * this.m_Definitions.CellSize) / 5);
-        var BtnHeight = Math.floor(((this.m_Definitions.DimensionY * this.m_Definitions.CellSize) - ((NumberOfButtons + 1) * BtnMargin)) / NumberOfButtons);
+        var BtnWidth = parseInt(Math.floor((this.m_Definitions.DimensionX * this.m_Definitions.CellSize) / 5));
+        var BtnHeight = parseInt(Math.floor(((this.m_Definitions.DimensionY * this.m_Definitions.CellSize) - ((NumberOfButtons + 1) * BtnMargin)) / NumberOfButtons));
         var GameBoard = this;
 
         for (var Loop = 0; Loop < NumberOfButtons; Loop++) {
             var CurCol = this.m_Definitions.Colors[Loop];
             var Button = $("#" + ButtonField).append("<div id=\"" + CurCol + "\"></div>");
 
-            $("#" + CurCol).css("width", BtnWidth);
-            $("#" + CurCol).css("height", BtnHeight);
+            ElementSetSize($("#" + CurCol), BtnWidth, BtnHeight);
             $("#" + CurCol).css("background-color", CurCol);
             $("#" + CurCol).addClass("gamebtn");
             $("#" + CurCol).unbind("click").bind("click", {

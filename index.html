@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Liquid Color</title>
+    <link rel="stylesheet" type="text/css" href="./css-reset.css">
     <link rel="stylesheet" type="text/css" href="./lc.css">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script type="text/javascript" src="./util.js"></script>
@@ -39,9 +40,6 @@
         <div><button id="btn_draw" type="button">Draw</button></div><br>
     </div>
     <div id="playground" class="playground">
-        <div id="playbuttons" class="left">
-            <!-- Buttons for selecting colors are placed here. -->
-        </div>
         <div class="left">
             <canvas id="gamearea" class="left">
                 <!-- Game matrix is placed here. -->
@@ -61,6 +59,9 @@
             <div id="moveinfo" class="clear mt10 pt10 gamestatus">
                 <!-- Displays status messages -->
             </div>
+        </div>
+        <div id="playbuttons" class="left">
+            <!-- Buttons for selecting colors are placed here. -->
         </div>
     </div>
     <div id="fakebtn" class="gamebtn dspno">

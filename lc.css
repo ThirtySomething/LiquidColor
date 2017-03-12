@@ -1,3 +1,7 @@
+body {
+    margin: 10px;
+}
+
 .gameinfo {
     font-family: Verdana, Geneva, sans-serif;
     font-size: 24px;
@@ -34,9 +38,6 @@
     margin: 10px;
     padding: 0px;
     border: 1px solid black;
-    /* Fake values, will be replaced */
-    width: 10px;
-    height: 10px;
 }
 
 .gamestatus {

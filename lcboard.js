@@ -52,12 +52,11 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
     // ------------------------------------------------------------
     this.BoardButtonsInit = function (ButtonField) {
         // Retrive margin size from CSS classn
-        var BtnMargin = parseInt($("#fakebtn").css("margin"));
+        var BtnMargin = parseInt($("#fakebtn").css("marginTop"));
         var NumberOfButtons = this.m_Definitions.Colors.length;
         var BtnWidth = parseInt(Math.floor((this.m_Definitions.DimensionX * this.m_Definitions.CellSize) / 5));
         var BtnHeight = parseInt(Math.floor(((this.m_Definitions.DimensionY * this.m_Definitions.CellSize) - ((NumberOfButtons + 1) * BtnMargin)) / NumberOfButtons));
         var GameBoard = this;
-        $("#fakebtn").hide();
 
         for (var Loop = 0; Loop < NumberOfButtons; Loop++) {
             var CurCol = this.m_Definitions.Colors[Loop];

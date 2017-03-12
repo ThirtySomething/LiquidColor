@@ -26,35 +26,19 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
     };
     // ------------------------------------------------------------
     this.PlayerInit = function () {
-        this.m_PlayerComputer.m_BaseCell = this.m_Cells[0][this.m_Definitions.DimensionX - 1];
-        this.m_PlayerComputer.m_BaseCell.OwnerSet(this.m_PlayerComputer.m_PlayerName);
-        this.m_PlayerComputer.m_Offsets.push({
-            DX: -1,
-            DY: 0
-        });
-        this.m_PlayerComputer.m_Offsets.push({
-            DX: 0,
-            DY: 1
-        });
-
+        // Human
         this.m_PlayerHuman.m_BaseCell = this.m_Cells[this.m_Definitions.DimensionY - 1][0];
         this.m_PlayerHuman.m_BaseCell.OwnerSet(this.m_PlayerHuman.m_PlayerName);
-        this.m_PlayerHuman.m_Offsets.push({
-            DX: 1,
-            DY: 0
-        });
-        this.m_PlayerHuman.m_Offsets.push({
-            DX: 0,
-            DY: -1
-        });
-
-        while (this.m_PlayerHuman.m_BaseCell.m_Color === this.m_PlayerComputer.m_BaseCell.m_Color) {
-            this.m_PlayerComputer.m_BaseCell.CellColorRandomSet(this.m_Definitions.Colors);
-        }
-        this.m_PlayerComputer.m_BaseCell.Draw(this);
-
-        this.CellMarkOwner(this.m_PlayerComputer);
+        this.m_PlayerHuman.m_BaseCell.CellColorRandomSet(this.m_Definitions.Colors);
+        this.m_PlayerHuman.m_BaseCell.Draw(this);
         this.CellMarkOwner(this.m_PlayerHuman);
+
+        // Computer
+        var colors = this.m_Definitions.Colors.filter(color => color !== this.m_PlayerHuman.m_BaseCell.m_Color);
+        this.m_PlayerComputer.m_BaseCell = this.m_Cells[0][this.m_Definitions.DimensionX - 1];
+        this.m_PlayerComputer.m_BaseCell.OwnerSet(this.m_PlayerComputer.m_PlayerName);
+        this.m_PlayerComputer.m_BaseCell.Draw(this);
+        this.CellMarkOwner(this.m_PlayerComputer);
     };
     // ------------------------------------------------------------
     this.BoardInit = function () {
@@ -75,11 +59,12 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
     // ------------------------------------------------------------
     this.BoardButtonsInit = function (ButtonField) {
         // Retrive margin size from CSS classn
-        var BtnMargin = parseInt($(".gamebtn").css("margin"));
+        var BtnMargin = parseInt($("#fakebtn").css("margin"));
         var NumberOfButtons = this.m_Definitions.Colors.length;
         var BtnWidth = parseInt(Math.floor((this.m_Definitions.DimensionX * this.m_Definitions.CellSize) / 5));
         var BtnHeight = parseInt(Math.floor(((this.m_Definitions.DimensionY * this.m_Definitions.CellSize) - ((NumberOfButtons + 1) * BtnMargin)) / NumberOfButtons));
         var GameBoard = this;
+        $("#fakebtn").hide();
 
         for (var Loop = 0; Loop < NumberOfButtons; Loop++) {
             var CurCol = this.m_Definitions.Colors[Loop];
@@ -99,7 +84,7 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
     // ------------------------------------------------------------
     this.CellMarkOwner = function (Player) {
         var CellsCollect = [];
-        var CellsWork = Player.m_BaseCell.NeighboursGet(this.m_Cells, Player.m_Offsets);
+        var CellsWork = Player.m_BaseCell.NeighboursGet(this.m_Cells, this.m_Definitions.Offsets);
         var Board = this;
 
         do {
@@ -107,7 +92,8 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
                 CurrentCell.m_Color = Player.m_BaseCell.m_Color;
                 CurrentCell.OwnerSet(Player.m_PlayerName);
                 CurrentCell.Draw(Board);
-                var NewNeighbours = CurrentCell.NeighboursGet(Board.m_Cells, Player.m_Offsets);
+                CurrentCell.m_Neighbourcheck = true;
+                var NewNeighbours = CurrentCell.NeighboursGet(Board.m_Cells, Board.m_Definitions.Offsets);
                 NewNeighbours.forEach(function (NewCell) {
                     CellsCollect.push(NewCell)
                 });
@@ -121,6 +107,7 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
     };
     // ------------------------------------------------------------
     this.PerformMove = function (NewColor) {
+        // Checks
         if (NewColor === this.m_PlayerHuman.m_BaseCell.m_Color) {
             alert("You cannot select the color of yourself.");
             return;
@@ -129,14 +116,16 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
             alert("You cannot select the color of your opponent.");
             return;
         }
+
+        // Human
         this.m_PlayerHuman.m_BaseCell.m_Color = NewColor;
         this.m_PlayerHuman.m_BaseCell.Draw(this);
         this.CellMarkOwner(this.m_PlayerHuman);
 
-        this.m_PlayerComputer.m_BaseCell.CellColorRandomSet(this.m_Definitions.Colors);
-        while (this.m_PlayerHuman.m_BaseCell.m_Color === this.m_PlayerComputer.m_BaseCell.m_Color) {
-            this.m_PlayerComputer.m_BaseCell.CellColorRandomSet(this.m_Definitions.Colors);
-        }
+        // Computer
+        var colors = this.m_Definitions.Colors.filter(color => color !== NewColor);
+        colors = colors.filter(color => color !== this.m_PlayerComputer.m_BaseCell.m_Color);
+        this.m_PlayerComputer.m_BaseCell.CellColorRandomSet(colors);
         this.m_PlayerComputer.m_BaseCell.Draw(this);
         this.CellMarkOwner(this.m_PlayerComputer);
     };

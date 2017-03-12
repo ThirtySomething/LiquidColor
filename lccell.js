@@ -8,6 +8,7 @@ function LCCell(PosX, PosY) {
     this.m_Color = "white";
     this.m_Owner = "";
     this.m_Occupied = false;
+    this.m_Neighbourcheck = false;
     // ------------------------------------------------------------
     this.Draw = function (BoardData) {
         var PosX = BoardData.m_Definitions.CellSize * this.m_PosX;

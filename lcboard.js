@@ -27,18 +27,11 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
     // ------------------------------------------------------------
     this.PlayerInit = function () {
         // Human
-        this.m_PlayerHuman.m_BaseCell = this.m_Cells[this.m_Definitions.DimensionY - 1][0];
-        this.m_PlayerHuman.m_BaseCell.OwnerSet(this.m_PlayerHuman.m_PlayerName);
-        this.m_PlayerHuman.m_BaseCell.CellColorRandomSet(this.m_Definitions.Colors);
-        this.m_PlayerHuman.m_BaseCell.Draw(this);
-        this.CellMarkOwner(this.m_PlayerHuman);
+        this.m_PlayerHuman.Init(this, 0, this.m_Definitions.DimensionY - 1, this.m_Definitions.Colors);
 
         // Computer
-        var colors = this.m_Definitions.Colors.filter(color => color !== this.m_PlayerHuman.m_BaseCell.m_Color);
-        this.m_PlayerComputer.m_BaseCell = this.m_Cells[0][this.m_Definitions.DimensionX - 1];
-        this.m_PlayerComputer.m_BaseCell.OwnerSet(this.m_PlayerComputer.m_PlayerName);
-        this.m_PlayerComputer.m_BaseCell.Draw(this);
-        this.CellMarkOwner(this.m_PlayerComputer);
+        var ComputerColors = this.m_Definitions.Colors.filter(AvailableColor => AvailableColor !== this.m_PlayerHuman.m_BaseCell.m_Color);
+        this.m_PlayerComputer.Init(this, this.m_Definitions.DimensionX - 1, 0, ComputerColors);
     };
     // ------------------------------------------------------------
     this.BoardInit = function () {
@@ -51,7 +44,7 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
                 var PosY = LoopY * this.m_Definitions.CellSize;
                 var CurrentCell = new LCCell(LoopX, LoopY, this.m_Definitions.Colors);
                 CurrentCell.CellColorRandomSet(this.m_Definitions.Colors);
-                CurrentCell.Draw(this);
+                CurrentCell.Draw(this.m_Definitions, this.m_CanvasElement);
                 this.m_Cells[LoopY].push(CurrentCell);
             }
         }
@@ -82,51 +75,31 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
         }
     };
     // ------------------------------------------------------------
-    this.CellMarkOwner = function (Player) {
-        var CellsCollect = [];
-        var CellsWork = Player.m_BaseCell.NeighboursGet(this.m_Cells, this.m_Definitions.Offsets);
-        var Board = this;
-
-        do {
-            CellsWork.forEach(function (CurrentCell) {
-                CurrentCell.m_Color = Player.m_BaseCell.m_Color;
-                CurrentCell.OwnerSet(Player.m_PlayerName);
-                CurrentCell.Draw(Board);
-                CurrentCell.m_Neighbourcheck = true;
-                var NewNeighbours = CurrentCell.NeighboursGet(Board.m_Cells, Board.m_Definitions.Offsets);
-                NewNeighbours.forEach(function (NewCell) {
-                    CellsCollect.push(NewCell)
-                });
-
-            });
-            CellsWork = CellsCollect;
-            CellsCollect = [];
-        } while (0 < CellsWork.length);
-
-        Player.CounterUpdate(this);
-    };
-    // ------------------------------------------------------------
     this.PerformMove = function (NewColor) {
         // Checks
+        $("#moveinfo").html("");
         if (NewColor === this.m_PlayerHuman.m_BaseCell.m_Color) {
-            alert("You cannot select the color of yourself.");
+            $("#moveinfo").html("You cannot select the color of yourself.");
             return;
         }
         if (NewColor === this.m_PlayerComputer.m_BaseCell.m_Color) {
-            alert("You cannot select the color of your opponent.");
+            $("#moveinfo").html("You cannot select the color of your opponent.");
             return;
         }
 
-        // Human
-        this.m_PlayerHuman.m_BaseCell.m_Color = NewColor;
-        this.m_PlayerHuman.m_BaseCell.Draw(this);
-        this.CellMarkOwner(this.m_PlayerHuman);
+        // Reset neighbourhood information
+        this.m_Cells.forEach(function (CurrentRow) {
+            CurrentRow.forEach(function (CurrentCell) {
+                CurrentCell.m_DoRedraw = true;
+            });
+        });
 
-        // Computer
-        var colors = this.m_Definitions.Colors.filter(color => color !== NewColor);
-        colors = colors.filter(color => color !== this.m_PlayerComputer.m_BaseCell.m_Color);
-        this.m_PlayerComputer.m_BaseCell.CellColorRandomSet(colors);
-        this.m_PlayerComputer.m_BaseCell.Draw(this);
-        this.CellMarkOwner(this.m_PlayerComputer);
+
+        // Human move
+        this.m_PlayerHuman.Move(this.m_Cells, [NewColor], this.m_Definitions, this.m_CanvasElement);
+
+        // Computer move
+        var ValidColors = this.m_Definitions.Colors.filter(AvailableColor => AvailableColor !== NewColor, AvailableColor => AvailableColor !== this.m_PlayerComputer.m_BaseCell.m_Color);
+        this.m_PlayerComputer.Move(this.m_Cells, ValidColors, this.m_Definitions, this.m_CanvasElement);
     };
 }

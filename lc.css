@@ -39,6 +39,15 @@
     height: 10px;
 }
 
+.gamestatus {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 500;
+    line-height: 16px;
+}
+
 .dspno {
     display: none;
 }
@@ -57,6 +66,10 @@
 
 .mr10 {
     margin-right: 10px;
+}
+
+.mt10 {
+    margin-top: 10px;
 }
 
 .pt10 {

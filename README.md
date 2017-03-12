@@ -20,4 +20,5 @@ Saw this game on [Android](https://play.google.com/store/apps/details?id=yio.fil
 
 ### Credits
 
-- Thanks to Jonas for hint with JavaScript filters.
+- Thanks to Jonas for the hints with JavaScript filters and to use HTML div for messages instead of alert.
+- Thanks to [Sascha](https://github.com/Foomy) for common hints about HTML and JavaScript.

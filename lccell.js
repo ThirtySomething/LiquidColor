@@ -40,31 +40,27 @@ function LCCell(PosX, PosY) {
 
             if ((0 > PosY) ||
                 (Definitions.DimensionY <= PosY)) {
-                return;
+                return true;
             }
 
             var PosX = CurrentCell.m_PosX + CurrentOffset.DX;
             if ((0 > PosX) ||
                 (Definitions.DimensionX <= PosX)) {
-                return;
+                return true;
             }
 
             var CurrentNeighbour = Cells[PosY][PosX];
 
 
             if (false === CurrentNeighbour.m_DoRedraw) {
-                return;
+                return true;
             }
 
             var IsOfInterest = false;
-            if ((false === CurrentNeighbour.m_Occupied) &&
-                (CurrentCell.m_Color === CurrentNeighbour.m_Color)) {
-                IsOfInterest = true;
-            } else if ((CurrentCell.m_Owner === CurrentNeighbour.m_Owner) &&
-                (CurrentCell.m_Color !== CurrentNeighbour.m_Color)) {
-                IsOfInterest = true;
-            }
-            if (true === IsOfInterest) {
+            if (((false === CurrentNeighbour.m_Occupied) &&
+                    (CurrentCell.m_Color === CurrentNeighbour.m_Color)) ||
+                ((CurrentCell.m_Owner === CurrentNeighbour.m_Owner) &&
+                    (CurrentCell.m_Color !== CurrentNeighbour.m_Color))) {
                 Neighbours.push(CurrentNeighbour);
             }
         });

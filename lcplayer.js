@@ -26,8 +26,8 @@ function LCPlayer(PlayerName) {
     this.Init = function (Board, PosX, PosY, Colors) {
         this.m_BaseCell = Board.m_Cells[PosY][PosX];
         this.m_BaseCell.OwnerSet(this.m_PlayerName);
+        this.m_BaseCell.Draw(Board.m_Definitions, Board.m_CanvasElement);
         this.CellsMarkOwner(Board.m_Cells, Board.m_Definitions, Board.m_CanvasElement);
-
     };
     // ------------------------------------------------------------
     this.Move = function (Cells, Colors, Definitions, CanvasElement) {
@@ -52,7 +52,9 @@ function LCPlayer(PlayerName) {
                 });
 
             });
-            CellsWork = CellsCollect;
+            CellsWork = CellsCollect.filter(function (value, index, self) {
+                return self.indexOf(value) === index;
+            })
             CellsCollect = [];
         } while (0 < CellsWork.length);
 

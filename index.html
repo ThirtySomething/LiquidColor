@@ -14,12 +14,12 @@
     <script type="text/javascript" src="./lcplayer.js"></script>
     <script>
         var Definitions = new LCDefinitions(60, 40, 10);
-        var Human = new LCPlayer("human");
-        var Computer = new LCPlayer("computer");
+        var Human = new LCPlayer("Player", "name_human", "score_human");
+        var Computer = new LCPlayer("Computer", "name_computer", "score_computer");
         var Board = new LCBoard(Definitions, Human, Computer);
         $(document).ready(function () {
             $("#compare").css("display", "none");
-            Board.Init("gamearea", "playbuttons");
+            Board.Init("gamearea", "playbuttons", "winner");
         });
     </script>
 </head>
@@ -47,17 +47,20 @@
             <div class="clear pt10 gamestatus">
                 <div class="left">
                     <!-- Displays number of occupied cells for human -->
-                    <div class="left mr10">Human</div>
-                    <div id="human" class="right">0</div>
+                    <div id="name_human" class="left mr10">Human</div>
+                    <div id="score_human" class="right">0</div>
                 </div>
                 <div class="right">
                     <!-- Displays number of occupied cells for computer -->
-                    <div id="computer" class="left">0</div>
-                    <div class="right ml10">Computer</div>
+                    <div id="score_computer" class="left">0</div>
+                    <div id="name_computer" class="right ml10">Computer</div>
                 </div>
             </div>
             <div id="moveinfo" class="clear mt10 pt10 gamestatus">
                 <!-- Displays status messages -->
+            </div>
+            <div id="winner" class="clear mt10 gamestatus dspno">
+                <!-- Displays winner messages -->
             </div>
         </div>
         <div id="playbuttons" class="left">

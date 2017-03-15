@@ -5,12 +5,13 @@ function LCDefinitions(DimX, DimY, CellSize) {
     this.DimensionX = parseInt(DimX);
     this.DimensionY = parseInt(DimY);
     this.CellSize = parseInt(CellSize);
+    this.Winner = parseInt(((parseInt(DimX) * parseInt(DimY)) / 2) + 1);
     // ------------------------------------------------------------
     this.Colors = [
         "blue",
         "cyan",
-        "gray",
         "green",
+        "lightgray",
         "red",
         "yellow"
     ];
@@ -28,4 +29,4 @@ function LCDefinitions(DimX, DimY, CellSize) {
         DX: -1,
         DY: 0
     }];
-};
+}

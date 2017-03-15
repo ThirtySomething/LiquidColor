@@ -12,11 +12,11 @@ function LCCell(PosX, PosY) {
     // ------------------------------------------------------------
     this.Draw = function (Definitions, CanvasElement) {
         if (true === this.m_DoRedraw) {
-            var PosX = Definitions.CellSize * this.m_PosX;
-            var PosY = Definitions.CellSize * this.m_PosY;
+            var Cell_PosX = Definitions.CellSize * this.m_PosX;
+            var Cell_PosY = Definitions.CellSize * this.m_PosY;
 
             CanvasElement.beginPath();
-            CanvasElement.rect(PosX, PosY, Definitions.CellSize, Definitions.CellSize);
+            CanvasElement.rect(Cell_PosX, Cell_PosY, Definitions.CellSize, Definitions.CellSize);
             CanvasElement.fillStyle = this.m_Color;
             CanvasElement.fill();
             CanvasElement.lineWidth = 1;
@@ -36,31 +36,25 @@ function LCCell(PosX, PosY) {
         var CurrentCell = this;
 
         Definitions.Offsets.forEach(function (CurrentOffset) {
-            var PosY = CurrentCell.m_PosY + CurrentOffset.DY;
+            var Cell_PosY = CurrentCell.m_PosY + CurrentOffset.DY;
 
-            if ((0 > PosY) ||
-                (Definitions.DimensionY <= PosY)) {
+            if ((0 > Cell_PosY) || (Definitions.DimensionY <= Cell_PosY)) {
                 return true;
             }
 
-            var PosX = CurrentCell.m_PosX + CurrentOffset.DX;
-            if ((0 > PosX) ||
-                (Definitions.DimensionX <= PosX)) {
+            var Cell_PosX = CurrentCell.m_PosX + CurrentOffset.DX;
+            if ((0 > Cell_PosX) || (Definitions.DimensionX <= Cell_PosX)) {
                 return true;
             }
 
-            var CurrentNeighbour = Cells[PosY][PosX];
+            var CurrentNeighbour = Cells[Cell_PosY][Cell_PosX];
 
 
             if (false === CurrentNeighbour.m_DoRedraw) {
                 return true;
             }
 
-            var IsOfInterest = false;
-            if (((false === CurrentNeighbour.m_Occupied) &&
-                    (CurrentCell.m_Color === CurrentNeighbour.m_Color)) ||
-                ((CurrentCell.m_Owner === CurrentNeighbour.m_Owner) &&
-                    (CurrentCell.m_Color !== CurrentNeighbour.m_Color))) {
+            if (((false === CurrentNeighbour.m_Occupied) && (CurrentCell.m_Color === CurrentNeighbour.m_Color)) || ((CurrentCell.m_Owner === CurrentNeighbour.m_Owner) && (CurrentCell.m_Color !== CurrentNeighbour.m_Color))) {
                 Neighbours.push(CurrentNeighbour);
             }
         });
@@ -68,8 +62,8 @@ function LCCell(PosX, PosY) {
         return Neighbours;
     };
     // ------------------------------------------------------------
-    this.CellColorRandomSet = function (Colors) {
-        var ColorIndex = Math.floor((Math.random() * Colors.length));
-        this.m_Color = Colors[ColorIndex];
+    this.CellColorRandomGet = function (Colors) {
+        var ColorIndex = Math.floor(Math.random() * Colors.length);
+        return Colors[ColorIndex];
     };
 }

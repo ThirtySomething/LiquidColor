@@ -1,29 +1,36 @@
 "use strict";
 
-function LCPlayer(PlayerName) {
+function LCPlayer(PlayerName, IDName, IDScore) {
     // ------------------------------------------------------------
     // Player data
     this.m_PlayerName = PlayerName;
     this.m_BaseCell = null;
     this.m_Offsets = [];
+    this.m_IDName = IDName;
+    this.m_IDScore = IDScore;
     // ------------------------------------------------------------
-    this.CounterUpdate = function (Cells) {
+    this.CounterUpdate = function (Cells, Definitions) {
         var CellCounter = 0;
         var CurrentPlayer = this;
 
         Cells.forEach(function (CurrentRow) {
             CurrentRow.forEach(function (CurrentCell) {
-                if ((true === CurrentCell.m_Occupied) &&
-                    (CurrentPlayer.m_PlayerName === CurrentCell.m_Owner)) {
-                    CellCounter++;
+                if ((true === CurrentCell.m_Occupied) && (CurrentPlayer.m_PlayerName === CurrentCell.m_Owner)) {
+                    CellCounter += 1;
                 }
             });
         });
 
-        $("#" + this.m_PlayerName).html(CellCounter);
+        $("#" + this.m_IDScore).html(CellCounter);
+        if (CellCounter >= Definitions.Winner) {
+            $("#" + this.m_IDWinner).html("Player [" + this.m_PlayerName + "] won the game - has more than the half cells occupied.");
+            $("#" + this.m_IDWinner).removeClass("dspno");
+        }
     };
     // ------------------------------------------------------------
-    this.Init = function (Board, PosX, PosY, Colors) {
+    this.Init = function (Board, PosX, PosY, IDWinner) {
+        $("#" + this.m_IDName).html(this.m_PlayerName);
+        this.m_IDWinner = IDWinner;
         this.m_BaseCell = Board.m_Cells[PosY][PosX];
         this.m_BaseCell.OwnerSet(this.m_PlayerName);
         this.m_BaseCell.Draw(Board.m_Definitions, Board.m_CanvasElement);
@@ -31,7 +38,7 @@ function LCPlayer(PlayerName) {
     };
     // ------------------------------------------------------------
     this.Move = function (Cells, Colors, Definitions, CanvasElement) {
-        this.m_BaseCell.CellColorRandomSet(Colors);
+        this.m_BaseCell.m_Color = this.m_BaseCell.CellColorRandomGet(Colors);
         this.m_BaseCell.Draw(Definitions, CanvasElement);
         this.CellsMarkOwner(Cells, Definitions, CanvasElement);
     };
@@ -48,16 +55,16 @@ function LCPlayer(PlayerName) {
                 CurrentCell.Draw(Definitions, CanvasElement);
                 var NewNeighbours = CurrentCell.NeighboursGet(Cells, Definitions);
                 NewNeighbours.forEach(function (NewCell) {
-                    CellsCollect.push(NewCell)
+                    CellsCollect.push(NewCell);
                 });
 
             });
             CellsWork = CellsCollect.filter(function (value, index, self) {
                 return self.indexOf(value) === index;
-            })
+            });
             CellsCollect = [];
         } while (0 < CellsWork.length);
 
-        this.CounterUpdate(Cells);
+        this.CounterUpdate(Cells, Definitions);
     };
 }

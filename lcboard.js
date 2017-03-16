@@ -2,53 +2,62 @@
 
 function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
     // ------------------------------------------------------------
-    // Board config
-    this.m_Cells = [];
     this.m_CanvasElement = null;
     this.m_Definitions = Definitions;
     this.m_PlayerHuman = PlayerHuman;
     this.m_PlayerComputer = PlayerComputer;
+    this.m_Grid = new LCGrid();
+    this.m_IDGameField = null;
+    this.m_IDButtonField = null;
+    this.m_IDWinner = null;
     // ------------------------------------------------------------
     this.Init = function (GameField, ButtonField, IDWinner) {
-        var BoardWidth = this.m_Definitions.DimensionX * this.m_Definitions.CellSize;
-        var BoardHeight = this.m_Definitions.DimensionY * this.m_Definitions.CellSize;
-
-        ElementSetSize($("#" + GameField), BoardWidth, BoardHeight);
-        $("#" + GameField).css("border", "1px solid black");
-
-        var Graphics = document.getElementById(GameField);
+        this.m_IDGameField = GameField;
+        this.m_IDButtonField = ButtonField;
+        this.m_IDWinner = IDWinner;
+        var Graphics = document.getElementById(this.m_IDGameField);
         if (Graphics.getContext) {
             this.m_CanvasElement = Graphics.getContext("2d");
             this.BoardInit();
-            this.BoardButtonsInit(ButtonField);
-            this.PlayerInit(IDWinner);
+            this.BoardButtonsInit(this.m_IDButtonField);
+            this.PlayerInit(this.m_IDWinner);
         }
     };
     // ------------------------------------------------------------
+    this.ReInit = function (IDDimX, IDDimY, IDCellSize, IDPlayerName) {
+        var DimX = $("#" + IDDimX).val();
+        var DimY = $("#" + IDDimY).val();
+        var CellSize = $("#" + IDCellSize).val();
+        var PlayerName = $("#" + IDPlayerName).val();
+
+        this.m_Definitions.ReInit(DimX, DimY, CellSize);
+        this.m_PlayerHuman.m_PlayerName = PlayerName;
+
+        this.BoardInit();
+        this.BoardButtonsInit(this.m_IDButtonField);
+        this.PlayerInit(this.m_IDWinner);
+    };
+    // ------------------------------------------------------------
     this.PlayerInit = function (IDWinner) {
+        $("#" + IDWinner).html("");
+
         // Human will start in bottom left corner
-        this.CellsReset();
+        this.m_Grid.GridReset();
         this.m_PlayerHuman.Init(this, 0, this.m_Definitions.DimensionY - 1, IDWinner);
 
         // Computer will start in top right corner
-        this.CellsReset();
+        this.m_Grid.GridReset();
         this.m_PlayerComputer.Init(this, this.m_Definitions.DimensionX - 1, 0, IDWinner);
     };
     // ------------------------------------------------------------
     this.BoardInit = function () {
-        this.m_Cells = [];
+        var BoardWidth = this.m_Definitions.DimensionX * this.m_Definitions.CellSize;
+        var BoardHeight = this.m_Definitions.DimensionY * this.m_Definitions.CellSize;
 
-        for (var LoopY = 0; LoopY < this.m_Definitions.DimensionY; LoopY++) {
-            this.m_Cells[LoopY] = [];
-            for (var LoopX = 0; LoopX < this.m_Definitions.DimensionX; LoopX++) {
-                var PosX = LoopX * this.m_Definitions.CellSize;
-                var PosY = LoopY * this.m_Definitions.CellSize;
-                var CurrentCell = new LCCell(LoopX, LoopY, this.m_Definitions.Colors);
-                CurrentCell.m_Color = CurrentCell.CellColorRandomGet(this.m_Definitions.Colors);
-                CurrentCell.Draw(this.m_Definitions, this.m_CanvasElement);
-                this.m_Cells[LoopY].push(CurrentCell);
-            }
-        }
+        $("#moveinfo").html("");
+        ElementSetSize($("#" + this.m_IDGameField), BoardWidth, BoardHeight);
+        $("#" + this.m_IDGameField).css("border", "1px solid black");
+        this.m_Grid.GridInit(this.m_Definitions, this.m_CanvasElement);
     };
     // ------------------------------------------------------------
     this.BoardButtonsInit = function (ButtonField) {
@@ -59,6 +68,7 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
         var BtnHeight = parseInt(Math.floor(((this.m_Definitions.DimensionY * this.m_Definitions.CellSize) - ((NumberOfButtons + 1) * BtnMargin)) / NumberOfButtons));
         var GameBoard = this;
 
+        $("#" + ButtonField).children().remove();
         for (var Loop = 0; Loop < NumberOfButtons; Loop++) {
             var CurCol = this.m_Definitions.Colors[Loop];
             var Button = $("#" + ButtonField).append("<div id=\"" + CurCol + "\"></div>");
@@ -75,14 +85,6 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
         }
     };
     // ------------------------------------------------------------
-    this.CellsReset = function () {
-        this.m_Cells.forEach(function (CurrentRow) {
-            CurrentRow.forEach(function (CurrentCell) {
-                CurrentCell.m_DoRedraw = true;
-            });
-        });
-    }
-    // ------------------------------------------------------------
     this.PerformMove = function (NewColor) {
         // Checks
         $("#moveinfo").html("");
@@ -96,12 +98,12 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
         }
 
         // Human move
-        this.CellsReset();
-        this.m_PlayerHuman.Move(this.m_Cells, [NewColor], this.m_Definitions, this.m_CanvasElement);
+        this.m_Grid.GridReset();
+        this.m_PlayerHuman.Move(this.m_Grid.m_Cells, [NewColor], this.m_Definitions, this.m_CanvasElement);
 
         // Computer move
-        this.CellsReset();
+        this.m_Grid.GridReset();
         var ValidColors = this.m_Definitions.Colors.filter(AvailableColor => AvailableColor !== NewColor, AvailableColor => AvailableColor !== this.m_PlayerComputer.m_BaseCell.m_Color);
-        this.m_PlayerComputer.Move(this.m_Cells, ValidColors, this.m_Definitions, this.m_CanvasElement);
+        this.m_PlayerComputer.Move(this.m_Grid.m_Cells, ValidColors, this.m_Definitions, this.m_CanvasElement);
     };
 }

@@ -2,7 +2,6 @@
 
 function LCPlayer(PlayerName, IDName, IDScore) {
     // ------------------------------------------------------------
-    // Player data
     this.m_PlayerName = PlayerName;
     this.m_BaseCell = null;
     this.m_Offsets = [];
@@ -31,10 +30,10 @@ function LCPlayer(PlayerName, IDName, IDScore) {
     this.Init = function (Board, PosX, PosY, IDWinner) {
         $("#" + this.m_IDName).html(this.m_PlayerName);
         this.m_IDWinner = IDWinner;
-        this.m_BaseCell = Board.m_Cells[PosY][PosX];
+        this.m_BaseCell = Board.m_Grid.m_Cells[PosY][PosX];
         this.m_BaseCell.OwnerSet(this.m_PlayerName);
         this.m_BaseCell.Draw(Board.m_Definitions, Board.m_CanvasElement);
-        this.CellsMarkOwner(Board.m_Cells, Board.m_Definitions, Board.m_CanvasElement);
+        this.CellsMarkOwner(Board.m_Grid.m_Cells, Board.m_Definitions, Board.m_CanvasElement);
     };
     // ------------------------------------------------------------
     this.Move = function (Cells, Colors, Definitions, CanvasElement) {

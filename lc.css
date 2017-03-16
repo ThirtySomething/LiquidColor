@@ -4,21 +4,20 @@ body {
 
 .gameinfo {
     font-family: Verdana, Geneva, sans-serif;
-    font-size: 24px;
-    font-style: normal;
+    font-size: 14px;
+    font-style: bold;
     font-variant: normal;
     font-weight: 500;
-    line-height: 26.4px;
+    line-height: 16px;
 }
 
 .setup {
     font-family: Verdana, Geneva, sans-serif;
-    font-size: 24px;
-    font-style: normal;
+    font-size: 14px;
+    font-style: bold;
     font-variant: normal;
     font-weight: 500;
-    line-height: 26.4px;
-    display: none;
+    line-height: 16px;
 }
 
 .playground {
@@ -34,6 +33,11 @@ body {
     float: right;
 }
 
+.btnlbl {
+    width: 300px;
+    display: block;
+}
+
 .gamebtn {
     margin: 10px;
     padding: 0px;
@@ -43,7 +47,7 @@ body {
 .gamestatus {
     font-family: Verdana, Geneva, sans-serif;
     font-size: 14px;
-    font-style: normal;
+    font-style: bold;
     font-variant: normal;
     font-weight: 500;
     line-height: 16px;

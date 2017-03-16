@@ -10,16 +10,27 @@
     <script type="text/javascript" src="./util.js"></script>
     <script type="text/javascript" src="./lcdefinitions.js"></script>
     <script type="text/javascript" src="./lccell.js"></script>
+    <script type="text/javascript" src="./lcgrid.js"></script>
     <script type="text/javascript" src="./lcboard.js"></script>
     <script type="text/javascript" src="./lcplayer.js"></script>
     <script>
         var Definitions = new LCDefinitions(60, 40, 10);
-        var Human = new LCPlayer("Player", "name_human", "score_human");
+        var Human = new LCPlayer("ThirtySomething", "name_human", "score_human");
         var Computer = new LCPlayer("Computer", "name_computer", "score_computer");
         var Board = new LCBoard(Definitions, Human, Computer);
-        $(document).ready(function () {
+        $(document).ready(function() {
             $("#compare").css("display", "none");
-            Board.Init("gamearea", "playbuttons", "winner");
+            Board.Init("gamearea", "playbuttons", "winner", "btn_reset");
+            // ------------------------------------------------------------
+            $("#btn_reset").unbind("click").bind("click", {
+                Board: Board,
+                DimX: "dimx",
+                DimY: "dimy",
+                CellSize: "cellsize",
+                PlayerName: "playername"
+            }, function(event) {
+                event.data.Board.ReInit(event.data.DimX, event.data.DimY, event.data.CellSize, event.data.PlayerName);
+            });
         });
     </script>
 </head>
@@ -27,19 +38,32 @@
 <body>
     <div id="gameinfo" class="gameinfo">
         <!-- Rough game information. -->
-        This is Liquid Color, a simple game written in JavaScript. The goal is to get as much as possible cells in a contiguous color.
-        To reach this goal, you have to select one color of the surrounding cells. You cannot select the current color of
-        your opponent, and of course you cannot also select your own current color. All other colors are available to select.
-        The computer will start on the upper right corner, the human player will start on the lower left corner.
+        This is Liquid Color, a simple game written in JavaScript. The goal is to get as much as possible cells in a contiguous color. To reach this goal, you have to select one color of the surrounding cells. You cannot select the current color of your opponent,
+        and of course you cannot also select your own current color. All other colors are available to select. The computer will start on the upper right corner, the human player will start on the lower left corner.
     </div>
-    <div id="setup" class="setup">
+    <div id="setup" class="setup mt10">
         <!-- On a later step user can change cell and board size. -->
-        <div>Dimension X: <input type="text" name="dimx"></div>
-        <div>Dimension Y: <input type="text" name="dimy"></div>
-        <div>Cell width: <input type="text" name="cellwidth"></div>
-        <div><button id="btn_draw" type="button">Draw</button></div><br>
+        <div class="btnlbl">
+            <label for="dimx" class="left">Dimension X:</label>
+            <input type="text" id="dimx" name="dimx" value="60" class="right" />
+        </div>
+        <div class="btnlbl">
+            <label for="dimy" class="left">Dimension Y:</label>
+            <input type="text" id="dimy" name="dimy" value="40" class="right" />
+        </div>
+        <div class="btnlbl">
+            <label for="cellsize" class="left">Cell width:</label>
+            <input type="text" id="cellsize" name="cellsize" value="10" class="right" />
+        </div>
+        <div class="btnlbl">
+            <label for="playername" class="left">Playername:</label>
+            <input type="text" id="playername" name="playername" value="ThirtySomething" class="right" />
+        </div>
+        <div class="btnlbl">
+            <button id="btn_reset" type="button" class="right clear">Reset</button>
+        </div>
     </div>
-    <div id="playground" class="playground">
+    <div id="playground" class="clear playground">
         <div class="left">
             <canvas id="gamearea" class="left">
                 <!-- Game matrix is placed here. -->

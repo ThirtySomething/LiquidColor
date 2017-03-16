@@ -2,7 +2,6 @@
 
 function LCCell(PosX, PosY) {
     // ------------------------------------------------------------
-    // Cell data
     this.m_PosX = parseInt(PosX);
     this.m_PosY = parseInt(PosY);
     this.m_Color = "white";
@@ -19,8 +18,8 @@ function LCCell(PosX, PosY) {
             CanvasElement.rect(Cell_PosX, Cell_PosY, Definitions.CellSize, Definitions.CellSize);
             CanvasElement.fillStyle = this.m_Color;
             CanvasElement.fill();
-            CanvasElement.lineWidth = 1;
-            CanvasElement.strokeStyle = "black";
+            // CanvasElement.lineWidth = 1;
+            // CanvasElement.strokeStyle = "black";
             CanvasElement.stroke();
             this.m_DoRedraw = false;
         }

@@ -34,7 +34,7 @@ function LCCell(PosX, PosY) {
         var Neighbours = [];
         var CurrentCell = this;
 
-        Definitions.Offsets.forEach(function (CurrentOffset) {
+        Definitions.Offsets.some(function (CurrentOffset) {
             var Cell_PosY = CurrentCell.m_PosY + CurrentOffset.DY;
 
             if ((0 > Cell_PosY) || (Definitions.DimensionY <= Cell_PosY)) {
@@ -64,5 +64,30 @@ function LCCell(PosX, PosY) {
     this.CellColorRandomGet = function (Colors) {
         var ColorIndex = Math.floor(Math.random() * Colors.length);
         return Colors[ColorIndex];
+    };
+    // ------------------------------------------------------------
+    this.IsBorderCell = function (Definitions) {
+        var IsBorder = false;
+
+        Definitions.Offsets.some(function (CurrentOffset) {
+            var Cell_PosY = CurrentCell.m_PosY + CurrentOffset.DY;
+
+            if ((0 > Cell_PosY) || (Definitions.DimensionY <= Cell_PosY)) {
+                return true;
+            }
+
+            var Cell_PosX = CurrentCell.m_PosX + CurrentOffset.DX;
+            if ((0 > Cell_PosX) || (Definitions.DimensionX <= Cell_PosX)) {
+                return true;
+            }
+
+            var CurrentNeighbour = Cells[Cell_PosY][Cell_PosX];
+            if (false === CurrentNeighbour.m_Occupied) {
+                IsBorder = true;
+                return true;
+            }
+        });
+
+        return IsBorder;
     };
 }

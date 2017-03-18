@@ -26,6 +26,31 @@ function LCGrid() {
                 CurrentCell.m_DoRedraw = true;
             });
         });
-    }
+    };
+    // ------------------------------------------------------------
+    this.GetPlayerCells = function (Player) {
+        var PlayerCells = [];
 
+        this.m_Cells.forEach(function (CurrentRow) {
+            CurrentRow.forEach(function (CurrentCell) {
+                if (CurrentCell.m_Owner === Player.m_PlayerName) {
+                    PlayerCells.push(CurrentCell);
+                }
+            });
+        });
+
+        return PlayerCells;
+    };
+    // ------------------------------------------------------------
+    this.IdentifyBorderCells = function (Cells, Definitions) {
+        var BorderCells = [];
+
+        Cells.forEach(function (CurrentCell) {
+            if (true == CurrentCell.IsBorderCell(Definitions)) {
+                BorderCells.push(CurrentCell);
+            };
+        });
+
+        return BorderCells;
+    };
 };

@@ -34,7 +34,7 @@ function LCCell(PosX, PosY) {
         var Neighbours = [];
         var CurrentCell = this;
 
-        Definitions.Offsets.some(function (CurrentOffset) {
+        Definitions.Offsets.forEach(function (CurrentOffset) {
             var Cell_PosY = CurrentCell.m_PosY + CurrentOffset.DY;
 
             if ((0 > Cell_PosY) || (Definitions.DimensionY <= Cell_PosY)) {
@@ -66,8 +66,9 @@ function LCCell(PosX, PosY) {
         return Colors[ColorIndex];
     };
     // ------------------------------------------------------------
-    this.IsBorderCell = function (Definitions) {
+    this.IsBorderCell = function (Cells, Definitions) {
         var IsBorder = false;
+        var CurrentCell = this;
 
         Definitions.Offsets.some(function (CurrentOffset) {
             var Cell_PosY = CurrentCell.m_PosY + CurrentOffset.DY;

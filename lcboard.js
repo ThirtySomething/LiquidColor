@@ -102,6 +102,10 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
         this.m_PlayerHuman.Move(this.m_Grid.m_Cells, [NewColor], this.m_Definitions, this.m_CanvasElement);
 
         // Computer move
+        var ComputerCells = this.m_Grid.GetPlayerCells(this.m_PlayerComputer);
+        var BorderCells = this.m_Grid.IdentifyBorderCells(ComputerCells, this.m_Definitions);
+        var Colors = this.m_Grid.PlayerColorsGet(BorderCells, this.m_Definitions);
+
         this.m_Grid.GridReset();
         var ValidColors = this.m_Definitions.Colors.filter(AvailableColor => AvailableColor !== NewColor, AvailableColor => AvailableColor !== this.m_PlayerComputer.m_BaseCell.m_Color);
         this.m_PlayerComputer.Move(this.m_Grid.m_Cells, ValidColors, this.m_Definitions, this.m_CanvasElement);

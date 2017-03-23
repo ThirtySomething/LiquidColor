@@ -70,22 +70,22 @@ function LCCell(PosX, PosY) {
         var IsBorder = false;
         var CurrentCell = this;
 
-        Definitions.Offsets.some(function (CurrentOffset) {
+        Definitions.Offsets.forEach(function (CurrentOffset) {
             var Cell_PosY = CurrentCell.m_PosY + CurrentOffset.DY;
 
             if ((0 > Cell_PosY) || (Definitions.DimensionY <= Cell_PosY)) {
-                return true;
+                return;
             }
 
             var Cell_PosX = CurrentCell.m_PosX + CurrentOffset.DX;
             if ((0 > Cell_PosX) || (Definitions.DimensionX <= Cell_PosX)) {
-                return true;
+                return;
             }
 
             var CurrentNeighbour = Cells[Cell_PosY][Cell_PosX];
             if (false === CurrentNeighbour.m_Occupied) {
                 IsBorder = true;
-                return true;
+                return;
             }
         });
 

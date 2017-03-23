@@ -60,29 +60,31 @@ function LCGrid() {
         var Grid = this;
 
         Cells.forEach(function (CurrentCell) {
-            Definitions.Offsets.some(function (CurrentOffset) {
+            Definitions.Offsets.forEach(function (CurrentOffset) {
                 var Cell_PosY = CurrentCell.m_PosY + CurrentOffset.DY;
 
                 if ((0 > Cell_PosY) || (Definitions.DimensionY <= Cell_PosY)) {
-                    return true;
+                    return;
                 }
 
                 var Cell_PosX = CurrentCell.m_PosX + CurrentOffset.DX;
                 if ((0 > Cell_PosX) || (Definitions.DimensionX <= Cell_PosX)) {
-                    return true;
+                    return;
                 }
 
-                // Todo: Extend condition here!
-                var CurrentNeighbour = this.m_Cells[Cell_PosY][Cell_PosX];
+                var CurrentNeighbour = Grid.m_Cells[Cell_PosY][Cell_PosX];
+
+                if (true === CurrentNeighbour.m_Occupied) {
+                    return;
+                }
+
                 var ValueOld = 0;
                 if (true === PlayerColors.hasOwnProperty(CurrentNeighbour.m_Color)) {
-                    ValueOld = PlayerColors[CurrentCell.m_Color];
+                    ValueOld = parseInt(PlayerColors[CurrentNeighbour.m_Color]);
                 }
-                PlayerColors[CurrentNeighbour.m_Color] = ValueOld + 1;
+                PlayerColors[CurrentNeighbour.m_Color] = parseInt(ValueOld + 1);
             });
         });
-
-        console.log(JSON.stringify(PlayerColors));
 
         return PlayerColors;
     };

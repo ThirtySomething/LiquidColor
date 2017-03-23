@@ -66,4 +66,25 @@ function LCPlayer(PlayerName, IDName, IDScore) {
 
         this.CounterUpdate(Cells, Definitions);
     };
+    // ------------------------------------------------------------
+    this.IdentifyBestColor = function (ColorInformation, NewColorPlayer) {
+        var BestColor = this.m_BaseCell.m_Color;
+        var Number = -1;
+        var Player = this;
+
+        for (var Color in ColorInformation) {
+            if (Color === NewColorPlayer) {
+                continue;
+            }
+            if (Color === Player.m_BaseCell.m_Color) {
+                continue;
+            }
+            if (Number < ColorInformation[Color]) {
+                Number = ColorInformation[Color];
+                BestColor = Color;
+            }
+        }
+
+        return BestColor;
+    };
 }

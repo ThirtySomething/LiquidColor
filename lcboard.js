@@ -85,29 +85,29 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
         }
     };
     // ------------------------------------------------------------
-    this.PerformMove = function (NewColor) {
+    this.PerformMove = function (NewColorPlayer) {
         // Checks
         $("#moveinfo").html("");
-        if (NewColor === this.m_PlayerHuman.m_BaseCell.m_Color) {
+        if (NewColorPlayer === this.m_PlayerHuman.m_BaseCell.m_Color) {
             $("#moveinfo").html("You cannot select the color of yourself.");
             return;
         }
-        if (NewColor === this.m_PlayerComputer.m_BaseCell.m_Color) {
+        if (NewColorPlayer === this.m_PlayerComputer.m_BaseCell.m_Color) {
             $("#moveinfo").html("You cannot select the color of your opponent.");
             return;
         }
 
         // Human move
         this.m_Grid.GridReset();
-        this.m_PlayerHuman.Move(this.m_Grid.m_Cells, [NewColor], this.m_Definitions, this.m_CanvasElement);
+        this.m_PlayerHuman.Move(this.m_Grid.m_Cells, [NewColorPlayer], this.m_Definitions, this.m_CanvasElement);
 
         // Computer move
         var ComputerCells = this.m_Grid.GetPlayerCells(this.m_PlayerComputer);
         var BorderCells = this.m_Grid.IdentifyBorderCells(ComputerCells, this.m_Definitions);
         var Colors = this.m_Grid.PlayerColorsGet(BorderCells, this.m_Definitions);
+        var NewColorComputer = this.m_PlayerComputer.IdentifyBestColor(Colors, NewColorPlayer);
 
         this.m_Grid.GridReset();
-        var ValidColors = this.m_Definitions.Colors.filter(AvailableColor => AvailableColor !== NewColor, AvailableColor => AvailableColor !== this.m_PlayerComputer.m_BaseCell.m_Color);
-        this.m_PlayerComputer.Move(this.m_Grid.m_Cells, ValidColors, this.m_Definitions, this.m_CanvasElement);
+        this.m_PlayerComputer.Move(this.m_Grid.m_Cells, [NewColorComputer], this.m_Definitions, this.m_CanvasElement);
     };
 }

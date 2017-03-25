@@ -14,9 +14,9 @@
     <script type="text/javascript" src="./lcboard.js"></script>
     <script type="text/javascript" src="./lcplayer.js"></script>
     <script>
-        var Definitions = new LCDefinitions(60, 40, 10);
-        var Human = new LCPlayer("ThirtySomething", "name_human", "score_human");
-        var Computer = new LCPlayer("Computer", "name_computer", "score_computer");
+        var Definitions = new LCDefinitions(30, 20, 10);
+        var Human = new LCPlayer("Besucher", "name_human", "score_human");
+        var Computer = new LCPlayer("DerPaul", "name_computer", "score_computer");
         var Board = new LCBoard(Definitions, Human, Computer);
         $(document).ready(function() {
             $("#compare").css("display", "none");

@@ -21,6 +21,9 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
             this.BoardInit();
             this.BoardButtonsInit(this.m_IDButtonField);
             this.PlayerInit(this.m_IDWinner);
+            $("#dimx").val(this.m_Definitions.DimensionX);
+            $("#dimy").val(this.m_Definitions.DimensionY);
+            $("#playername").val(this.m_PlayerHuman.m_PlayerName);
         }
     };
     // ------------------------------------------------------------

@@ -90,13 +90,13 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
     // ------------------------------------------------------------
     this.PerformMove = function (NewColorPlayer) {
         // Checks
-        $("#moveinfo").html("");
+        $("#moveinfo").hide();
         if (NewColorPlayer === this.m_PlayerHuman.m_BaseCell.m_Color) {
-            $("#moveinfo").html("You cannot select the color of yourself.");
+            $("#moveinfo").html("You cannot select the color of yourself.").show();
             return;
         }
         if (NewColorPlayer === this.m_PlayerComputer.m_BaseCell.m_Color) {
-            $("#moveinfo").html("You cannot select the color of your opponent.");
+            $("#moveinfo").html("You cannot select the color of your opponent.").show();
             return;
         }
 

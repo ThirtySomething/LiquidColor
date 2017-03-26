@@ -10,6 +10,10 @@ This is a single player game written in JavaScript. It will take advantage of HT
 
 To run this game you need a internet browser supporting JavaScript and HTML5. At least all modern browsers will fit.
 
+## Test
+
+You can test this game on my [site](http://www.derpaul.net/wordpress/?page_id=740 "DerPaul").
+
 ## Supported Platforms
 
 The game is developed on Google Chrome. If you get problems, please report the used browser. As fallback you can use Google Chrome.

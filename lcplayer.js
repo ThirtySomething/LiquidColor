@@ -1,6 +1,5 @@
-"use strict";
-
 function LCPlayer(PlayerName, IDName, IDScore) {
+    "use strict";
     // ------------------------------------------------------------
     this.m_PlayerName = PlayerName;
     this.m_BaseCell = null;
@@ -57,22 +56,22 @@ function LCPlayer(PlayerName, IDName, IDScore) {
         var CellsCollect = [];
         var Player = this;
         var CellsWork = Player.m_BaseCell.NeighboursGet(Cells, Definitions);
-
-        do {
-            CellsWork.forEach(function(CurrentCell) {
-                CurrentCell.m_Color = Player.m_BaseCell.m_Color;
-                CurrentCell.OwnerSet(Player.m_PlayerName);
-                CurrentCell.Draw(Definitions, CanvasElement);
-                var NewNeighbours = CurrentCell.NeighboursGet(Cells, Definitions);
-                NewNeighbours.forEach(function(NewCell) {
-                    CellsCollect.push(NewCell);
+        http: //codecondo.com/28-free-books-for-learning-software-architecture/
+            do {
+                CellsWork.forEach(function(CurrentCell) {
+                    CurrentCell.m_Color = Player.m_BaseCell.m_Color;
+                    CurrentCell.OwnerSet(Player.m_PlayerName);
+                    CurrentCell.Draw(Definitions, CanvasElement);
+                    var NewNeighbours = CurrentCell.NeighboursGet(Cells, Definitions);
+                    NewNeighbours.forEach(function(NewCell) {
+                        CellsCollect.push(NewCell);
+                    });
                 });
-            });
-            CellsWork = CellsCollect.filter(function(value, index, self) {
-                return self.indexOf(value) === index;
-            });
-            CellsCollect = [];
-        } while (0 < CellsWork.length);
+                CellsWork = CellsCollect.filter(function(value, index, self) {
+                    return self.indexOf(value) === index;
+                });
+                CellsCollect = [];
+            } while (0 < CellsWork.length);
 
         this.CounterUpdate(Cells, Definitions);
     };

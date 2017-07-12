@@ -1,6 +1,5 @@
-"use strict";
-
 function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
+    "use strict";
     // ------------------------------------------------------------
     this.m_CanvasElement = null;
     this.m_Definitions = Definitions;

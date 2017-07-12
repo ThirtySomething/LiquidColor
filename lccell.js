@@ -1,6 +1,5 @@
-"use strict";
-
 function LCCell(PosX, PosY) {
+    "use strict";
     // ------------------------------------------------------------
     this.m_PosX = parseInt(PosX);
     this.m_PosY = parseInt(PosY);

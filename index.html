@@ -18,7 +18,7 @@
         var Human = new LCPlayer("Besucher", "name_human", "score_human");
         var Computer = new LCPlayer("DerPaul", "name_computer", "score_computer");
         var Board = new LCBoard(Definitions, Human, Computer);
-        $(document).ready(function () {
+        $(document).ready(function() {
             $("#compare").css("display", "none");
             Board.Init("gamearea", "playbuttons", "winner", "btn_reset");
             // ------------------------------------------------------------
@@ -28,7 +28,7 @@
                 DimY: "dimy",
                 CellSize: "cellsize",
                 PlayerName: "playername"
-            }, function (event) {
+            }, function(event) {
                 event.data.Board.ReInit(event.data.DimX, event.data.DimY, event.data.CellSize, event.data
                     .PlayerName);
             });
@@ -39,10 +39,8 @@
 <body>
     <div id="gameinfo" class="gameinfo">
         <!-- Rough game information. -->
-        This is Liquid Color, a simple game written in JavaScript. The goal is to get as much as possible cells in a contiguous color.
-        To reach this goal, you have to select one color of the surrounding cells. You cannot select the current color of
-        your opponent, and of course you cannot also select your own current color. All other colors are available to select.
-        The computer will start on the upper right corner, the human player will start on the lower left corner.
+        This is Liquid Color, a simple game written in JavaScript. The goal is to get as much as possible cells in a contiguous color. To reach this goal, you have to select one color of the surrounding cells. You cannot select the current color of your opponent,
+        and of course you cannot also select your own current color. All other colors are available to select. The computer will start on the upper right corner, the human player will start on the lower left corner.
     </div>
     <div id="setup" class="setup mt10">
         <!-- On a later step user can change cell and board size. -->

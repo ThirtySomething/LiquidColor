@@ -1,6 +1,5 @@
-"use strict";
-
 function LCDefinitions(DimX, DimY, CellSize) {
+    "use strict";
     // ------------------------------------------------------------
     this.DimensionX = parseInt(DimX);
     this.DimensionY = parseInt(DimY);

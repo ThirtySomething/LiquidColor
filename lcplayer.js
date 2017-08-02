@@ -56,7 +56,7 @@ function LCPlayer(PlayerName, IDName, IDScore) {
         var CellsCollect = [];
         var Player = this;
         var CellsWork = Player.m_BaseCell.NeighboursGet(Cells, Definitions);
-        http: //codecondo.com/28-free-books-for-learning-software-architecture/
+        http:
             do {
                 CellsWork.forEach(function(CurrentCell) {
                     CurrentCell.m_Color = Player.m_BaseCell.m_Color;

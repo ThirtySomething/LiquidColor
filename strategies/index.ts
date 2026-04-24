@@ -1,14 +1,17 @@
-import { chooseGreedyColor } from "./greedyStrategy.js";
-import { chooseMinimaxColor } from "./minimaxStrategy.js";
-import type { LCComputerStrategy, LCStrategyInput } from "./types.js";
+import { GreedyStrategy } from "./greedyStrategy.js";
+import { MinimaxStrategy } from "./minimaxStrategy.js";
+import type { IComputerStrategy, LCComputerStrategy, LCStrategyInput } from "./types.js";
 
-export function chooseComputerColor(
-    strategy: LCComputerStrategy,
-    input: LCStrategyInput
-): string {
-    if (strategy === "greedy") {
-        return chooseGreedyColor(input);
+export class ComputerStrategyFactory {
+    static create(strategy: LCComputerStrategy): IComputerStrategy {
+        if (strategy === "greedy") {
+            return new GreedyStrategy();
+        }
+
+        return new MinimaxStrategy();
     }
 
-    return chooseMinimaxColor(input);
+    static chooseComputerColor(strategy: LCComputerStrategy, input: LCStrategyInput): string {
+        return this.create(strategy).chooseColor(input);
+    }
 }

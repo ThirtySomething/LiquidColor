@@ -208,150 +208,161 @@
   };
 
   // strategies/simulateCapture.ts
-  function simulateCapture(cells, definitions2, ownedSet, extraBlocked, color) {
-    const newOwned = new Set(ownedSet);
-    let frontier = Array.from(ownedSet);
-    let gained = 0;
-    while (frontier.length > 0) {
-      const next = [];
-      for (const cell of frontier) {
-        for (const offset of definitions2.Offsets) {
-          const ny = cell.m_PosY + offset.DY;
-          const nx = cell.m_PosX + offset.DX;
-          if (ny < 0 || ny >= definitions2.DimensionY || nx < 0 || nx >= definitions2.DimensionX) {
-            continue;
-          }
-          const neighbor = cells[ny]?.[nx];
-          if (!neighbor || newOwned.has(neighbor) || extraBlocked.has(neighbor)) {
-            continue;
-          }
-          if (!neighbor.m_Occupied && neighbor.m_Color === color) {
-            newOwned.add(neighbor);
-            next.push(neighbor);
-            gained++;
+  var CaptureSimulator = class {
+    static simulate(cells, definitions2, ownedSet, extraBlocked, color) {
+      const newOwned = new Set(ownedSet);
+      let frontier = Array.from(ownedSet);
+      let gained = 0;
+      while (frontier.length > 0) {
+        const next = [];
+        for (const cell of frontier) {
+          for (const offset of definitions2.Offsets) {
+            const ny = cell.m_PosY + offset.DY;
+            const nx = cell.m_PosX + offset.DX;
+            if (ny < 0 || ny >= definitions2.DimensionY || nx < 0 || nx >= definitions2.DimensionX) {
+              continue;
+            }
+            const neighbor = cells[ny]?.[nx];
+            if (!neighbor || newOwned.has(neighbor) || extraBlocked.has(neighbor)) {
+              continue;
+            }
+            if (!neighbor.m_Occupied && neighbor.m_Color === color) {
+              newOwned.add(neighbor);
+              next.push(neighbor);
+              gained++;
+            }
           }
         }
+        frontier = next;
       }
-      frontier = next;
+      return { gained, newOwnedSet: newOwned };
     }
-    return { gained, newOwnedSet: newOwned };
-  }
+  };
 
   // strategies/greedyStrategy.ts
-  function chooseGreedyColor(input) {
-    const {
-      cells,
-      definitions: definitions2,
-      newColorPlayer,
-      compPlayerName,
-      humanPlayerName,
-      compCurrentColor
-    } = input;
-    const compOwned = /* @__PURE__ */ new Set();
-    const humanOwned = /* @__PURE__ */ new Set();
-    const allColors = /* @__PURE__ */ new Set();
-    cells.forEach((row) => {
-      row.forEach((cell) => {
-        if (cell.m_Owner === compPlayerName) {
-          compOwned.add(cell);
-        } else if (cell.m_Owner === humanPlayerName) {
-          humanOwned.add(cell);
-        }
-        if (!cell.m_Occupied) {
-          allColors.add(cell.m_Color);
-        }
-      });
-    });
-    let bestColor = compCurrentColor;
-    let bestGain = -1;
-    for (const compColor of allColors) {
-      if (compColor === newColorPlayer || compColor === compCurrentColor) {
-        continue;
-      }
-      const { gained } = simulateCapture(cells, definitions2, compOwned, humanOwned, compColor);
-      if (gained > bestGain) {
-        bestGain = gained;
-        bestColor = compColor;
-      }
-    }
-    return bestColor;
-  }
-
-  // strategies/minimaxStrategy.ts
-  function chooseMinimaxColor(input) {
-    const {
-      cells,
-      definitions: definitions2,
-      newColorPlayer,
-      compPlayerName,
-      humanPlayerName,
-      compCurrentColor,
-      humanCurrentColor
-    } = input;
-    const DENY_WEIGHT = 1.2;
-    const DIVERSITY_WEIGHT = 0.15;
-    const compOwned = /* @__PURE__ */ new Set();
-    const humanOwned = /* @__PURE__ */ new Set();
-    const allColors = /* @__PURE__ */ new Set();
-    cells.forEach((row) => {
-      row.forEach((cell) => {
-        if (cell.m_Owner === compPlayerName) {
-          compOwned.add(cell);
-        } else if (cell.m_Owner === humanPlayerName) {
-          humanOwned.add(cell);
-        }
-        if (!cell.m_Occupied) {
-          allColors.add(cell.m_Color);
-        }
-      });
-    });
-    let bestColor = compCurrentColor;
-    let bestScore = -Infinity;
-    for (const compColor of allColors) {
-      if (compColor === newColorPlayer || compColor === compCurrentColor) {
-        continue;
-      }
-      const { gained: compGain, newOwnedSet: compOwned2 } = simulateCapture(cells, definitions2, compOwned, humanOwned, compColor);
-      const frontierColors = /* @__PURE__ */ new Set();
-      for (const cell of compOwned2) {
-        for (const offset of definitions2.Offsets) {
-          const ny = cell.m_PosY + offset.DY;
-          const nx = cell.m_PosX + offset.DX;
-          if (ny < 0 || ny >= definitions2.DimensionY || nx < 0 || nx >= definitions2.DimensionX) {
-            continue;
+  var GreedyStrategy = class {
+    chooseColor(input) {
+      const {
+        cells,
+        definitions: definitions2,
+        newColorPlayer,
+        compPlayerName,
+        humanPlayerName,
+        compCurrentColor
+      } = input;
+      const compOwned = /* @__PURE__ */ new Set();
+      const humanOwned = /* @__PURE__ */ new Set();
+      const allColors = /* @__PURE__ */ new Set();
+      cells.forEach((row) => {
+        row.forEach((cell) => {
+          if (cell.m_Owner === compPlayerName) {
+            compOwned.add(cell);
+          } else if (cell.m_Owner === humanPlayerName) {
+            humanOwned.add(cell);
           }
-          const neighbor = cells[ny]?.[nx];
-          if (neighbor && !neighbor.m_Occupied && !compOwned2.has(neighbor) && !humanOwned.has(neighbor)) {
-            frontierColors.add(neighbor.m_Color);
+          if (!cell.m_Occupied) {
+            allColors.add(cell.m_Color);
           }
-        }
-      }
-      let bestHumanGain = 0;
-      for (const humanColor of allColors) {
-        if (humanColor === compColor || humanColor === humanCurrentColor) {
+        });
+      });
+      let bestColor = compCurrentColor;
+      let bestGain = -1;
+      for (const compColor of allColors) {
+        if (compColor === newColorPlayer || compColor === compCurrentColor) {
           continue;
         }
-        const { gained: humanGain } = simulateCapture(cells, definitions2, humanOwned, compOwned2, humanColor);
-        if (humanGain > bestHumanGain) {
-          bestHumanGain = humanGain;
+        const { gained } = CaptureSimulator.simulate(cells, definitions2, compOwned, humanOwned, compColor);
+        if (gained > bestGain) {
+          bestGain = gained;
+          bestColor = compColor;
         }
       }
-      const score = compGain - bestHumanGain * DENY_WEIGHT + frontierColors.size * DIVERSITY_WEIGHT;
-      if (score > bestScore) {
-        bestScore = score;
-        bestColor = compColor;
-      }
+      return bestColor;
     }
-    return bestColor;
-  }
+  };
+
+  // strategies/minimaxStrategy.ts
+  var MinimaxStrategy = class {
+    chooseColor(input) {
+      const {
+        cells,
+        definitions: definitions2,
+        newColorPlayer,
+        compPlayerName,
+        humanPlayerName,
+        compCurrentColor,
+        humanCurrentColor
+      } = input;
+      const DENY_WEIGHT = 1.2;
+      const DIVERSITY_WEIGHT = 0.15;
+      const compOwned = /* @__PURE__ */ new Set();
+      const humanOwned = /* @__PURE__ */ new Set();
+      const allColors = /* @__PURE__ */ new Set();
+      cells.forEach((row) => {
+        row.forEach((cell) => {
+          if (cell.m_Owner === compPlayerName) {
+            compOwned.add(cell);
+          } else if (cell.m_Owner === humanPlayerName) {
+            humanOwned.add(cell);
+          }
+          if (!cell.m_Occupied) {
+            allColors.add(cell.m_Color);
+          }
+        });
+      });
+      let bestColor = compCurrentColor;
+      let bestScore = -Infinity;
+      for (const compColor of allColors) {
+        if (compColor === newColorPlayer || compColor === compCurrentColor) {
+          continue;
+        }
+        const { gained: compGain, newOwnedSet: compOwned2 } = CaptureSimulator.simulate(cells, definitions2, compOwned, humanOwned, compColor);
+        const frontierColors = /* @__PURE__ */ new Set();
+        for (const cell of compOwned2) {
+          for (const offset of definitions2.Offsets) {
+            const ny = cell.m_PosY + offset.DY;
+            const nx = cell.m_PosX + offset.DX;
+            if (ny < 0 || ny >= definitions2.DimensionY || nx < 0 || nx >= definitions2.DimensionX) {
+              continue;
+            }
+            const neighbor = cells[ny]?.[nx];
+            if (neighbor && !neighbor.m_Occupied && !compOwned2.has(neighbor) && !humanOwned.has(neighbor)) {
+              frontierColors.add(neighbor.m_Color);
+            }
+          }
+        }
+        let bestHumanGain = 0;
+        for (const humanColor of allColors) {
+          if (humanColor === compColor || humanColor === humanCurrentColor) {
+            continue;
+          }
+          const { gained: humanGain } = CaptureSimulator.simulate(cells, definitions2, humanOwned, compOwned2, humanColor);
+          if (humanGain > bestHumanGain) {
+            bestHumanGain = humanGain;
+          }
+        }
+        const score = compGain - bestHumanGain * DENY_WEIGHT + frontierColors.size * DIVERSITY_WEIGHT;
+        if (score > bestScore) {
+          bestScore = score;
+          bestColor = compColor;
+        }
+      }
+      return bestColor;
+    }
+  };
 
   // strategies/index.ts
-  function chooseComputerColor(strategy, input) {
-    if (strategy === "greedy") {
-      return chooseGreedyColor(input);
+  var ComputerStrategyFactory = class {
+    static create(strategy) {
+      if (strategy === "greedy") {
+        return new GreedyStrategy();
+      }
+      return new MinimaxStrategy();
     }
-    return chooseMinimaxColor(input);
-  }
+    static chooseComputerColor(strategy, input) {
+      return this.create(strategy).chooseColor(input);
+    }
+  };
 
   // util.ts
   function setElementSize(element, width, height) {
@@ -498,7 +509,7 @@
       if (!this.m_BaseCell || !opponent.m_BaseCell) {
         return newColorPlayer;
       }
-      return chooseComputerColor(strategy, {
+      return ComputerStrategyFactory.chooseComputerColor(strategy, {
         cells,
         definitions: definitions2,
         newColorPlayer,

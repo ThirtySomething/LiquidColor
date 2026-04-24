@@ -1,6 +1,6 @@
 import { LCCell } from "./lccell.js";
 import { LCDefinitions } from "./lcdefinitions.js";
-import { chooseComputerColor } from "./strategies/index.js";
+import { ComputerStrategyFactory } from "./strategies/index.js";
 import { removeClass, setText } from "./util.js";
 export class LCPlayer {
     m_PlayerName;
@@ -83,7 +83,7 @@ export class LCPlayer {
         if (!this.m_BaseCell || !opponent.m_BaseCell) {
             return newColorPlayer;
         }
-        return chooseComputerColor(strategy, {
+        return ComputerStrategyFactory.chooseComputerColor(strategy, {
             cells,
             definitions,
             newColorPlayer,

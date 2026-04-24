@@ -1,7 +1,7 @@
 import type { LCBoard } from "./lcboard.js";
 import { LCCell } from "./lccell.js";
 import { LCDefinitions } from "./lcdefinitions.js";
-import { chooseComputerColor } from "./strategies/index.js";
+import { ComputerStrategyFactory } from "./strategies/index.js";
 import type { LCComputerStrategy } from "./strategies/types.js";
 import { removeClass, setText } from "./util.js";
 
@@ -126,7 +126,7 @@ export class LCPlayer {
             return newColorPlayer;
         }
 
-        return chooseComputerColor(strategy, {
+        return ComputerStrategyFactory.chooseComputerColor(strategy, {
             cells,
             definitions,
             newColorPlayer,

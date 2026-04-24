@@ -12,3 +12,7 @@ export type LCStrategyInput = {
     compCurrentColor: string;
     humanCurrentColor: string;
 };
+
+export interface IComputerStrategy {
+    chooseColor(input: LCStrategyInput): string;
+}

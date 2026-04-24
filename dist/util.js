@@ -1,56 +1,58 @@
-export function setElementSize(element, width, height) {
-    if (!element) {
-        return;
+export class Util {
+    static setElementSize(element, width, height) {
+        if (!element) {
+            return;
+        }
+        element.style.width = `${width}px`;
+        element.style.height = `${height}px`;
+        element.width = width;
+        element.height = height;
     }
-    element.style.width = `${width}px`;
-    element.style.height = `${height}px`;
-    element.width = width;
-    element.height = height;
-}
-export function getInputValue(id) {
-    const element = document.getElementById(id);
-    return element ? element.value : "";
-}
-export function setInputValue(id, value) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.value = String(value);
+    static getInputValue(id) {
+        const element = document.getElementById(id);
+        return element ? element.value : "";
     }
-}
-export function setText(id, value) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.textContent = value;
+    static setInputValue(id, value) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.value = String(value);
+        }
     }
-}
-export function show(id, displayMode = "block") {
-    const element = document.getElementById(id);
-    if (element) {
-        element.style.display = displayMode;
+    static setText(id, value) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
     }
-}
-export function hide(id) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.style.display = "none";
+    static show(id, displayMode = "block") {
+        const element = document.getElementById(id);
+        if (element) {
+            element.style.display = displayMode;
+        }
     }
-}
-export function removeClass(id, className) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.classList.remove(className);
+    static hide(id) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.style.display = "none";
+        }
     }
-}
-export function clearChildren(id) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.replaceChildren();
+    static removeClass(id, className) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.classList.remove(className);
+        }
     }
-}
-export function getCssNumberVar(name, fallback = 0) {
-    const value = getComputedStyle(document.documentElement)
-        .getPropertyValue(name)
-        .trim();
-    const parsed = Number.parseInt(value, 10);
-    return Number.isNaN(parsed) ? fallback : parsed;
+    static clearChildren(id) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.replaceChildren();
+        }
+    }
+    static getCssNumberVar(name, fallback = 0) {
+        const value = getComputedStyle(document.documentElement)
+            .getPropertyValue(name)
+            .trim();
+        const parsed = Number.parseInt(value, 10);
+        return Number.isNaN(parsed) ? fallback : parsed;
+    }
 }

@@ -1,8 +1,8 @@
-import { LCCell } from "./lccell.js";
-import { LCDefinitions } from "./lcdefinitions.js";
-import { ComputerStrategyFactory } from "./strategies/index.js";
-import { removeClass, setText } from "./util.js";
-export class LCPlayer {
+import { Cell } from "./cell.js";
+import { Definitions } from "./definitions.js";
+import { ComputerStrategyFactory } from "./strategies/computerstrategyfactory.js";
+import { Util } from "./util.js";
+export class Player {
     m_PlayerName;
     m_BaseCell;
     m_Offsets;
@@ -26,14 +26,14 @@ export class LCPlayer {
                 }
             });
         });
-        setText(this.m_IDScore, String(cellCounter));
+        Util.setText(this.m_IDScore, String(cellCounter));
         if (cellCounter >= definitions.Winner) {
-            setText(this.m_IDWinner, `Player [${this.m_PlayerName}] won the game - has more than the half cells occupied.`);
-            removeClass(this.m_IDWinner, "dspno");
+            Util.setText(this.m_IDWinner, `Player [${this.m_PlayerName}] won the game - has more than the half cells occupied.`);
+            Util.removeClass(this.m_IDWinner, "dspno");
         }
     }
     init(board, posX, posY, idWinner) {
-        setText(this.m_IDName, this.m_PlayerName);
+        Util.setText(this.m_IDName, this.m_PlayerName);
         this.m_IDWinner = idWinner;
         const row = board.m_Grid.m_Cells[posY];
         const baseCell = row ? row[posX] : undefined;
@@ -94,4 +94,3 @@ export class LCPlayer {
         });
     }
 }
-//# sourceMappingURL=lcplayer.js.map

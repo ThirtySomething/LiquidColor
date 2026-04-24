@@ -1,6 +1,6 @@
-import { LCCell } from "./lccell.js";
-import { LCDefinitions } from "./lcdefinitions.js";
-export class LCGrid {
+import { Cell } from "./cell.js";
+import { Definitions } from "./definitions.js";
+export class Grid {
     m_Cells;
     constructor() {
         this.m_Cells = [];
@@ -11,7 +11,7 @@ export class LCGrid {
             const row = [];
             this.m_Cells[loopY] = row;
             for (let loopX = 0; loopX < definitions.DimensionX; loopX += 1) {
-                const currentCell = new LCCell(loopX, loopY);
+                const currentCell = new Cell(loopX, loopY);
                 currentCell.m_Color = currentCell.cellColorRandomGet(definitions.Colors);
                 currentCell.draw(definitions, canvasElement);
                 row.push(currentCell);

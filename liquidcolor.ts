@@ -7,17 +7,21 @@ const human = new Player("Besucher", "name_human", "score_human");
 const computer = new Player("DerPaul", "name_computer", "score_computer");
 const board = new Board(definitions, human, computer);
 
-function initLiquidColor(): void {
+function initLiquidColor(): void 
+{
     const compare = document.getElementById("compare");
-    if (compare) {
+    if (compare) 
+    {
         compare.style.display = "none";
     }
 
     board.init("gamearea", "playbuttons", "winner");
 
     const resetButton = document.getElementById("btn_reset");
-    if (resetButton) {
-        resetButton.addEventListener("click", () => {
+    if (resetButton) 
+    {
+        resetButton.addEventListener("click", () => 
+        {
             board.reInit("dimx", "dimy", "cellsize", "playername", "computerstrategy");
         });
     }

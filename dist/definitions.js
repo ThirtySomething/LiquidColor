@@ -1,4 +1,4 @@
-export class LCDefinitions {
+export class Definitions {
     DimensionX;
     DimensionY;
     CellSize;
@@ -26,4 +26,3 @@ export class LCDefinitions {
         this.Winner = Math.floor((this.DimensionX * this.DimensionY) / 2 + 1);
     }
 }
-//# sourceMappingURL=lcdefinitions.js.map

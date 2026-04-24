@@ -1,5 +1,5 @@
-import { LCDefinitions } from "./lcdefinitions.js";
-export class LCCell {
+import { Definitions } from "./definitions.js";
+export class Cell {
     m_PosX;
     m_PosY;
     m_Color;

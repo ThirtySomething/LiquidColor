@@ -116,6 +116,42 @@ body {
     align-items: flex-start;
 }
 
+.highscore-panel {
+    min-width: 210px;
+    padding: var(--space-2);
+    border: 1px solid color-mix(in srgb, var(--border) 55%, white);
+    border-radius: 8px;
+    background: linear-gradient(180deg, #eef7f9 0%, #f8fbfc 100%);
+    display: grid;
+    gap: var(--space-1);
+}
+
+.highscore-title {
+    margin: 0 0 var(--space-1) 0;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    color: var(--accent);
+}
+
+.highscore-row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: 6px 0;
+    border-bottom: 1px dashed color-mix(in srgb, var(--border) 25%, white);
+    font-weight: 600;
+}
+
+.highscore-row:last-child {
+    border-bottom: 0;
+}
+
+.highscore-total {
+    margin-top: var(--space-1);
+    padding-top: var(--space-1);
+    border-top: 1px solid color-mix(in srgb, var(--border) 40%, white);
+}
+
 .board-wrap {
     display: grid;
     gap: var(--space-2);
@@ -167,6 +203,11 @@ body {
 
     .playground {
         padding: var(--space-2);
+    }
+
+    .highscore-panel {
+        width: 100%;
+        min-width: 0;
     }
 
     .button-column {

@@ -1,5 +1,7 @@
 import { Definitions } from "./definitions.js";
 import { Grid } from "./grid.js";
+import type { HighscoreWinner } from "./highscore.js";
+import { Highscore } from "./highscore.js";
 import { Player, type ComputerStrategy } from "./player.js";
 import { Timer } from "./timer.js";
 import { Util } from "./util.js";
@@ -23,6 +25,7 @@ export class Board {
     m_Timer: Timer;
     m_ComputerStrategy: ComputerStrategy;
     m_GameOver: boolean;
+    m_Highscore: Highscore;
 
     constructor(definitions: Definitions, playerHuman: Player, playerComputer: Player) {
         this.m_CanvasElement = null;
@@ -36,6 +39,7 @@ export class Board {
         this.m_Timer = new Timer("gameduration");
         this.m_ComputerStrategy = "minimax";
         this.m_GameOver = false;
+        this.m_Highscore = new Highscore();
     }
 
     init(gameField: string, buttonField: string, idWinner: string): void {
@@ -52,6 +56,7 @@ export class Board {
             this.boardInit();
             this.boardButtonsInit(this.m_IDButtonField);
             this.playerInit(this.m_IDWinner);
+            this.m_Highscore.render(this.m_PlayerHuman.m_PlayerName, this.m_PlayerComputer.m_PlayerName);
             Util.setInputValue("dimx", this.m_Definitions.DimensionX);
             Util.setInputValue("dimy", this.m_Definitions.DimensionY);
             Util.setInputValue("cellsize", this.m_Definitions.CellSize);
@@ -76,6 +81,7 @@ export class Board {
         this.m_Definitions.reInit(dimX, dimY, cellSize);
         this.m_PlayerHuman.m_PlayerName = playerName;
         this.m_ComputerStrategy = this.readComputerStrategy(computerStrategy);
+        this.m_Highscore.render(this.m_PlayerHuman.m_PlayerName, this.m_PlayerComputer.m_PlayerName);
 
         this.boardInit();
         this.boardButtonsInit(this.m_IDButtonField);
@@ -239,9 +245,11 @@ export class Board {
         };
     }
 
-    endGame(message: string): void {
+    endGame(message: string, winner: HighscoreWinner): void {
         this.m_GameOver = true;
         this.m_Timer.stop();
+        this.m_Highscore.recordWin(winner);
+        this.m_Highscore.render(this.m_PlayerHuman.m_PlayerName, this.m_PlayerComputer.m_PlayerName);
         Util.setText(this.m_IDWinner, message);
         Util.removeClass(this.m_IDWinner, "dspno");
         Util.show(this.m_IDWinner, "block");
@@ -252,28 +260,32 @@ export class Board {
 
         if (stats.human >= this.m_Definitions.Winner) {
             this.endGame(
-                `Player [${this.m_PlayerHuman.m_PlayerName}] won the game - has more than the half cells occupied.`
+                `Player [${this.m_PlayerHuman.m_PlayerName}] won the game - has more than the half cells occupied.`,
+                "human"
             );
             return true;
         }
 
         if (stats.computer >= this.m_Definitions.Winner) {
             this.endGame(
-                `Player [${this.m_PlayerComputer.m_PlayerName}] won the game - has more than the half cells occupied.`
+                `Player [${this.m_PlayerComputer.m_PlayerName}] won the game - has more than the half cells occupied.`,
+                "computer"
             );
             return true;
         }
 
         if (stats.occupied === stats.total) {
             if (stats.human === stats.computer) {
-                this.endGame("50:50 draw - both players occupy the same number of cells.");
+                this.endGame("50:50 draw - both players occupy the same number of cells.", "draw");
             } else if (stats.human > stats.computer) {
                 this.endGame(
-                    `Player [${this.m_PlayerHuman.m_PlayerName}] won the game - more occupied cells at board end.`
+                    `Player [${this.m_PlayerHuman.m_PlayerName}] won the game - more occupied cells at board end.`,
+                    "human"
                 );
             } else {
                 this.endGame(
-                    `Player [${this.m_PlayerComputer.m_PlayerName}] won the game - more occupied cells at board end.`
+                    `Player [${this.m_PlayerComputer.m_PlayerName}] won the game - more occupied cells at board end.`,
+                    "computer"
                 );
             }
             return true;

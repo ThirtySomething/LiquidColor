@@ -52,6 +52,26 @@
         </section>
 
         <section id="playground" class="playground" aria-label="Game board">
+            <aside class="highscore-panel" aria-label="Highscore board">
+                <h2 class="highscore-title">Highscores</h2>
+                <div class="highscore-row">
+                    <span id="highscore_name_human">Human</span>
+                    <span id="highscore_human">0</span>
+                </div>
+                <div class="highscore-row">
+                    <span id="highscore_name_computer">Computer</span>
+                    <span id="highscore_computer">0</span>
+                </div>
+                <div class="highscore-row">
+                    <span>Draws</span>
+                    <span id="highscore_draws">0</span>
+                </div>
+                <div class="highscore-row highscore-total">
+                    <span>Total games</span>
+                    <span id="highscore_total">0</span>
+                </div>
+            </aside>
+
             <div class="board-wrap">
                 <canvas id="gamearea" aria-label="Liquid Color game board"></canvas>
                 <div class="gamestatus score-row">

@@ -25,6 +25,7 @@
         "definitions.ts",
         "cell.ts",
         "grid.ts",
+        "highscore.ts",
         "player.ts",
         "board.ts",
         "liquidcolor.ts"

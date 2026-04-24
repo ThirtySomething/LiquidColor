@@ -2,7 +2,7 @@ import { LCBoard } from "./lcboard.js";
 import { LCDefinitions } from "./lcdefinitions.js";
 import { LCPlayer } from "./lcplayer.js";
 
-const definitions = new LCDefinitions(30, 20, 10);
+const definitions = new LCDefinitions(30, 20, 15);
 const human = new LCPlayer("Besucher", "name_human", "score_human");
 const computer = new LCPlayer("DerPaul", "name_computer", "score_computer");
 const board = new LCBoard(definitions, human, computer);

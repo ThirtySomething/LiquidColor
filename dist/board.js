@@ -146,7 +146,6 @@ export class Board {
         if (this.evaluateGameState()) {
             return;
         }
-        // Simulate the full board for every candidate color to pick the best move.
         const newColorComputer = this.m_PlayerComputer.identifyBestColor(this.m_Grid.m_Cells, this.m_Definitions, newColorPlayer, this.m_PlayerHuman, this.m_ComputerStrategy);
         this.m_Grid.gridReset();
         this.m_PlayerComputer.move(this.m_Grid.m_Cells, [newColorComputer], this.m_Definitions, this.m_CanvasElement);

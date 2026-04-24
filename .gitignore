@@ -8,6 +8,7 @@
 .DS_Store
 .env
 .idea
+.tsbuildinfo*
 .vscode
 coverage
 node_modules

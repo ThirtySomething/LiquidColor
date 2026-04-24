@@ -1,5 +1,11 @@
 "use strict";
 class LCCell {
+    m_PosX;
+    m_PosY;
+    m_Color;
+    m_Owner;
+    m_Occupied;
+    m_DoRedraw;
     constructor(posX, posY) {
         this.m_PosX = Number.parseInt(String(posX), 10);
         this.m_PosY = Number.parseInt(String(posY), 10);
@@ -35,7 +41,14 @@ class LCCell {
             if (cellPosX < 0 || definitions.DimensionX <= cellPosX) {
                 return;
             }
-            const currentNeighbour = cells[cellPosY][cellPosX];
+            const row = cells[cellPosY];
+            if (!row) {
+                return;
+            }
+            const currentNeighbour = row[cellPosX];
+            if (!currentNeighbour) {
+                return;
+            }
             if (!currentNeighbour.m_DoRedraw) {
                 return;
             }
@@ -48,7 +61,7 @@ class LCCell {
     }
     cellColorRandomGet(colors) {
         const colorIndex = Math.floor(Math.random() * colors.length);
-        return colors[colorIndex];
+        return colors[colorIndex] ?? this.m_Color;
     }
     isBorderCell(cells, definitions) {
         let isBorder = false;
@@ -61,7 +74,14 @@ class LCCell {
             if (cellPosX < 0 || definitions.DimensionX <= cellPosX) {
                 return;
             }
-            const currentNeighbour = cells[cellPosY][cellPosX];
+            const row = cells[cellPosY];
+            if (!row) {
+                return;
+            }
+            const currentNeighbour = row[cellPosX];
+            if (!currentNeighbour) {
+                return;
+            }
             if (!currentNeighbour.m_Occupied) {
                 isBorder = true;
             }

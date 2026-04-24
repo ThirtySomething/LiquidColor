@@ -1,5 +1,11 @@
 "use strict";
 class LCPlayer {
+    m_PlayerName;
+    m_BaseCell;
+    m_Offsets;
+    m_IDName;
+    m_IDScore;
+    m_IDWinner;
     constructor(playerName, idName, idScore) {
         this.m_PlayerName = playerName;
         this.m_BaseCell = null;
@@ -26,7 +32,12 @@ class LCPlayer {
     init(board, posX, posY, idWinner) {
         setText(this.m_IDName, this.m_PlayerName);
         this.m_IDWinner = idWinner;
-        this.m_BaseCell = board.m_Grid.m_Cells[posY][posX];
+        const row = board.m_Grid.m_Cells[posY];
+        const baseCell = row ? row[posX] : undefined;
+        if (!baseCell) {
+            return;
+        }
+        this.m_BaseCell = baseCell;
         this.m_BaseCell.ownerSet(this.m_PlayerName);
         if (board.m_CanvasElement) {
             this.m_BaseCell.draw(board.m_Definitions, board.m_CanvasElement);
@@ -78,8 +89,12 @@ class LCPlayer {
             if (color === this.m_BaseCell?.m_Color) {
                 return;
             }
-            if (number < colorInformation[color]) {
-                number = colorInformation[color];
+            const score = colorInformation[color];
+            if (score === undefined) {
+                return;
+            }
+            if (number < score) {
+                number = score;
                 bestColor = color;
             }
         });

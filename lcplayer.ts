@@ -41,7 +41,13 @@ class LCPlayer {
     init(board: LCBoard, posX: number, posY: number, idWinner: string): void {
         setText(this.m_IDName, this.m_PlayerName);
         this.m_IDWinner = idWinner;
-        this.m_BaseCell = board.m_Grid.m_Cells[posY][posX];
+        const row = board.m_Grid.m_Cells[posY];
+        const baseCell = row ? row[posX] : undefined;
+        if (!baseCell) {
+            return;
+        }
+
+        this.m_BaseCell = baseCell;
         this.m_BaseCell.ownerSet(this.m_PlayerName);
 
         if (board.m_CanvasElement) {
@@ -117,8 +123,13 @@ class LCPlayer {
             if (color === this.m_BaseCell?.m_Color) {
                 return;
             }
-            if (number < colorInformation[color]) {
-                number = colorInformation[color];
+            const score = colorInformation[color];
+            if (score === undefined) {
+                return;
+            }
+
+            if (number < score) {
+                number = score;
                 bestColor = color;
             }
         });

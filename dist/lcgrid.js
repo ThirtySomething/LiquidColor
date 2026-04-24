@@ -1,17 +1,19 @@
 "use strict";
 class LCGrid {
+    m_Cells;
     constructor() {
         this.m_Cells = [];
     }
     gridInit(definitions, canvasElement) {
         this.m_Cells = [];
         for (let loopY = 0; loopY < definitions.DimensionY; loopY += 1) {
-            this.m_Cells[loopY] = [];
+            const row = [];
+            this.m_Cells[loopY] = row;
             for (let loopX = 0; loopX < definitions.DimensionX; loopX += 1) {
                 const currentCell = new LCCell(loopX, loopY);
                 currentCell.m_Color = currentCell.cellColorRandomGet(definitions.Colors);
                 currentCell.draw(definitions, canvasElement);
-                this.m_Cells[loopY].push(currentCell);
+                row.push(currentCell);
             }
         }
     }
@@ -54,7 +56,14 @@ class LCGrid {
                 if (cellPosX < 0 || definitions.DimensionX <= cellPosX) {
                     return;
                 }
-                const currentNeighbour = this.m_Cells[cellPosY][cellPosX];
+                const row = this.m_Cells[cellPosY];
+                if (!row) {
+                    return;
+                }
+                const currentNeighbour = row[cellPosX];
+                if (!currentNeighbour) {
+                    return;
+                }
                 if (currentNeighbour.m_Occupied) {
                     return;
                 }

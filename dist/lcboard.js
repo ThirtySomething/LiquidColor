@@ -1,5 +1,14 @@
 "use strict";
 class LCBoard {
+    m_CanvasElement;
+    m_Definitions;
+    m_PlayerHuman;
+    m_PlayerComputer;
+    m_Grid;
+    m_IDGameField;
+    m_IDButtonField;
+    m_IDWinner;
+    m_GameOver;
     constructor(definitions, playerHuman, playerComputer) {
         this.m_CanvasElement = null;
         this.m_Definitions = definitions;

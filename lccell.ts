@@ -53,7 +53,16 @@ class LCCell {
                 return;
             }
 
-            const currentNeighbour = cells[cellPosY][cellPosX];
+            const row = cells[cellPosY];
+            if (!row) {
+                return;
+            }
+
+            const currentNeighbour = row[cellPosX];
+            if (!currentNeighbour) {
+                return;
+            }
+
             if (!currentNeighbour.m_DoRedraw) {
                 return;
             }
@@ -71,7 +80,7 @@ class LCCell {
 
     cellColorRandomGet(colors: string[]): string {
         const colorIndex = Math.floor(Math.random() * colors.length);
-        return colors[colorIndex];
+        return colors[colorIndex] ?? this.m_Color;
     }
 
     isBorderCell(cells: LCCell[][], definitions: LCDefinitions): boolean {
@@ -88,7 +97,16 @@ class LCCell {
                 return;
             }
 
-            const currentNeighbour = cells[cellPosY][cellPosX];
+            const row = cells[cellPosY];
+            if (!row) {
+                return;
+            }
+
+            const currentNeighbour = row[cellPosX];
+            if (!currentNeighbour) {
+                return;
+            }
+
             if (!currentNeighbour.m_Occupied) {
                 isBorder = true;
             }

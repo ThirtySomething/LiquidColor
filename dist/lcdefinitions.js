@@ -1,5 +1,11 @@
 "use strict";
 class LCDefinitions {
+    DimensionX;
+    DimensionY;
+    CellSize;
+    Winner;
+    Colors;
+    Offsets;
     constructor(dimX, dimY, cellSize) {
         this.DimensionX = 0;
         this.DimensionY = 0;

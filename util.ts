@@ -1,4 +1,4 @@
-function setElementSize(
+export function setElementSize(
     element: HTMLCanvasElement | null,
     width: number,
     height: number
@@ -12,54 +12,54 @@ function setElementSize(
     element.height = height;
 }
 
-function getInputValue(id: string): string {
+export function getInputValue(id: string): string {
     const element = document.getElementById(id) as HTMLInputElement | null;
     return element ? element.value : "";
 }
 
-function setInputValue(id: string, value: string | number): void {
+export function setInputValue(id: string, value: string | number): void {
     const element = document.getElementById(id) as HTMLInputElement | null;
     if (element) {
         element.value = String(value);
     }
 }
 
-function setText(id: string, value: string): void {
+export function setText(id: string, value: string): void {
     const element = document.getElementById(id);
     if (element) {
         element.textContent = value;
     }
 }
 
-function show(id: string, displayMode = "block"): void {
+export function show(id: string, displayMode = "block"): void {
     const element = document.getElementById(id);
     if (element) {
         element.style.display = displayMode;
     }
 }
 
-function hide(id: string): void {
+export function hide(id: string): void {
     const element = document.getElementById(id);
     if (element) {
         element.style.display = "none";
     }
 }
 
-function removeClass(id: string, className: string): void {
+export function removeClass(id: string, className: string): void {
     const element = document.getElementById(id);
     if (element) {
         element.classList.remove(className);
     }
 }
 
-function clearChildren(id: string): void {
+export function clearChildren(id: string): void {
     const element = document.getElementById(id);
     if (element) {
         element.replaceChildren();
     }
 }
 
-function getCssNumberVar(name: string, fallback = 0): number {
+export function getCssNumberVar(name: string, fallback = 0): number {
     const value = getComputedStyle(document.documentElement)
         .getPropertyValue(name)
         .trim();

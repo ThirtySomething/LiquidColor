@@ -1,9 +1,9 @@
-type LCOffset = {
+export type LCOffset = {
     DX: number;
     DY: number;
 };
 
-class LCDefinitions {
+export class LCDefinitions {
     DimensionX: number;
     DimensionY: number;
     CellSize: number;

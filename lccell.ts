@@ -1,4 +1,6 @@
-class LCCell {
+import { LCDefinitions } from "./lcdefinitions.js";
+
+export class LCCell {
     m_PosX: number;
     m_PosY: number;
     m_Color: string;

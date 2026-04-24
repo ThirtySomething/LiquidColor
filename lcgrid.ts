@@ -1,6 +1,10 @@
+import { LCCell } from "./lccell.js";
+import { LCDefinitions } from "./lcdefinitions.js";
+import type { LCPlayer } from "./lcplayer.js";
+
 type ColorCountMap = Record<string, number>;
 
-class LCGrid {
+export class LCGrid {
     m_Cells: LCCell[][];
 
     constructor() {

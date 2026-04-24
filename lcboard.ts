@@ -1,3 +1,18 @@
+import { LCDefinitions } from "./lcdefinitions.js";
+import { LCGrid } from "./lcgrid.js";
+import { LCPlayer } from "./lcplayer.js";
+import {
+    clearChildren,
+    getCssNumberVar,
+    getInputValue,
+    hide,
+    removeClass,
+    setElementSize,
+    setInputValue,
+    setText,
+    show
+} from "./util.js";
+
 type ScoreStats = {
     human: number;
     computer: number;
@@ -5,7 +20,7 @@ type ScoreStats = {
     total: number;
 };
 
-class LCBoard {
+export class LCBoard {
     m_CanvasElement: CanvasRenderingContext2D | null;
     m_Definitions: LCDefinitions;
     m_PlayerHuman: LCPlayer;

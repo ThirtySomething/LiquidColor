@@ -1,5 +1,6 @@
-"use strict";
-class LCGrid {
+import { LCCell } from "./lccell.js";
+import { LCDefinitions } from "./lcdefinitions.js";
+export class LCGrid {
     m_Cells;
     constructor() {
         this.m_Cells = [];

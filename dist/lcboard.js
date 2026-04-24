@@ -1,5 +1,8 @@
-"use strict";
-class LCBoard {
+import { LCDefinitions } from "./lcdefinitions.js";
+import { LCGrid } from "./lcgrid.js";
+import { LCPlayer } from "./lcplayer.js";
+import { clearChildren, getCssNumberVar, getInputValue, hide, removeClass, setElementSize, setInputValue, setText, show } from "./util.js";
+export class LCBoard {
     m_CanvasElement;
     m_Definitions;
     m_PlayerHuman;

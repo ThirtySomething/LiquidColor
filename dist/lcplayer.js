@@ -1,5 +1,7 @@
-"use strict";
-class LCPlayer {
+import { LCCell } from "./lccell.js";
+import { LCDefinitions } from "./lcdefinitions.js";
+import { removeClass, setText } from "./util.js";
+export class LCPlayer {
     m_PlayerName;
     m_BaseCell;
     m_Offsets;

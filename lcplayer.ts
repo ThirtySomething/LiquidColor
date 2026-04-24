@@ -1,6 +1,11 @@
+import type { LCBoard } from "./lcboard.js";
+import { LCCell } from "./lccell.js";
+import { LCDefinitions } from "./lcdefinitions.js";
+import { removeClass, setText } from "./util.js";
+
 type ColorInformation = Record<string, number>;
 
-class LCPlayer {
+export class LCPlayer {
     m_PlayerName: string;
     m_BaseCell: LCCell | null;
     m_Offsets: unknown[];

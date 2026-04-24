@@ -1,5 +1,4 @@
-"use strict";
-class LCDefinitions {
+export class LCDefinitions {
     DimensionX;
     DimensionY;
     CellSize;

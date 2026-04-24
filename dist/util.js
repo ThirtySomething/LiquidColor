@@ -1,5 +1,4 @@
-"use strict";
-function setElementSize(element, width, height) {
+export function setElementSize(element, width, height) {
     if (!element) {
         return;
     }
@@ -8,47 +7,47 @@ function setElementSize(element, width, height) {
     element.width = width;
     element.height = height;
 }
-function getInputValue(id) {
+export function getInputValue(id) {
     const element = document.getElementById(id);
     return element ? element.value : "";
 }
-function setInputValue(id, value) {
+export function setInputValue(id, value) {
     const element = document.getElementById(id);
     if (element) {
         element.value = String(value);
     }
 }
-function setText(id, value) {
+export function setText(id, value) {
     const element = document.getElementById(id);
     if (element) {
         element.textContent = value;
     }
 }
-function show(id, displayMode = "block") {
+export function show(id, displayMode = "block") {
     const element = document.getElementById(id);
     if (element) {
         element.style.display = displayMode;
     }
 }
-function hide(id) {
+export function hide(id) {
     const element = document.getElementById(id);
     if (element) {
         element.style.display = "none";
     }
 }
-function removeClass(id, className) {
+export function removeClass(id, className) {
     const element = document.getElementById(id);
     if (element) {
         element.classList.remove(className);
     }
 }
-function clearChildren(id) {
+export function clearChildren(id) {
     const element = document.getElementById(id);
     if (element) {
         element.replaceChildren();
     }
 }
-function getCssNumberVar(name, fallback = 0) {
+export function getCssNumberVar(name, fallback = 0) {
     const value = getComputedStyle(document.documentElement)
         .getPropertyValue(name)
         .trim();

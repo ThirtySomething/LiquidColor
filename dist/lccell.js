@@ -1,5 +1,5 @@
-"use strict";
-class LCCell {
+import { LCDefinitions } from "./lcdefinitions.js";
+export class LCCell {
     m_PosX;
     m_PosY;
     m_Color;

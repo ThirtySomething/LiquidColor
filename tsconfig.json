@@ -2,6 +2,8 @@
     "compilerOptions": {
         "target": "ES2023",
         "module": "es2022",
+        "moduleResolution": "bundler",
+        "verbatimModuleSyntax": true,
         "lib": [
             "ES2023",
             "DOM",

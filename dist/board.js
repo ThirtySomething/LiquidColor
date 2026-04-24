@@ -5,6 +5,8 @@ import { Subject } from "./subject.js";
 import { Player } from "./player.js";
 import { Timer } from "./timer.js";
 import { Util } from "./util.js";
+import { CommandInvoker } from "./commands/commandinvoker.js";
+import { CommandPlayColor } from "./commands/commandplaycolor.js";
 export class Board {
     static instance = null;
     m_CanvasElement;
@@ -20,6 +22,7 @@ export class Board {
     m_GameOver;
     m_Highscore;
     m_UISubject;
+    m_CommandInvoker;
     constructor(definitions, playerHuman, playerComputer) {
         this.m_CanvasElement = null;
         this.m_Definitions = definitions;
@@ -34,6 +37,7 @@ export class Board {
         this.m_GameOver = false;
         this.m_Highscore = new Highscore();
         this.m_UISubject = new Subject();
+        this.m_CommandInvoker = new CommandInvoker();
     }
     static initialize(definitions, playerHuman, playerComputer) {
         if (!Board.instance) {
@@ -48,6 +52,9 @@ export class Board {
     }
     getUISubject() {
         return this.m_UISubject;
+    }
+    getCommandInvoker() {
+        return this.m_CommandInvoker;
     }
     init(gameField, buttonField, idWinner) {
         this.m_IDGameField = gameField;
@@ -138,7 +145,8 @@ export class Board {
             colorButton.style.height = `${btnHeight}px`;
             colorButton.setAttribute("aria-label", `Choose ${currentColor} color`);
             colorButton.addEventListener("click", () => {
-                this.performMove(currentColor);
+                const command = new CommandPlayColor(this, currentColor);
+                this.m_CommandInvoker.execute(command);
             });
             buttonContainer.appendChild(colorButton);
         });

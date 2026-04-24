@@ -13,11 +13,12 @@
     --button-gap: 10px;
 }
 
-* {
+.liquidcolor-root,
+.liquidcolor-root * {
     box-sizing: border-box;
 }
 
-body {
+.liquidcolor-root {
     margin: 0;
     min-height: 100vh;
     background:
@@ -26,6 +27,13 @@ body {
         var(--page-bg);
     color: var(--text-color);
     font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+.liquidcolor-root button,
+.liquidcolor-root input,
+.liquidcolor-root select,
+.liquidcolor-root textarea {
+    font: inherit;
 }
 
 .app-shell {

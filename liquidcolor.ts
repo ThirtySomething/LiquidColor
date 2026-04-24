@@ -7,7 +7,7 @@ const human = new Player("Besucher", "name_human", "score_human");
 const computer = new Player("DerPaul", "name_computer", "score_computer");
 const board = new Board(definitions, human, computer);
 
-function initApp(): void {
+function initLiquidColor(): void {
     const compare = document.getElementById("compare");
     if (compare) {
         compare.style.display = "none";
@@ -23,4 +23,4 @@ function initApp(): void {
     }
 }
 
-document.addEventListener("DOMContentLoaded", initApp);
+document.addEventListener("DOMContentLoaded", initLiquidColor);

@@ -1,4 +1,4 @@
-import { setText } from "./util.js";
+import { Util } from "./util.js";
 
 export class Timer {
     m_IDDuration: string;
@@ -22,7 +22,7 @@ export class Timer {
         const elapsedMs = this.m_StartTimestamp === null
             ? 0
             : Date.now() - this.m_StartTimestamp;
-        setText(this.m_IDDuration, `Duration: ${this.formatDuration(elapsedMs)}`);
+        Util.setText(this.m_IDDuration, `Duration: ${this.formatDuration(elapsedMs)}`);
     }
 
     startTicker(): void {

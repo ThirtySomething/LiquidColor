@@ -2,17 +2,7 @@ import { Definitions } from "./definitions.js";
 import { Grid } from "./grid.js";
 import { Player, type ComputerStrategy } from "./player.js";
 import { Timer } from "./timer.js";
-import {
-    clearChildren,
-    getCssNumberVar,
-    getInputValue,
-    hide,
-    removeClass,
-    setElementSize,
-    setInputValue,
-    setText,
-    show
-} from "./util.js";
+import { Util } from "./util.js";
 
 type ScoreStats = {
     human: number;
@@ -62,11 +52,11 @@ export class Board {
             this.boardInit();
             this.boardButtonsInit(this.m_IDButtonField);
             this.playerInit(this.m_IDWinner);
-            setInputValue("dimx", this.m_Definitions.DimensionX);
-            setInputValue("dimy", this.m_Definitions.DimensionY);
-            setInputValue("cellsize", this.m_Definitions.CellSize);
-            setInputValue("playername", this.m_PlayerHuman.m_PlayerName);
-            setInputValue("computerstrategy", this.m_ComputerStrategy);
+            Util.setInputValue("dimx", this.m_Definitions.DimensionX);
+            Util.setInputValue("dimy", this.m_Definitions.DimensionY);
+            Util.setInputValue("cellsize", this.m_Definitions.CellSize);
+            Util.setInputValue("playername", this.m_PlayerHuman.m_PlayerName);
+            Util.setInputValue("computerstrategy", this.m_ComputerStrategy);
         }
     }
 
@@ -77,11 +67,11 @@ export class Board {
         idPlayerName: string,
         idComputerStrategy: string
     ): void {
-        const dimX = getInputValue(idDimX);
-        const dimY = getInputValue(idDimY);
-        const cellSize = getInputValue(idCellSize);
-        const playerName = getInputValue(idPlayerName);
-        const computerStrategy = getInputValue(idComputerStrategy);
+        const dimX = Util.getInputValue(idDimX);
+        const dimY = Util.getInputValue(idDimY);
+        const cellSize = Util.getInputValue(idCellSize);
+        const playerName = Util.getInputValue(idPlayerName);
+        const computerStrategy = Util.getInputValue(idComputerStrategy);
 
         this.m_Definitions.reInit(dimX, dimY, cellSize);
         this.m_PlayerHuman.m_PlayerName = playerName;
@@ -131,9 +121,9 @@ export class Board {
         const boardWidth = this.m_Definitions.DimensionX * this.m_Definitions.CellSize;
         const boardHeight = this.m_Definitions.DimensionY * this.m_Definitions.CellSize;
 
-        setText("moveinfo", "");
+        Util.setText("moveinfo", "");
         const canvas = document.getElementById(this.m_IDGameField) as HTMLCanvasElement | null;
-        setElementSize(canvas, boardWidth, boardHeight);
+        Util.setElementSize(canvas, boardWidth, boardHeight);
 
         if (!this.m_CanvasElement) {
             return;
@@ -146,7 +136,7 @@ export class Board {
         if (!buttonContainer) {
             return;
         }
-        const btnMargin = getCssNumberVar("--button-gap", 10);
+        const btnMargin = Util.getCssNumberVar("--button-gap", 10);
         const numberOfButtons = this.m_Definitions.Colors.length;
         const btnWidth = Math.floor((this.m_Definitions.DimensionX * this.m_Definitions.CellSize) / 5);
         const btnHeight = Math.floor(
@@ -155,7 +145,7 @@ export class Board {
             numberOfButtons
         );
 
-        clearChildren(buttonField);
+        Util.clearChildren(buttonField);
         this.m_Definitions.Colors.forEach((currentColor) => {
             const colorButton = document.createElement("button");
             colorButton.type = "button";
@@ -177,15 +167,15 @@ export class Board {
             return;
         }
 
-        hide("moveinfo");
+        Util.hide("moveinfo");
         if (newColorPlayer === this.m_PlayerHuman.m_BaseCell.m_Color) {
-            setText("moveinfo", "You cannot select the color of yourself.");
-            show("moveinfo", "block");
+            Util.setText("moveinfo", "You cannot select the color of yourself.");
+            Util.show("moveinfo", "block");
             return;
         }
         if (newColorPlayer === this.m_PlayerComputer.m_BaseCell.m_Color) {
-            setText("moveinfo", "You cannot select the color of your opponent.");
-            show("moveinfo", "block");
+            Util.setText("moveinfo", "You cannot select the color of your opponent.");
+            Util.show("moveinfo", "block");
             return;
         }
 
@@ -252,9 +242,9 @@ export class Board {
     endGame(message: string): void {
         this.m_GameOver = true;
         this.m_Timer.stop();
-        setText(this.m_IDWinner, message);
-        removeClass(this.m_IDWinner, "dspno");
-        show(this.m_IDWinner, "block");
+        Util.setText(this.m_IDWinner, message);
+        Util.removeClass(this.m_IDWinner, "dspno");
+        Util.show(this.m_IDWinner, "block");
     }
 
     evaluateGameState(): boolean {

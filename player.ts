@@ -3,7 +3,7 @@ import { Cell } from "./cell.js";
 import { Definitions } from "./definitions.js";
 import { ComputerStrategyFactory } from "./strategies/computerstrategyfactory.js";
 import type { ComputerStrategy } from "./strategies/computerstrategytype.js";
-import { removeClass, setText } from "./util.js";
+import { Util } from "./util.js";
 
 export type { ComputerStrategy } from "./strategies/computerstrategytype.js";
 
@@ -35,18 +35,18 @@ export class Player {
             });
         });
 
-        setText(this.m_IDScore, String(cellCounter));
+        Util.setText(this.m_IDScore, String(cellCounter));
         if (cellCounter >= definitions.Winner) {
-            setText(
+            Util.setText(
                 this.m_IDWinner,
                 `Player [${this.m_PlayerName}] won the game - has more than the half cells occupied.`
             );
-            removeClass(this.m_IDWinner, "dspno");
+            Util.removeClass(this.m_IDWinner, "dspno");
         }
     }
 
     init(board: Board, posX: number, posY: number, idWinner: string): void {
-        setText(this.m_IDName, this.m_PlayerName);
+        Util.setText(this.m_IDName, this.m_PlayerName);
         this.m_IDWinner = idWinner;
         const row = board.m_Grid.m_Cells[posY];
         const baseCell = row ? row[posX] : undefined;

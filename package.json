@@ -10,9 +10,13 @@
         "build:bundle:dev": "esbuild app.ts --bundle --platform=browser --format=iife --target=es2020 --sourcemap --outfile=dist/app.js",
         "build:bundle:prod": "esbuild app.ts --bundle --platform=browser --format=iife --target=es2020 --minify --outfile=dist/app.js && node -e \"require('fs').rmSync('dist/app.js.map', { force: true })\"",
         "typecheck": "tsc --noEmit -p tsconfig.dev.json",
-        "watch": "tsc --watch -p tsconfig.dev.json"
+        "watch": "npm run watch:dev",
+        "watch:ts": "tsc --watch -p tsconfig.dev.json",
+        "watch:bundle": "esbuild app.ts --bundle --platform=browser --format=iife --target=es2020 --sourcemap --outfile=dist/app.js --watch",
+        "watch:dev": "concurrently -k -n TSC,ESBUILD -c cyan,magenta \"npm:watch:ts\" \"npm:watch:bundle\""
     },
     "devDependencies": {
+        "concurrently": "^9.1.2",
         "esbuild": "^0.25.3",
         "typescript": "^5.9.3"
     }

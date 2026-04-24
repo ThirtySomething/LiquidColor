@@ -532,7 +532,10 @@
       __publicField(this, "m_IDGameField");
       __publicField(this, "m_IDButtonField");
       __publicField(this, "m_IDWinner");
+      __publicField(this, "m_IDDuration");
       __publicField(this, "m_ComputerStrategy");
+      __publicField(this, "m_GameStartTimestamp");
+      __publicField(this, "m_GameDurationTimer");
       __publicField(this, "m_GameOver");
       this.m_CanvasElement = null;
       this.m_Definitions = definitions2;
@@ -542,8 +545,51 @@
       this.m_IDGameField = "";
       this.m_IDButtonField = "";
       this.m_IDWinner = "";
+      this.m_IDDuration = "gameduration";
       this.m_ComputerStrategy = "minimax";
+      this.m_GameStartTimestamp = null;
+      this.m_GameDurationTimer = null;
       this.m_GameOver = false;
+    }
+    formatDuration(ms) {
+      const totalSeconds = Math.max(0, Math.floor(ms / 1e3));
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
+    updateDurationDisplay() {
+      const elapsedMs = this.m_GameStartTimestamp === null ? 0 : Date.now() - this.m_GameStartTimestamp;
+      setText(this.m_IDDuration, `Duration: ${this.formatDuration(elapsedMs)}`);
+    }
+    startDurationTicker() {
+      if (this.m_GameDurationTimer !== null) {
+        window.clearInterval(this.m_GameDurationTimer);
+      }
+      this.m_GameDurationTimer = window.setInterval(() => {
+        this.updateDurationDisplay();
+      }, 1e3);
+    }
+    resetDurationCounter() {
+      if (this.m_GameDurationTimer !== null) {
+        window.clearInterval(this.m_GameDurationTimer);
+        this.m_GameDurationTimer = null;
+      }
+      this.m_GameStartTimestamp = null;
+      this.updateDurationDisplay();
+    }
+    startDurationCounter() {
+      if (this.m_GameStartTimestamp !== null) {
+        return;
+      }
+      this.m_GameStartTimestamp = Date.now();
+      this.updateDurationDisplay();
+    }
+    stopDurationCounter() {
+      if (this.m_GameDurationTimer !== null) {
+        window.clearInterval(this.m_GameDurationTimer);
+        this.m_GameDurationTimer = null;
+      }
+      this.updateDurationDisplay();
     }
     init(gameField, buttonField, idWinner) {
       this.m_IDGameField = gameField;
@@ -586,6 +632,8 @@
     }
     playerInit(idWinner) {
       this.m_GameOver = false;
+      this.resetDurationCounter();
+      this.startDurationTicker();
       const winnerElement = document.getElementById(idWinner);
       if (winnerElement) {
         winnerElement.textContent = "";
@@ -660,6 +708,7 @@
         show("moveinfo", "block");
         return;
       }
+      this.startDurationCounter();
       this.m_Grid.gridReset();
       this.m_PlayerHuman.move(
         this.m_Grid.m_Cells,
@@ -712,6 +761,7 @@
     }
     endGame(message) {
       this.m_GameOver = true;
+      this.stopDurationCounter();
       setText(this.m_IDWinner, message);
       removeClass(this.m_IDWinner, "dspno");
       show(this.m_IDWinner, "block");

@@ -1,6 +1,7 @@
 import { LCDefinitions } from "./lcdefinitions.js";
 import { LCGrid } from "./lcgrid.js";
 import { LCPlayer } from "./lcplayer.js";
+import { LCTimer } from "./lctimer.js";
 import { clearChildren, getCssNumberVar, getInputValue, hide, removeClass, setElementSize, setInputValue, setText, show } from "./util.js";
 export class LCBoard {
     m_CanvasElement;
@@ -11,10 +12,8 @@ export class LCBoard {
     m_IDGameField;
     m_IDButtonField;
     m_IDWinner;
-    m_IDDuration;
+    m_Timer;
     m_ComputerStrategy;
-    m_GameStartTimestamp;
-    m_GameDurationTimer;
     m_GameOver;
     constructor(definitions, playerHuman, playerComputer) {
         this.m_CanvasElement = null;
@@ -25,53 +24,9 @@ export class LCBoard {
         this.m_IDGameField = "";
         this.m_IDButtonField = "";
         this.m_IDWinner = "";
-        this.m_IDDuration = "gameduration";
+        this.m_Timer = new LCTimer("gameduration");
         this.m_ComputerStrategy = "minimax";
-        this.m_GameStartTimestamp = null;
-        this.m_GameDurationTimer = null;
         this.m_GameOver = false;
-    }
-    formatDuration(ms) {
-        const totalSeconds = Math.max(0, Math.floor(ms / 1000));
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-        return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-    }
-    updateDurationDisplay() {
-        const elapsedMs = this.m_GameStartTimestamp === null
-            ? 0
-            : Date.now() - this.m_GameStartTimestamp;
-        setText(this.m_IDDuration, `Duration: ${this.formatDuration(elapsedMs)}`);
-    }
-    startDurationTicker() {
-        if (this.m_GameDurationTimer !== null) {
-            window.clearInterval(this.m_GameDurationTimer);
-        }
-        this.m_GameDurationTimer = window.setInterval(() => {
-            this.updateDurationDisplay();
-        }, 1000);
-    }
-    resetDurationCounter() {
-        if (this.m_GameDurationTimer !== null) {
-            window.clearInterval(this.m_GameDurationTimer);
-            this.m_GameDurationTimer = null;
-        }
-        this.m_GameStartTimestamp = null;
-        this.updateDurationDisplay();
-    }
-    startDurationCounter() {
-        if (this.m_GameStartTimestamp !== null) {
-            return;
-        }
-        this.m_GameStartTimestamp = Date.now();
-        this.updateDurationDisplay();
-    }
-    stopDurationCounter() {
-        if (this.m_GameDurationTimer !== null) {
-            window.clearInterval(this.m_GameDurationTimer);
-            this.m_GameDurationTimer = null;
-        }
-        this.updateDurationDisplay();
     }
     init(gameField, buttonField, idWinner) {
         this.m_IDGameField = gameField;
@@ -114,8 +69,8 @@ export class LCBoard {
     }
     playerInit(idWinner) {
         this.m_GameOver = false;
-        this.resetDurationCounter();
-        this.startDurationTicker();
+        this.m_Timer.reset();
+        this.m_Timer.startTicker();
         const winnerElement = document.getElementById(idWinner);
         if (winnerElement) {
             winnerElement.textContent = "";
@@ -180,7 +135,7 @@ export class LCBoard {
             show("moveinfo", "block");
             return;
         }
-        this.startDurationCounter();
+        this.m_Timer.startCounting();
         this.m_Grid.gridReset();
         this.m_PlayerHuman.move(this.m_Grid.m_Cells, [newColorPlayer], this.m_Definitions, this.m_CanvasElement);
         if (this.evaluateGameState()) {
@@ -218,7 +173,7 @@ export class LCBoard {
     }
     endGame(message) {
         this.m_GameOver = true;
-        this.stopDurationCounter();
+        this.m_Timer.stop();
         setText(this.m_IDWinner, message);
         removeClass(this.m_IDWinner, "dspno");
         show(this.m_IDWinner, "block");

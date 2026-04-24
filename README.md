@@ -2,7 +2,7 @@
 
 ## General Information
 
-**LiquidColor** is distributed under the terms of the **GNU LESSER GENERAL PUBLIC LICENSE**, version 3.0. The text of the license is included in the file [<code>LICENSE.TXT</code>][url_license] in the project root.
+**LiquidColor** is distributed under the terms of the **GNU LESSER GENERAL PUBLIC LICENSE**, version 3.0. The text of the license is included in the file [`LICENSE.TXT`][url_license] in the project root.
 
 This is a single player game written in JavaScript. It will take advantage of HTML5 canvas.
 

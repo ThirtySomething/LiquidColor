@@ -38,6 +38,7 @@ export class LCBoard {
             this.playerInit(this.m_IDWinner);
             setInputValue("dimx", this.m_Definitions.DimensionX);
             setInputValue("dimy", this.m_Definitions.DimensionY);
+            setInputValue("cellsize", this.m_Definitions.CellSize);
             setInputValue("playername", this.m_PlayerHuman.m_PlayerName);
         }
     }

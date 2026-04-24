@@ -114,6 +114,45 @@ export class LCPlayer {
         }
         return { gained, newOwnedSet: newOwned };
     }
+    identifyBestColorGreedy(cells, definitions, newColorPlayer, opponent) {
+        if (!this.m_BaseCell || !opponent.m_BaseCell) {
+            return newColorPlayer;
+        }
+        const compOwned = new Set();
+        const humanOwned = new Set();
+        cells.forEach((row) => {
+            row.forEach((cell) => {
+                if (cell.m_Owner === this.m_PlayerName) {
+                    compOwned.add(cell);
+                }
+                else if (cell.m_Owner === opponent.m_PlayerName) {
+                    humanOwned.add(cell);
+                }
+            });
+        });
+        const compCurrentColor = this.m_BaseCell.m_Color;
+        const allColors = new Set();
+        cells.forEach((row) => {
+            row.forEach((cell) => {
+                if (!cell.m_Occupied) {
+                    allColors.add(cell.m_Color);
+                }
+            });
+        });
+        let bestColor = compCurrentColor;
+        let bestGain = -1;
+        for (const compColor of allColors) {
+            if (compColor === newColorPlayer || compColor === compCurrentColor) {
+                continue;
+            }
+            const { gained } = LCPlayer.simulateCapture(cells, definitions, compOwned, humanOwned, compColor);
+            if (gained > bestGain) {
+                bestGain = gained;
+                bestColor = compColor;
+            }
+        }
+        return bestColor;
+    }
     /**
      * 2-ply minimax color selection.
      *
@@ -128,7 +167,7 @@ export class LCPlayer {
      * frontierColorDiversity counts how many distinct colors the computer's
      * new territory borders — a larger palette means more good moves next turn.
      */
-    identifyBestColor(cells, definitions, newColorPlayer, opponent) {
+    identifyBestColorMinimax(cells, definitions, newColorPlayer, opponent) {
         if (!this.m_BaseCell || !opponent.m_BaseCell) {
             return newColorPlayer;
         }
@@ -212,4 +251,11 @@ export class LCPlayer {
         }
         return bestColor;
     }
+    identifyBestColor(cells, definitions, newColorPlayer, opponent, strategy = "minimax") {
+        if (strategy === "greedy") {
+            return this.identifyBestColorGreedy(cells, definitions, newColorPlayer, opponent);
+        }
+        return this.identifyBestColorMinimax(cells, definitions, newColorPlayer, opponent);
+    }
 }
+//# sourceMappingURL=lcplayer.js.map

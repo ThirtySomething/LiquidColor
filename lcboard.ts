@@ -1,6 +1,6 @@
 import { LCDefinitions } from "./lcdefinitions.js";
 import { LCGrid } from "./lcgrid.js";
-import { LCPlayer } from "./lcplayer.js";
+import { LCPlayer, type LCComputerStrategy } from "./lcplayer.js";
 import {
     clearChildren,
     getCssNumberVar,
@@ -29,6 +29,7 @@ export class LCBoard {
     m_IDGameField: string;
     m_IDButtonField: string;
     m_IDWinner: string;
+    m_ComputerStrategy: LCComputerStrategy;
     m_GameOver: boolean;
 
     constructor(definitions: LCDefinitions, playerHuman: LCPlayer, playerComputer: LCPlayer) {
@@ -40,6 +41,7 @@ export class LCBoard {
         this.m_IDGameField = "";
         this.m_IDButtonField = "";
         this.m_IDWinner = "";
+        this.m_ComputerStrategy = "minimax";
         this.m_GameOver = false;
     }
 
@@ -61,21 +63,37 @@ export class LCBoard {
             setInputValue("dimy", this.m_Definitions.DimensionY);
             setInputValue("cellsize", this.m_Definitions.CellSize);
             setInputValue("playername", this.m_PlayerHuman.m_PlayerName);
+            setInputValue("computerstrategy", this.m_ComputerStrategy);
         }
     }
 
-    reInit(idDimX: string, idDimY: string, idCellSize: string, idPlayerName: string): void {
+    reInit(
+        idDimX: string,
+        idDimY: string,
+        idCellSize: string,
+        idPlayerName: string,
+        idComputerStrategy: string
+    ): void {
         const dimX = getInputValue(idDimX);
         const dimY = getInputValue(idDimY);
         const cellSize = getInputValue(idCellSize);
         const playerName = getInputValue(idPlayerName);
+        const computerStrategy = getInputValue(idComputerStrategy);
 
         this.m_Definitions.reInit(dimX, dimY, cellSize);
         this.m_PlayerHuman.m_PlayerName = playerName;
+        this.m_ComputerStrategy = this.readComputerStrategy(computerStrategy);
 
         this.boardInit();
         this.boardButtonsInit(this.m_IDButtonField);
         this.playerInit(this.m_IDWinner);
+    }
+
+    readComputerStrategy(strategyValue: string): LCComputerStrategy {
+        if (strategyValue === "greedy") {
+            return "greedy";
+        }
+        return "minimax";
     }
 
     playerInit(idWinner: string): void {
@@ -182,7 +200,8 @@ export class LCBoard {
             this.m_Grid.m_Cells,
             this.m_Definitions,
             newColorPlayer,
-            this.m_PlayerHuman
+            this.m_PlayerHuman,
+            this.m_ComputerStrategy
         );
 
         this.m_Grid.gridReset();

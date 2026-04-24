@@ -11,6 +11,7 @@ export class LCBoard {
     m_IDGameField;
     m_IDButtonField;
     m_IDWinner;
+    m_ComputerStrategy;
     m_GameOver;
     constructor(definitions, playerHuman, playerComputer) {
         this.m_CanvasElement = null;
@@ -21,6 +22,7 @@ export class LCBoard {
         this.m_IDGameField = "";
         this.m_IDButtonField = "";
         this.m_IDWinner = "";
+        this.m_ComputerStrategy = "minimax";
         this.m_GameOver = false;
     }
     init(gameField, buttonField, idWinner) {
@@ -40,18 +42,27 @@ export class LCBoard {
             setInputValue("dimy", this.m_Definitions.DimensionY);
             setInputValue("cellsize", this.m_Definitions.CellSize);
             setInputValue("playername", this.m_PlayerHuman.m_PlayerName);
+            setInputValue("computerstrategy", this.m_ComputerStrategy);
         }
     }
-    reInit(idDimX, idDimY, idCellSize, idPlayerName) {
+    reInit(idDimX, idDimY, idCellSize, idPlayerName, idComputerStrategy) {
         const dimX = getInputValue(idDimX);
         const dimY = getInputValue(idDimY);
         const cellSize = getInputValue(idCellSize);
         const playerName = getInputValue(idPlayerName);
+        const computerStrategy = getInputValue(idComputerStrategy);
         this.m_Definitions.reInit(dimX, dimY, cellSize);
         this.m_PlayerHuman.m_PlayerName = playerName;
+        this.m_ComputerStrategy = this.readComputerStrategy(computerStrategy);
         this.boardInit();
         this.boardButtonsInit(this.m_IDButtonField);
         this.playerInit(this.m_IDWinner);
+    }
+    readComputerStrategy(strategyValue) {
+        if (strategyValue === "greedy") {
+            return "greedy";
+        }
+        return "minimax";
     }
     playerInit(idWinner) {
         this.m_GameOver = false;
@@ -125,7 +136,7 @@ export class LCBoard {
             return;
         }
         // Simulate the full board for every candidate color to pick the best move.
-        const newColorComputer = this.m_PlayerComputer.identifyBestColor(this.m_Grid.m_Cells, this.m_Definitions, newColorPlayer, this.m_PlayerHuman);
+        const newColorComputer = this.m_PlayerComputer.identifyBestColor(this.m_Grid.m_Cells, this.m_Definitions, newColorPlayer, this.m_PlayerHuman, this.m_ComputerStrategy);
         this.m_Grid.gridReset();
         this.m_PlayerComputer.move(this.m_Grid.m_Cells, [newColorComputer], this.m_Definitions, this.m_CanvasElement);
         this.evaluateGameState();
@@ -185,3 +196,4 @@ export class LCBoard {
         return false;
     }
 }
+//# sourceMappingURL=lcboard.js.map

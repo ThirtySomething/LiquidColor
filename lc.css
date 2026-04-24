@@ -83,6 +83,14 @@ body {
     background-color: #fff;
 }
 
+.form-row select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #9ea8af;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
 .actions {
     grid-column: 1 / -1;
 }

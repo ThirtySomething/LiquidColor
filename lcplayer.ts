@@ -3,6 +3,8 @@ import { LCCell } from "./lccell.js";
 import { LCDefinitions } from "./lcdefinitions.js";
 import { removeClass, setText } from "./util.js";
 
+export type LCComputerStrategy = "minimax" | "greedy";
+
 export class LCPlayer {
     m_PlayerName: string;
     m_BaseCell: LCCell | null;
@@ -156,6 +158,57 @@ export class LCPlayer {
         return { gained, newOwnedSet: newOwned };
     }
 
+    private identifyBestColorGreedy(
+        cells: LCCell[][],
+        definitions: LCDefinitions,
+        newColorPlayer: string,
+        opponent: LCPlayer
+    ): string {
+        if (!this.m_BaseCell || !opponent.m_BaseCell) {
+            return newColorPlayer;
+        }
+
+        const compOwned = new Set<LCCell>();
+        const humanOwned = new Set<LCCell>();
+        cells.forEach((row) => {
+            row.forEach((cell) => {
+                if (cell.m_Owner === this.m_PlayerName) {
+                    compOwned.add(cell);
+                } else if (cell.m_Owner === opponent.m_PlayerName) {
+                    humanOwned.add(cell);
+                }
+            });
+        });
+
+        const compCurrentColor = this.m_BaseCell.m_Color;
+
+        const allColors = new Set<string>();
+        cells.forEach((row) => {
+            row.forEach((cell) => {
+                if (!cell.m_Occupied) {
+                    allColors.add(cell.m_Color);
+                }
+            });
+        });
+
+        let bestColor = compCurrentColor;
+        let bestGain = -1;
+
+        for (const compColor of allColors) {
+            if (compColor === newColorPlayer || compColor === compCurrentColor) {
+                continue;
+            }
+
+            const { gained } = LCPlayer.simulateCapture(cells, definitions, compOwned, humanOwned, compColor);
+            if (gained > bestGain) {
+                bestGain = gained;
+                bestColor = compColor;
+            }
+        }
+
+        return bestColor;
+    }
+
     /**
      * 2-ply minimax color selection.
      *
@@ -170,7 +223,7 @@ export class LCPlayer {
      * frontierColorDiversity counts how many distinct colors the computer's
      * new territory borders — a larger palette means more good moves next turn.
      */
-    identifyBestColor(
+    private identifyBestColorMinimax(
         cells: LCCell[][],
         definitions: LCDefinitions,
         newColorPlayer: string,
@@ -272,5 +325,19 @@ export class LCPlayer {
         }
 
         return bestColor;
+    }
+
+    identifyBestColor(
+        cells: LCCell[][],
+        definitions: LCDefinitions,
+        newColorPlayer: string,
+        opponent: LCPlayer,
+        strategy: LCComputerStrategy = "minimax"
+    ): string {
+        if (strategy === "greedy") {
+            return this.identifyBestColorGreedy(cells, definitions, newColorPlayer, opponent);
+        }
+
+        return this.identifyBestColorMinimax(cells, definitions, newColorPlayer, opponent);
     }
 }

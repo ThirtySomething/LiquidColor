@@ -18,7 +18,7 @@ function initApp(): void {
     const resetButton = document.getElementById("btn_reset");
     if (resetButton) {
         resetButton.addEventListener("click", () => {
-            board.reInit("dimx", "dimy", "cellsize", "playername");
+            board.reInit("dimx", "dimy", "cellsize", "playername", "computerstrategy");
         });
     }
 }

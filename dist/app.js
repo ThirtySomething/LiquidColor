@@ -1,1 +1,766 @@
-"use strict";(()=>{var k=Object.defineProperty;var T=(s,e,t)=>e in s?k(s,e,{enumerable:!0,configurable:!0,writable:!0,value:t}):s[e]=t;var l=(s,e,t)=>T(s,typeof e!="symbol"?e+"":e,t);var w=class{constructor(e,t,n){l(this,"DimensionX");l(this,"DimensionY");l(this,"CellSize");l(this,"Winner");l(this,"Colors");l(this,"Offsets");this.DimensionX=0,this.DimensionY=0,this.CellSize=0,this.Winner=0,this.Colors=["blue","cyan","green","red","yellow"],this.Offsets=[{DX:0,DY:1},{DX:1,DY:0},{DX:0,DY:-1},{DX:-1,DY:0}],this.reInit(e,t,n)}reInit(e,t,n){this.DimensionX=Number.parseInt(String(e),10),this.DimensionY=Number.parseInt(String(t),10),this.CellSize=Number.parseInt(String(n),10),this.Winner=Math.floor(this.DimensionX*this.DimensionY/2+1)}};var v=class{constructor(e,t){l(this,"m_PosX");l(this,"m_PosY");l(this,"m_Color");l(this,"m_Owner");l(this,"m_Occupied");l(this,"m_DoRedraw");this.m_PosX=Number.parseInt(String(e),10),this.m_PosY=Number.parseInt(String(t),10),this.m_Color="white",this.m_Owner="",this.m_Occupied=!1,this.m_DoRedraw=!0}draw(e,t){if(this.m_DoRedraw){let n=e.CellSize*this.m_PosX,i=e.CellSize*this.m_PosY;t.beginPath(),t.rect(n,i,e.CellSize,e.CellSize),t.fillStyle=this.m_Color,t.fill(),t.stroke(),this.m_DoRedraw=!1}}ownerSet(e){this.m_Owner=e,this.m_Occupied=!0}neighboursGet(e,t){let n=[];return t.Offsets.forEach(i=>{let r=this.m_PosY+i.DY;if(r<0||t.DimensionY<=r)return;let m=this.m_PosX+i.DX;if(m<0||t.DimensionX<=m)return;let a=e[r];if(!a)return;let o=a[m];o&&o.m_DoRedraw&&(!o.m_Occupied&&this.m_Color===o.m_Color||this.m_Owner===o.m_Owner&&this.m_Color!==o.m_Color)&&n.push(o)}),n}cellColorRandomGet(e){let t=Math.floor(Math.random()*e.length);return e[t]??this.m_Color}isBorderCell(e,t){let n=!1;return t.Offsets.forEach(i=>{let r=this.m_PosY+i.DY;if(r<0||t.DimensionY<=r)return;let m=this.m_PosX+i.DX;if(m<0||t.DimensionX<=m)return;let a=e[r];if(!a)return;let o=a[m];o&&(o.m_Occupied||(n=!0))}),n}};var L=class{constructor(){l(this,"m_Cells");this.m_Cells=[]}gridInit(e,t){this.m_Cells=[];for(let n=0;n<e.DimensionY;n+=1){let i=[];this.m_Cells[n]=i;for(let r=0;r<e.DimensionX;r+=1){let m=new v(r,n);m.m_Color=m.cellColorRandomGet(e.Colors),m.draw(e,t),i.push(m)}}}gridReset(){this.m_Cells.forEach(e=>{e.forEach(t=>{t.m_DoRedraw=!0})})}getPlayerCells(e){let t=[];return this.m_Cells.forEach(n=>{n.forEach(i=>{i.m_Owner===e.m_PlayerName&&t.push(i)})}),t}identifyBorderCells(e,t){let n=[];return e.forEach(i=>{i.isBorderCell(this.m_Cells,t)&&n.push(i)}),n}playerColorsGet(e,t){let n={};return e.forEach(i=>{t.Offsets.forEach(r=>{let m=i.m_PosY+r.DY;if(m<0||t.DimensionY<=m)return;let a=i.m_PosX+r.DX;if(a<0||t.DimensionX<=a)return;let o=this.m_Cells[m];if(!o)return;let u=o[a];if(!u||u.m_Occupied)return;let C=n[u.m_Color]||0;n[u.m_Color]=C+1})}),n}};function R(s,e,t){s&&(s.style.width=`${e}px`,s.style.height=`${t}px`,s.width=e,s.height=t)}function b(s){let e=document.getElementById(s);return e?e.value:""}function P(s,e){let t=document.getElementById(s);t&&(t.value=String(e))}function _(s,e){let t=document.getElementById(s);t&&(t.textContent=e)}function E(s,e="block"){let t=document.getElementById(s);t&&(t.style.display=e)}function H(s){let e=document.getElementById(s);e&&(e.style.display="none")}function B(s,e){let t=document.getElementById(s);t&&t.classList.remove(e)}function W(s){let e=document.getElementById(s);e&&e.replaceChildren()}function M(s,e=0){let t=getComputedStyle(document.documentElement).getPropertyValue(s).trim(),n=Number.parseInt(t,10);return Number.isNaN(n)?e:n}var I=class s{constructor(e,t,n){l(this,"m_PlayerName");l(this,"m_BaseCell");l(this,"m_Offsets");l(this,"m_IDName");l(this,"m_IDScore");l(this,"m_IDWinner");this.m_PlayerName=e,this.m_BaseCell=null,this.m_Offsets=[],this.m_IDName=t,this.m_IDScore=n,this.m_IDWinner=""}counterUpdate(e,t){let n=0;e.forEach(i=>{i.forEach(r=>{r.m_Occupied&&this.m_PlayerName===r.m_Owner&&(n+=1)})}),_(this.m_IDScore,String(n)),n>=t.Winner&&(_(this.m_IDWinner,`Player [${this.m_PlayerName}] won the game - has more than the half cells occupied.`),B(this.m_IDWinner,"dspno"))}init(e,t,n,i){_(this.m_IDName,this.m_PlayerName),this.m_IDWinner=i;let r=e.m_Grid.m_Cells[n],m=r?r[t]:void 0;m&&(this.m_BaseCell=m,this.m_BaseCell.ownerSet(this.m_PlayerName),e.m_CanvasElement&&(this.m_BaseCell.draw(e.m_Definitions,e.m_CanvasElement),this.cellsMarkOwner(e.m_Grid.m_Cells,e.m_Definitions,e.m_CanvasElement)))}move(e,t,n,i){!this.m_BaseCell||!i||(this.m_BaseCell.m_Color=this.m_BaseCell.cellColorRandomGet(t),this.m_BaseCell.draw(n,i),this.cellsMarkOwner(e,n,i))}cellsMarkOwner(e,t,n){if(!this.m_BaseCell)return;let i=[],r=this.m_BaseCell.neighboursGet(e,t);do r.forEach(m=>{if(!this.m_BaseCell)return;m.m_Color=this.m_BaseCell.m_Color,m.ownerSet(this.m_PlayerName),m.draw(t,n),m.neighboursGet(e,t).forEach(o=>{i.push(o)})}),r=i.filter((m,a,o)=>o.indexOf(m)===a),i=[];while(r.length>0);this.counterUpdate(e,t)}static simulateCapture(e,t,n,i,r){let m=new Set(n),a=Array.from(n),o=0;for(;a.length>0;){let u=[];for(let C of a)for(let f of t.Offsets){let d=C.m_PosY+f.DY,p=C.m_PosX+f.DX;if(d<0||d>=t.DimensionY||p<0||p>=t.DimensionX)continue;let h=e[d]?.[p];!h||m.has(h)||i.has(h)||!h.m_Occupied&&h.m_Color===r&&(m.add(h),u.push(h),o++)}a=u}return{gained:o,newOwnedSet:m}}identifyBestColor(e,t,n,i){if(!this.m_BaseCell||!i.m_BaseCell)return n;let r=1.2,m=.15,a=new Set,o=new Set;e.forEach(h=>{h.forEach(c=>{c.m_Owner===this.m_PlayerName?a.add(c):c.m_Owner===i.m_PlayerName&&o.add(c)})});let u=this.m_BaseCell.m_Color,C=i.m_BaseCell.m_Color,f=new Set;e.forEach(h=>{h.forEach(c=>{c.m_Occupied||f.add(c.m_Color)})});let d=u,p=-1/0;for(let h of f){if(h===n||h===u)continue;let{gained:c,newOwnedSet:O}=s.simulateCapture(e,t,a,o,h),X=new Set;for(let D of O)for(let g of t.Offsets){let Y=D.m_PosY+g.DY,N=D.m_PosX+g.DX;if(Y<0||Y>=t.DimensionY||N<0||N>=t.DimensionX)continue;let y=e[Y]?.[N];y&&!y.m_Occupied&&!O.has(y)&&!o.has(y)&&X.add(y.m_Color)}let G=0;for(let D of f){if(D===h||D===C)continue;let{gained:g}=s.simulateCapture(e,t,o,O,D);g>G&&(G=g)}let x=c-G*r+X.size*m;x>p&&(p=x,d=h)}return d}};var S=class{constructor(e,t,n){l(this,"m_CanvasElement");l(this,"m_Definitions");l(this,"m_PlayerHuman");l(this,"m_PlayerComputer");l(this,"m_Grid");l(this,"m_IDGameField");l(this,"m_IDButtonField");l(this,"m_IDWinner");l(this,"m_GameOver");this.m_CanvasElement=null,this.m_Definitions=e,this.m_PlayerHuman=t,this.m_PlayerComputer=n,this.m_Grid=new L,this.m_IDGameField="",this.m_IDButtonField="",this.m_IDWinner="",this.m_GameOver=!1}init(e,t,n){this.m_IDGameField=e,this.m_IDButtonField=t,this.m_IDWinner=n;let i=document.getElementById(this.m_IDGameField);if(i?.getContext){if(this.m_CanvasElement=i.getContext("2d"),!this.m_CanvasElement)return;this.boardInit(),this.boardButtonsInit(this.m_IDButtonField),this.playerInit(this.m_IDWinner),P("dimx",this.m_Definitions.DimensionX),P("dimy",this.m_Definitions.DimensionY),P("cellsize",this.m_Definitions.CellSize),P("playername",this.m_PlayerHuman.m_PlayerName)}}reInit(e,t,n,i){let r=b(e),m=b(t),a=b(n),o=b(i);this.m_Definitions.reInit(r,m,a),this.m_PlayerHuman.m_PlayerName=o,this.boardInit(),this.boardButtonsInit(this.m_IDButtonField),this.playerInit(this.m_IDWinner)}playerInit(e){this.m_GameOver=!1;let t=document.getElementById(e);t&&(t.textContent="",t.classList.add("dspno"),t.style.display=""),this.m_Grid.gridReset(),this.m_PlayerHuman.init(this,0,this.m_Definitions.DimensionY-1,e),this.m_Grid.gridReset(),this.m_PlayerComputer.init(this,this.m_Definitions.DimensionX-1,0,e)}boardInit(){let e=this.m_Definitions.DimensionX*this.m_Definitions.CellSize,t=this.m_Definitions.DimensionY*this.m_Definitions.CellSize;_("moveinfo","");let n=document.getElementById(this.m_IDGameField);R(n,e,t),this.m_CanvasElement&&this.m_Grid.gridInit(this.m_Definitions,this.m_CanvasElement)}boardButtonsInit(e){let t=document.getElementById(e);if(!t)return;let n=M("--button-gap",10),i=this.m_Definitions.Colors.length,r=Math.floor(this.m_Definitions.DimensionX*this.m_Definitions.CellSize/5),m=Math.floor((this.m_Definitions.DimensionY*this.m_Definitions.CellSize-(i+1)*n)/i);W(e),this.m_Definitions.Colors.forEach(a=>{let o=document.createElement("button");o.type="button",o.id=a,o.className="gamebtn",o.style.backgroundColor=a,o.style.width=`${r}px`,o.style.height=`${m}px`,o.setAttribute("aria-label",`Choose ${a} color`),o.addEventListener("click",()=>{this.performMove(a)}),t.appendChild(o)})}performMove(e){if(this.m_GameOver||!this.m_PlayerHuman.m_BaseCell||!this.m_PlayerComputer.m_BaseCell)return;if(H("moveinfo"),e===this.m_PlayerHuman.m_BaseCell.m_Color){_("moveinfo","You cannot select the color of yourself."),E("moveinfo","block");return}if(e===this.m_PlayerComputer.m_BaseCell.m_Color){_("moveinfo","You cannot select the color of your opponent."),E("moveinfo","block");return}if(this.m_Grid.gridReset(),this.m_PlayerHuman.move(this.m_Grid.m_Cells,[e],this.m_Definitions,this.m_CanvasElement),this.evaluateGameState())return;let t=this.m_PlayerComputer.identifyBestColor(this.m_Grid.m_Cells,this.m_Definitions,e,this.m_PlayerHuman);this.m_Grid.gridReset(),this.m_PlayerComputer.move(this.m_Grid.m_Cells,[t],this.m_Definitions,this.m_CanvasElement),this.evaluateGameState()}getScoreStats(){let e=0,t=0,n=0;return this.m_Grid.m_Cells.forEach(i=>{i.forEach(r=>{r.m_Occupied&&(n+=1),r.m_Owner===this.m_PlayerHuman.m_PlayerName&&(e+=1),r.m_Owner===this.m_PlayerComputer.m_PlayerName&&(t+=1)})}),{human:e,computer:t,occupied:n,total:this.m_Definitions.DimensionX*this.m_Definitions.DimensionY}}endGame(e){this.m_GameOver=!0,_(this.m_IDWinner,e),B(this.m_IDWinner,"dspno"),E(this.m_IDWinner,"block")}evaluateGameState(){let e=this.getScoreStats();return e.human>=this.m_Definitions.Winner?(this.endGame(`Player [${this.m_PlayerHuman.m_PlayerName}] won the game - has more than the half cells occupied.`),!0):e.computer>=this.m_Definitions.Winner?(this.endGame(`Player [${this.m_PlayerComputer.m_PlayerName}] won the game - has more than the half cells occupied.`),!0):e.occupied===e.total?(e.human===e.computer?this.endGame("50:50 draw - both players occupy the same number of cells."):e.human>e.computer?this.endGame(`Player [${this.m_PlayerHuman.m_PlayerName}] won the game - more occupied cells at board end.`):this.endGame(`Player [${this.m_PlayerComputer.m_PlayerName}] won the game - more occupied cells at board end.`),!0):!1}};var $=new w(30,20,15),F=new I("Besucher","name_human","score_human"),V=new I("DerPaul","name_computer","score_computer"),z=new S($,F,V);function A(){let s=document.getElementById("compare");s&&(s.style.display="none"),z.init("gamearea","playbuttons","winner");let e=document.getElementById("btn_reset");e&&e.addEventListener("click",()=>{z.reInit("dimx","dimy","cellsize","playername")})}document.addEventListener("DOMContentLoaded",A);})();
+"use strict";
+(() => {
+  var __defProp = Object.defineProperty;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+
+  // lcdefinitions.ts
+  var LCDefinitions = class {
+    constructor(dimX, dimY, cellSize) {
+      __publicField(this, "DimensionX");
+      __publicField(this, "DimensionY");
+      __publicField(this, "CellSize");
+      __publicField(this, "Winner");
+      __publicField(this, "Colors");
+      __publicField(this, "Offsets");
+      this.DimensionX = 0;
+      this.DimensionY = 0;
+      this.CellSize = 0;
+      this.Winner = 0;
+      this.Colors = ["blue", "cyan", "green", "red", "yellow"];
+      this.Offsets = [
+        { DX: 0, DY: 1 },
+        { DX: 1, DY: 0 },
+        { DX: 0, DY: -1 },
+        { DX: -1, DY: 0 }
+      ];
+      this.reInit(dimX, dimY, cellSize);
+    }
+    reInit(dimX, dimY, cellSize) {
+      this.DimensionX = Number.parseInt(String(dimX), 10);
+      this.DimensionY = Number.parseInt(String(dimY), 10);
+      this.CellSize = Number.parseInt(String(cellSize), 10);
+      this.Winner = Math.floor(this.DimensionX * this.DimensionY / 2 + 1);
+    }
+  };
+
+  // lccell.ts
+  var LCCell = class {
+    constructor(posX, posY) {
+      __publicField(this, "m_PosX");
+      __publicField(this, "m_PosY");
+      __publicField(this, "m_Color");
+      __publicField(this, "m_Owner");
+      __publicField(this, "m_Occupied");
+      __publicField(this, "m_DoRedraw");
+      this.m_PosX = Number.parseInt(String(posX), 10);
+      this.m_PosY = Number.parseInt(String(posY), 10);
+      this.m_Color = "white";
+      this.m_Owner = "";
+      this.m_Occupied = false;
+      this.m_DoRedraw = true;
+    }
+    draw(definitions2, canvasElement) {
+      if (this.m_DoRedraw) {
+        const cellPosX = definitions2.CellSize * this.m_PosX;
+        const cellPosY = definitions2.CellSize * this.m_PosY;
+        canvasElement.beginPath();
+        canvasElement.rect(
+          cellPosX,
+          cellPosY,
+          definitions2.CellSize,
+          definitions2.CellSize
+        );
+        canvasElement.fillStyle = this.m_Color;
+        canvasElement.fill();
+        canvasElement.stroke();
+        this.m_DoRedraw = false;
+      }
+    }
+    ownerSet(newOwner) {
+      this.m_Owner = newOwner;
+      this.m_Occupied = true;
+    }
+    neighboursGet(cells, definitions2) {
+      const neighbours = [];
+      definitions2.Offsets.forEach((currentOffset) => {
+        const cellPosY = this.m_PosY + currentOffset.DY;
+        if (cellPosY < 0 || definitions2.DimensionY <= cellPosY) {
+          return;
+        }
+        const cellPosX = this.m_PosX + currentOffset.DX;
+        if (cellPosX < 0 || definitions2.DimensionX <= cellPosX) {
+          return;
+        }
+        const row = cells[cellPosY];
+        if (!row) {
+          return;
+        }
+        const currentNeighbour = row[cellPosX];
+        if (!currentNeighbour) {
+          return;
+        }
+        if (!currentNeighbour.m_DoRedraw) {
+          return;
+        }
+        if (!currentNeighbour.m_Occupied && this.m_Color === currentNeighbour.m_Color || this.m_Owner === currentNeighbour.m_Owner && this.m_Color !== currentNeighbour.m_Color) {
+          neighbours.push(currentNeighbour);
+        }
+      });
+      return neighbours;
+    }
+    cellColorRandomGet(colors) {
+      const colorIndex = Math.floor(Math.random() * colors.length);
+      return colors[colorIndex] ?? this.m_Color;
+    }
+    isBorderCell(cells, definitions2) {
+      let isBorder = false;
+      definitions2.Offsets.forEach((currentOffset) => {
+        const cellPosY = this.m_PosY + currentOffset.DY;
+        if (cellPosY < 0 || definitions2.DimensionY <= cellPosY) {
+          return;
+        }
+        const cellPosX = this.m_PosX + currentOffset.DX;
+        if (cellPosX < 0 || definitions2.DimensionX <= cellPosX) {
+          return;
+        }
+        const row = cells[cellPosY];
+        if (!row) {
+          return;
+        }
+        const currentNeighbour = row[cellPosX];
+        if (!currentNeighbour) {
+          return;
+        }
+        if (!currentNeighbour.m_Occupied) {
+          isBorder = true;
+        }
+      });
+      return isBorder;
+    }
+  };
+
+  // lcgrid.ts
+  var LCGrid = class {
+    constructor() {
+      __publicField(this, "m_Cells");
+      this.m_Cells = [];
+    }
+    gridInit(definitions2, canvasElement) {
+      this.m_Cells = [];
+      for (let loopY = 0; loopY < definitions2.DimensionY; loopY += 1) {
+        const row = [];
+        this.m_Cells[loopY] = row;
+        for (let loopX = 0; loopX < definitions2.DimensionX; loopX += 1) {
+          const currentCell = new LCCell(loopX, loopY);
+          currentCell.m_Color = currentCell.cellColorRandomGet(definitions2.Colors);
+          currentCell.draw(definitions2, canvasElement);
+          row.push(currentCell);
+        }
+      }
+    }
+    gridReset() {
+      this.m_Cells.forEach((currentRow) => {
+        currentRow.forEach((currentCell) => {
+          currentCell.m_DoRedraw = true;
+        });
+      });
+    }
+    getPlayerCells(player) {
+      const playerCells = [];
+      this.m_Cells.forEach((currentRow) => {
+        currentRow.forEach((currentCell) => {
+          if (currentCell.m_Owner === player.m_PlayerName) {
+            playerCells.push(currentCell);
+          }
+        });
+      });
+      return playerCells;
+    }
+    identifyBorderCells(cells, definitions2) {
+      const borderCells = [];
+      cells.forEach((currentCell) => {
+        if (currentCell.isBorderCell(this.m_Cells, definitions2)) {
+          borderCells.push(currentCell);
+        }
+      });
+      return borderCells;
+    }
+    playerColorsGet(cells, definitions2) {
+      const playerColors = {};
+      cells.forEach((currentCell) => {
+        definitions2.Offsets.forEach((currentOffset) => {
+          const cellPosY = currentCell.m_PosY + currentOffset.DY;
+          if (cellPosY < 0 || definitions2.DimensionY <= cellPosY) {
+            return;
+          }
+          const cellPosX = currentCell.m_PosX + currentOffset.DX;
+          if (cellPosX < 0 || definitions2.DimensionX <= cellPosX) {
+            return;
+          }
+          const row = this.m_Cells[cellPosY];
+          if (!row) {
+            return;
+          }
+          const currentNeighbour = row[cellPosX];
+          if (!currentNeighbour) {
+            return;
+          }
+          if (currentNeighbour.m_Occupied) {
+            return;
+          }
+          const valueOld = playerColors[currentNeighbour.m_Color] || 0;
+          playerColors[currentNeighbour.m_Color] = valueOld + 1;
+        });
+      });
+      return playerColors;
+    }
+  };
+
+  // util.ts
+  function setElementSize(element, width, height) {
+    if (!element) {
+      return;
+    }
+    element.style.width = `${width}px`;
+    element.style.height = `${height}px`;
+    element.width = width;
+    element.height = height;
+  }
+  function getInputValue(id) {
+    const element = document.getElementById(id);
+    return element ? element.value : "";
+  }
+  function setInputValue(id, value) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.value = String(value);
+    }
+  }
+  function setText(id, value) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.textContent = value;
+    }
+  }
+  function show(id, displayMode = "block") {
+    const element = document.getElementById(id);
+    if (element) {
+      element.style.display = displayMode;
+    }
+  }
+  function hide(id) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.style.display = "none";
+    }
+  }
+  function removeClass(id, className) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.classList.remove(className);
+    }
+  }
+  function clearChildren(id) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.replaceChildren();
+    }
+  }
+  function getCssNumberVar(name, fallback = 0) {
+    const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    const parsed = Number.parseInt(value, 10);
+    return Number.isNaN(parsed) ? fallback : parsed;
+  }
+
+  // lcplayer.ts
+  var LCPlayer = class _LCPlayer {
+    constructor(playerName, idName, idScore) {
+      __publicField(this, "m_PlayerName");
+      __publicField(this, "m_BaseCell");
+      __publicField(this, "m_Offsets");
+      __publicField(this, "m_IDName");
+      __publicField(this, "m_IDScore");
+      __publicField(this, "m_IDWinner");
+      this.m_PlayerName = playerName;
+      this.m_BaseCell = null;
+      this.m_Offsets = [];
+      this.m_IDName = idName;
+      this.m_IDScore = idScore;
+      this.m_IDWinner = "";
+    }
+    counterUpdate(cells, definitions2) {
+      let cellCounter = 0;
+      cells.forEach((currentRow) => {
+        currentRow.forEach((currentCell) => {
+          if (currentCell.m_Occupied && this.m_PlayerName === currentCell.m_Owner) {
+            cellCounter += 1;
+          }
+        });
+      });
+      setText(this.m_IDScore, String(cellCounter));
+      if (cellCounter >= definitions2.Winner) {
+        setText(
+          this.m_IDWinner,
+          `Player [${this.m_PlayerName}] won the game - has more than the half cells occupied.`
+        );
+        removeClass(this.m_IDWinner, "dspno");
+      }
+    }
+    init(board2, posX, posY, idWinner) {
+      setText(this.m_IDName, this.m_PlayerName);
+      this.m_IDWinner = idWinner;
+      const row = board2.m_Grid.m_Cells[posY];
+      const baseCell = row ? row[posX] : void 0;
+      if (!baseCell) {
+        return;
+      }
+      this.m_BaseCell = baseCell;
+      this.m_BaseCell.ownerSet(this.m_PlayerName);
+      if (board2.m_CanvasElement) {
+        this.m_BaseCell.draw(board2.m_Definitions, board2.m_CanvasElement);
+        this.cellsMarkOwner(
+          board2.m_Grid.m_Cells,
+          board2.m_Definitions,
+          board2.m_CanvasElement
+        );
+      }
+    }
+    move(cells, colors, definitions2, canvasElement) {
+      if (!this.m_BaseCell || !canvasElement) {
+        return;
+      }
+      this.m_BaseCell.m_Color = this.m_BaseCell.cellColorRandomGet(colors);
+      this.m_BaseCell.draw(definitions2, canvasElement);
+      this.cellsMarkOwner(cells, definitions2, canvasElement);
+    }
+    cellsMarkOwner(cells, definitions2, canvasElement) {
+      if (!this.m_BaseCell) {
+        return;
+      }
+      let cellsCollect = [];
+      let cellsWork = this.m_BaseCell.neighboursGet(cells, definitions2);
+      do {
+        cellsWork.forEach((currentCell) => {
+          if (!this.m_BaseCell) {
+            return;
+          }
+          currentCell.m_Color = this.m_BaseCell.m_Color;
+          currentCell.ownerSet(this.m_PlayerName);
+          currentCell.draw(definitions2, canvasElement);
+          const newNeighbours = currentCell.neighboursGet(cells, definitions2);
+          newNeighbours.forEach((newCell) => {
+            cellsCollect.push(newCell);
+          });
+        });
+        cellsWork = cellsCollect.filter((value, index, self) => self.indexOf(value) === index);
+        cellsCollect = [];
+      } while (cellsWork.length > 0);
+      this.counterUpdate(cells, definitions2);
+    }
+    /**
+     * Pure flood-fill simulation (no board mutation).
+     * Expands `ownedSet` into unoccupied cells matching `color`, treating
+     * every cell in `extraBlocked` as occupied even if the live data says
+     * otherwise (used for 2-ply lookahead where simulated gains must be
+     * blocked for the opponent's response simulation).
+     * Returns the number of cells gained and the full updated ownership set.
+     */
+    static simulateCapture(cells, definitions2, ownedSet, extraBlocked, color) {
+      const newOwned = new Set(ownedSet);
+      let frontier = Array.from(ownedSet);
+      let gained = 0;
+      while (frontier.length > 0) {
+        const next = [];
+        for (const cell of frontier) {
+          for (const offset of definitions2.Offsets) {
+            const ny = cell.m_PosY + offset.DY;
+            const nx = cell.m_PosX + offset.DX;
+            if (ny < 0 || ny >= definitions2.DimensionY || nx < 0 || nx >= definitions2.DimensionX) {
+              continue;
+            }
+            const neighbor = cells[ny]?.[nx];
+            if (!neighbor || newOwned.has(neighbor) || extraBlocked.has(neighbor)) {
+              continue;
+            }
+            if (!neighbor.m_Occupied && neighbor.m_Color === color) {
+              newOwned.add(neighbor);
+              next.push(neighbor);
+              gained++;
+            }
+          }
+        }
+        frontier = next;
+      }
+      return { gained, newOwnedSet: newOwned };
+    }
+    identifyBestColorGreedy(cells, definitions2, newColorPlayer, opponent) {
+      if (!this.m_BaseCell || !opponent.m_BaseCell) {
+        return newColorPlayer;
+      }
+      const compOwned = /* @__PURE__ */ new Set();
+      const humanOwned = /* @__PURE__ */ new Set();
+      cells.forEach((row) => {
+        row.forEach((cell) => {
+          if (cell.m_Owner === this.m_PlayerName) {
+            compOwned.add(cell);
+          } else if (cell.m_Owner === opponent.m_PlayerName) {
+            humanOwned.add(cell);
+          }
+        });
+      });
+      const compCurrentColor = this.m_BaseCell.m_Color;
+      const allColors = /* @__PURE__ */ new Set();
+      cells.forEach((row) => {
+        row.forEach((cell) => {
+          if (!cell.m_Occupied) {
+            allColors.add(cell.m_Color);
+          }
+        });
+      });
+      let bestColor = compCurrentColor;
+      let bestGain = -1;
+      for (const compColor of allColors) {
+        if (compColor === newColorPlayer || compColor === compCurrentColor) {
+          continue;
+        }
+        const { gained } = _LCPlayer.simulateCapture(cells, definitions2, compOwned, humanOwned, compColor);
+        if (gained > bestGain) {
+          bestGain = gained;
+          bestColor = compColor;
+        }
+      }
+      return bestColor;
+    }
+    /**
+     * 2-ply minimax color selection.
+     *
+     * For every candidate computer color C:
+     *   1st ply – simulate computer capturing with C  → compGain, newCompOwned
+     *   2nd ply – find the human's best response color from the resulting board
+     *             (human cannot pick C or their own current color)
+     *            → bestHumanGain
+     *   score   = compGain - bestHumanGain × DENY_WEIGHT
+     *             + frontierColorDiversity × DIVERSITY_WEIGHT
+     *
+     * frontierColorDiversity counts how many distinct colors the computer's
+     * new territory borders — a larger palette means more good moves next turn.
+     */
+    identifyBestColorMinimax(cells, definitions2, newColorPlayer, opponent) {
+      if (!this.m_BaseCell || !opponent.m_BaseCell) {
+        return newColorPlayer;
+      }
+      const DENY_WEIGHT = 1.2;
+      const DIVERSITY_WEIGHT = 0.15;
+      const compOwned = /* @__PURE__ */ new Set();
+      const humanOwned = /* @__PURE__ */ new Set();
+      cells.forEach((row) => {
+        row.forEach((cell) => {
+          if (cell.m_Owner === this.m_PlayerName) {
+            compOwned.add(cell);
+          } else if (cell.m_Owner === opponent.m_PlayerName) {
+            humanOwned.add(cell);
+          }
+        });
+      });
+      const compCurrentColor = this.m_BaseCell.m_Color;
+      const humanCurrentColor = opponent.m_BaseCell.m_Color;
+      const allColors = /* @__PURE__ */ new Set();
+      cells.forEach((row) => {
+        row.forEach((cell) => {
+          if (!cell.m_Occupied) {
+            allColors.add(cell.m_Color);
+          }
+        });
+      });
+      let bestColor = compCurrentColor;
+      let bestScore = -Infinity;
+      for (const compColor of allColors) {
+        if (compColor === newColorPlayer) {
+          continue;
+        }
+        if (compColor === compCurrentColor) {
+          continue;
+        }
+        const { gained: compGain, newOwnedSet: compOwned2 } = _LCPlayer.simulateCapture(cells, definitions2, compOwned, humanOwned, compColor);
+        const frontierColors = /* @__PURE__ */ new Set();
+        for (const cell of compOwned2) {
+          for (const offset of definitions2.Offsets) {
+            const ny = cell.m_PosY + offset.DY;
+            const nx = cell.m_PosX + offset.DX;
+            if (ny < 0 || ny >= definitions2.DimensionY || nx < 0 || nx >= definitions2.DimensionX) {
+              continue;
+            }
+            const neighbor = cells[ny]?.[nx];
+            if (neighbor && !neighbor.m_Occupied && !compOwned2.has(neighbor) && !humanOwned.has(neighbor)) {
+              frontierColors.add(neighbor.m_Color);
+            }
+          }
+        }
+        let bestHumanGain = 0;
+        for (const humanColor of allColors) {
+          if (humanColor === compColor) {
+            continue;
+          }
+          if (humanColor === humanCurrentColor) {
+            continue;
+          }
+          const { gained: humanGain } = _LCPlayer.simulateCapture(cells, definitions2, humanOwned, compOwned2, humanColor);
+          if (humanGain > bestHumanGain) {
+            bestHumanGain = humanGain;
+          }
+        }
+        const score = compGain - bestHumanGain * DENY_WEIGHT + frontierColors.size * DIVERSITY_WEIGHT;
+        if (score > bestScore) {
+          bestScore = score;
+          bestColor = compColor;
+        }
+      }
+      return bestColor;
+    }
+    identifyBestColor(cells, definitions2, newColorPlayer, opponent, strategy = "minimax") {
+      if (strategy === "greedy") {
+        return this.identifyBestColorGreedy(cells, definitions2, newColorPlayer, opponent);
+      }
+      return this.identifyBestColorMinimax(cells, definitions2, newColorPlayer, opponent);
+    }
+  };
+
+  // lcboard.ts
+  var LCBoard = class {
+    constructor(definitions2, playerHuman, playerComputer) {
+      __publicField(this, "m_CanvasElement");
+      __publicField(this, "m_Definitions");
+      __publicField(this, "m_PlayerHuman");
+      __publicField(this, "m_PlayerComputer");
+      __publicField(this, "m_Grid");
+      __publicField(this, "m_IDGameField");
+      __publicField(this, "m_IDButtonField");
+      __publicField(this, "m_IDWinner");
+      __publicField(this, "m_ComputerStrategy");
+      __publicField(this, "m_GameOver");
+      this.m_CanvasElement = null;
+      this.m_Definitions = definitions2;
+      this.m_PlayerHuman = playerHuman;
+      this.m_PlayerComputer = playerComputer;
+      this.m_Grid = new LCGrid();
+      this.m_IDGameField = "";
+      this.m_IDButtonField = "";
+      this.m_IDWinner = "";
+      this.m_ComputerStrategy = "minimax";
+      this.m_GameOver = false;
+    }
+    init(gameField, buttonField, idWinner) {
+      this.m_IDGameField = gameField;
+      this.m_IDButtonField = buttonField;
+      this.m_IDWinner = idWinner;
+      const graphics = document.getElementById(this.m_IDGameField);
+      if (graphics?.getContext) {
+        this.m_CanvasElement = graphics.getContext("2d");
+        if (!this.m_CanvasElement) {
+          return;
+        }
+        this.boardInit();
+        this.boardButtonsInit(this.m_IDButtonField);
+        this.playerInit(this.m_IDWinner);
+        setInputValue("dimx", this.m_Definitions.DimensionX);
+        setInputValue("dimy", this.m_Definitions.DimensionY);
+        setInputValue("cellsize", this.m_Definitions.CellSize);
+        setInputValue("playername", this.m_PlayerHuman.m_PlayerName);
+        setInputValue("computerstrategy", this.m_ComputerStrategy);
+      }
+    }
+    reInit(idDimX, idDimY, idCellSize, idPlayerName, idComputerStrategy) {
+      const dimX = getInputValue(idDimX);
+      const dimY = getInputValue(idDimY);
+      const cellSize = getInputValue(idCellSize);
+      const playerName = getInputValue(idPlayerName);
+      const computerStrategy = getInputValue(idComputerStrategy);
+      this.m_Definitions.reInit(dimX, dimY, cellSize);
+      this.m_PlayerHuman.m_PlayerName = playerName;
+      this.m_ComputerStrategy = this.readComputerStrategy(computerStrategy);
+      this.boardInit();
+      this.boardButtonsInit(this.m_IDButtonField);
+      this.playerInit(this.m_IDWinner);
+    }
+    readComputerStrategy(strategyValue) {
+      if (strategyValue === "greedy") {
+        return "greedy";
+      }
+      return "minimax";
+    }
+    playerInit(idWinner) {
+      this.m_GameOver = false;
+      const winnerElement = document.getElementById(idWinner);
+      if (winnerElement) {
+        winnerElement.textContent = "";
+        winnerElement.classList.add("dspno");
+        winnerElement.style.display = "";
+      }
+      this.m_Grid.gridReset();
+      this.m_PlayerHuman.init(
+        this,
+        0,
+        this.m_Definitions.DimensionY - 1,
+        idWinner
+      );
+      this.m_Grid.gridReset();
+      this.m_PlayerComputer.init(
+        this,
+        this.m_Definitions.DimensionX - 1,
+        0,
+        idWinner
+      );
+    }
+    boardInit() {
+      const boardWidth = this.m_Definitions.DimensionX * this.m_Definitions.CellSize;
+      const boardHeight = this.m_Definitions.DimensionY * this.m_Definitions.CellSize;
+      setText("moveinfo", "");
+      const canvas = document.getElementById(this.m_IDGameField);
+      setElementSize(canvas, boardWidth, boardHeight);
+      if (!this.m_CanvasElement) {
+        return;
+      }
+      this.m_Grid.gridInit(this.m_Definitions, this.m_CanvasElement);
+    }
+    boardButtonsInit(buttonField) {
+      const buttonContainer = document.getElementById(buttonField);
+      if (!buttonContainer) {
+        return;
+      }
+      const btnMargin = getCssNumberVar("--button-gap", 10);
+      const numberOfButtons = this.m_Definitions.Colors.length;
+      const btnWidth = Math.floor(this.m_Definitions.DimensionX * this.m_Definitions.CellSize / 5);
+      const btnHeight = Math.floor(
+        (this.m_Definitions.DimensionY * this.m_Definitions.CellSize - (numberOfButtons + 1) * btnMargin) / numberOfButtons
+      );
+      clearChildren(buttonField);
+      this.m_Definitions.Colors.forEach((currentColor) => {
+        const colorButton = document.createElement("button");
+        colorButton.type = "button";
+        colorButton.id = currentColor;
+        colorButton.className = "gamebtn";
+        colorButton.style.backgroundColor = currentColor;
+        colorButton.style.width = `${btnWidth}px`;
+        colorButton.style.height = `${btnHeight}px`;
+        colorButton.setAttribute("aria-label", `Choose ${currentColor} color`);
+        colorButton.addEventListener("click", () => {
+          this.performMove(currentColor);
+        });
+        buttonContainer.appendChild(colorButton);
+      });
+    }
+    performMove(newColorPlayer) {
+      if (this.m_GameOver || !this.m_PlayerHuman.m_BaseCell || !this.m_PlayerComputer.m_BaseCell) {
+        return;
+      }
+      hide("moveinfo");
+      if (newColorPlayer === this.m_PlayerHuman.m_BaseCell.m_Color) {
+        setText("moveinfo", "You cannot select the color of yourself.");
+        show("moveinfo", "block");
+        return;
+      }
+      if (newColorPlayer === this.m_PlayerComputer.m_BaseCell.m_Color) {
+        setText("moveinfo", "You cannot select the color of your opponent.");
+        show("moveinfo", "block");
+        return;
+      }
+      this.m_Grid.gridReset();
+      this.m_PlayerHuman.move(
+        this.m_Grid.m_Cells,
+        [newColorPlayer],
+        this.m_Definitions,
+        this.m_CanvasElement
+      );
+      if (this.evaluateGameState()) {
+        return;
+      }
+      const newColorComputer = this.m_PlayerComputer.identifyBestColor(
+        this.m_Grid.m_Cells,
+        this.m_Definitions,
+        newColorPlayer,
+        this.m_PlayerHuman,
+        this.m_ComputerStrategy
+      );
+      this.m_Grid.gridReset();
+      this.m_PlayerComputer.move(
+        this.m_Grid.m_Cells,
+        [newColorComputer],
+        this.m_Definitions,
+        this.m_CanvasElement
+      );
+      this.evaluateGameState();
+    }
+    getScoreStats() {
+      let human2 = 0;
+      let computer2 = 0;
+      let occupied = 0;
+      this.m_Grid.m_Cells.forEach((row) => {
+        row.forEach((cell) => {
+          if (cell.m_Occupied) {
+            occupied += 1;
+          }
+          if (cell.m_Owner === this.m_PlayerHuman.m_PlayerName) {
+            human2 += 1;
+          }
+          if (cell.m_Owner === this.m_PlayerComputer.m_PlayerName) {
+            computer2 += 1;
+          }
+        });
+      });
+      return {
+        human: human2,
+        computer: computer2,
+        occupied,
+        total: this.m_Definitions.DimensionX * this.m_Definitions.DimensionY
+      };
+    }
+    endGame(message) {
+      this.m_GameOver = true;
+      setText(this.m_IDWinner, message);
+      removeClass(this.m_IDWinner, "dspno");
+      show(this.m_IDWinner, "block");
+    }
+    evaluateGameState() {
+      const stats = this.getScoreStats();
+      if (stats.human >= this.m_Definitions.Winner) {
+        this.endGame(
+          `Player [${this.m_PlayerHuman.m_PlayerName}] won the game - has more than the half cells occupied.`
+        );
+        return true;
+      }
+      if (stats.computer >= this.m_Definitions.Winner) {
+        this.endGame(
+          `Player [${this.m_PlayerComputer.m_PlayerName}] won the game - has more than the half cells occupied.`
+        );
+        return true;
+      }
+      if (stats.occupied === stats.total) {
+        if (stats.human === stats.computer) {
+          this.endGame("50:50 draw - both players occupy the same number of cells.");
+        } else if (stats.human > stats.computer) {
+          this.endGame(
+            `Player [${this.m_PlayerHuman.m_PlayerName}] won the game - more occupied cells at board end.`
+          );
+        } else {
+          this.endGame(
+            `Player [${this.m_PlayerComputer.m_PlayerName}] won the game - more occupied cells at board end.`
+          );
+        }
+        return true;
+      }
+      return false;
+    }
+  };
+
+  // app.ts
+  var definitions = new LCDefinitions(30, 20, 15);
+  var human = new LCPlayer("Besucher", "name_human", "score_human");
+  var computer = new LCPlayer("DerPaul", "name_computer", "score_computer");
+  var board = new LCBoard(definitions, human, computer);
+  function initApp() {
+    const compare = document.getElementById("compare");
+    if (compare) {
+      compare.style.display = "none";
+    }
+    board.init("gamearea", "playbuttons", "winner");
+    const resetButton = document.getElementById("btn_reset");
+    if (resetButton) {
+      resetButton.addEventListener("click", () => {
+        board.reInit("dimx", "dimy", "cellsize", "playername", "computerstrategy");
+      });
+    }
+  }
+  document.addEventListener("DOMContentLoaded", initApp);
+})();
+//# sourceMappingURL=app.js.map

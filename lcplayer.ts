@@ -113,28 +113,40 @@ export class LCPlayer {
         this.counterUpdate(cells, definitions);
     }
 
-    identifyBestColor(colorInformation: ColorInformation, newColorPlayer: string): string {
+    identifyBestColor(
+        colorInformation: ColorInformation,
+        newColorPlayer: string,
+        opponentColorInformation: ColorInformation = {}
+    ): string {
         if (!this.m_BaseCell) {
             return newColorPlayer;
         }
 
-        let bestColor = this.m_BaseCell.m_Color;
-        let number = -1;
+        // Weight applied to denial value: 0 = pure offense, 1 = equal offense/defense.
+        const DENY_WEIGHT = 0.5;
 
-        Object.keys(colorInformation).forEach((color) => {
+        const allColors = new Set([
+            ...Object.keys(colorInformation),
+            ...Object.keys(opponentColorInformation)
+        ]);
+
+        let bestColor = this.m_BaseCell.m_Color;
+        let bestScore = -1;
+
+        allColors.forEach((color) => {
             if (color === newColorPlayer) {
                 return;
             }
             if (color === this.m_BaseCell?.m_Color) {
                 return;
             }
-            const score = colorInformation[color];
-            if (score === undefined) {
-                return;
-            }
 
-            if (number < score) {
-                number = score;
+            const ownGain = colorInformation[color] ?? 0;
+            const denyGain = opponentColorInformation[color] ?? 0;
+            const totalScore = ownGain + denyGain * DENY_WEIGHT;
+
+            if (totalScore > bestScore) {
+                bestScore = totalScore;
                 bestColor = color;
             }
         });

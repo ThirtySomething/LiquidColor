@@ -127,7 +127,11 @@ export class LCBoard {
         const computerCells = this.m_Grid.getPlayerCells(this.m_PlayerComputer);
         const borderCells = this.m_Grid.identifyBorderCells(computerCells, this.m_Definitions);
         const colors = this.m_Grid.playerColorsGet(borderCells, this.m_Definitions);
-        const newColorComputer = this.m_PlayerComputer.identifyBestColor(colors, newColorPlayer);
+        // Compute human's border colors so the computer can deny high-value colors.
+        const humanCells = this.m_Grid.getPlayerCells(this.m_PlayerHuman);
+        const humanBorderCells = this.m_Grid.identifyBorderCells(humanCells, this.m_Definitions);
+        const humanColors = this.m_Grid.playerColorsGet(humanBorderCells, this.m_Definitions);
+        const newColorComputer = this.m_PlayerComputer.identifyBestColor(colors, newColorPlayer, humanColors);
         this.m_Grid.gridReset();
         this.m_PlayerComputer.move(this.m_Grid.m_Cells, [newColorComputer], this.m_Definitions, this.m_CanvasElement);
         this.evaluateGameState();

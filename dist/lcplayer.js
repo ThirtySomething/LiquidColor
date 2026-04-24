@@ -78,27 +78,89 @@ export class LCPlayer {
         } while (cellsWork.length > 0);
         this.counterUpdate(cells, definitions);
     }
-    identifyBestColor(colorInformation, newColorPlayer, opponentColorInformation = {}) {
+    /**
+     * Simulates selecting `candidateColor` and returns the number of
+     * unoccupied cells this player would capture across the whole board
+     * (full flood-fill, no board mutation).
+     */
+    simulateCaptureCount(cells, definitions, candidateColor) {
+        if (!this.m_BaseCell) {
+            return 0;
+        }
+        const visited = new Set();
+        // Seed visited with all currently-owned territory.
+        cells.forEach((row) => {
+            row.forEach((cell) => {
+                if (cell.m_Owner === this.m_PlayerName) {
+                    visited.add(cell);
+                }
+            });
+        });
+        // BFS: expand from owned territory into unoccupied cells of candidateColor.
+        let frontier = Array.from(visited);
+        let gained = 0;
+        while (frontier.length > 0) {
+            const nextFrontier = [];
+            frontier.forEach((cell) => {
+                definitions.Offsets.forEach((offset) => {
+                    const ny = cell.m_PosY + offset.DY;
+                    const nx = cell.m_PosX + offset.DX;
+                    if (ny < 0 || ny >= definitions.DimensionY) {
+                        return;
+                    }
+                    if (nx < 0 || nx >= definitions.DimensionX) {
+                        return;
+                    }
+                    const row = cells[ny];
+                    if (!row) {
+                        return;
+                    }
+                    const neighbor = row[nx];
+                    if (!neighbor || visited.has(neighbor)) {
+                        return;
+                    }
+                    if (!neighbor.m_Occupied && neighbor.m_Color === candidateColor) {
+                        visited.add(neighbor);
+                        nextFrontier.push(neighbor);
+                        gained += 1;
+                    }
+                });
+            });
+            frontier = nextFrontier;
+        }
+        return gained;
+    }
+    /**
+     * Selects the best color for the computer by simulating the full
+     * flood-fill for every candidate color on the whole board.
+     * Scores = own cells gained + (opponent cells denied × DENY_WEIGHT).
+     */
+    identifyBestColor(cells, definitions, newColorPlayer, opponent) {
         if (!this.m_BaseCell) {
             return newColorPlayer;
         }
-        // Weight applied to denial value: 0 = pure offense, 1 = equal offense/defense.
-        const DENY_WEIGHT = 0.5;
-        const allColors = new Set([
-            ...Object.keys(colorInformation),
-            ...Object.keys(opponentColorInformation)
-        ]);
+        // 1.5 = value blocking the human 1.5× relative to capturing for self.
+        const DENY_WEIGHT = 1.5;
+        // Collect every color present on unoccupied cells across the whole board.
+        const candidateColors = new Set();
+        cells.forEach((row) => {
+            row.forEach((cell) => {
+                if (!cell.m_Occupied) {
+                    candidateColors.add(cell.m_Color);
+                }
+            });
+        });
         let bestColor = this.m_BaseCell.m_Color;
         let bestScore = -1;
-        allColors.forEach((color) => {
+        candidateColors.forEach((color) => {
             if (color === newColorPlayer) {
                 return;
             }
             if (color === this.m_BaseCell?.m_Color) {
                 return;
             }
-            const ownGain = colorInformation[color] ?? 0;
-            const denyGain = opponentColorInformation[color] ?? 0;
+            const ownGain = this.simulateCaptureCount(cells, definitions, color);
+            const denyGain = opponent.simulateCaptureCount(cells, definitions, color);
             const totalScore = ownGain + denyGain * DENY_WEIGHT;
             if (totalScore > bestScore) {
                 bestScore = totalScore;

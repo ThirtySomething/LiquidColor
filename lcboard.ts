@@ -177,16 +177,13 @@ export class LCBoard {
             return;
         }
 
-        const computerCells = this.m_Grid.getPlayerCells(this.m_PlayerComputer);
-        const borderCells = this.m_Grid.identifyBorderCells(computerCells, this.m_Definitions);
-        const colors = this.m_Grid.playerColorsGet(borderCells, this.m_Definitions);
-
-        // Compute human's border colors so the computer can deny high-value colors.
-        const humanCells = this.m_Grid.getPlayerCells(this.m_PlayerHuman);
-        const humanBorderCells = this.m_Grid.identifyBorderCells(humanCells, this.m_Definitions);
-        const humanColors = this.m_Grid.playerColorsGet(humanBorderCells, this.m_Definitions);
-
-        const newColorComputer = this.m_PlayerComputer.identifyBestColor(colors, newColorPlayer, humanColors);
+        // Simulate the full board for every candidate color to pick the best move.
+        const newColorComputer = this.m_PlayerComputer.identifyBestColor(
+            this.m_Grid.m_Cells,
+            this.m_Definitions,
+            newColorPlayer,
+            this.m_PlayerHuman
+        );
 
         this.m_Grid.gridReset();
         this.m_PlayerComputer.move(

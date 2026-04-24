@@ -3,8 +3,6 @@ import { LCCell } from "./lccell.js";
 import { LCDefinitions } from "./lcdefinitions.js";
 import { removeClass, setText } from "./util.js";
 
-type ColorInformation = Record<string, number>;
-
 export class LCPlayer {
     m_PlayerName: string;
     m_BaseCell: LCCell | null;
@@ -113,27 +111,100 @@ export class LCPlayer {
         this.counterUpdate(cells, definitions);
     }
 
+    /**
+     * Simulates selecting `candidateColor` and returns the number of
+     * unoccupied cells this player would capture across the whole board
+     * (full flood-fill, no board mutation).
+     */
+    simulateCaptureCount(
+        cells: LCCell[][],
+        definitions: LCDefinitions,
+        candidateColor: string
+    ): number {
+        if (!this.m_BaseCell) {
+            return 0;
+        }
+
+        const visited = new Set<LCCell>();
+
+        // Seed visited with all currently-owned territory.
+        cells.forEach((row) => {
+            row.forEach((cell) => {
+                if (cell.m_Owner === this.m_PlayerName) {
+                    visited.add(cell);
+                }
+            });
+        });
+
+        // BFS: expand from owned territory into unoccupied cells of candidateColor.
+        let frontier = Array.from(visited);
+        let gained = 0;
+
+        while (frontier.length > 0) {
+            const nextFrontier: LCCell[] = [];
+            frontier.forEach((cell) => {
+                definitions.Offsets.forEach((offset) => {
+                    const ny = cell.m_PosY + offset.DY;
+                    const nx = cell.m_PosX + offset.DX;
+                    if (ny < 0 || ny >= definitions.DimensionY) {
+                        return;
+                    }
+                    if (nx < 0 || nx >= definitions.DimensionX) {
+                        return;
+                    }
+                    const row = cells[ny];
+                    if (!row) {
+                        return;
+                    }
+                    const neighbor = row[nx];
+                    if (!neighbor || visited.has(neighbor)) {
+                        return;
+                    }
+                    if (!neighbor.m_Occupied && neighbor.m_Color === candidateColor) {
+                        visited.add(neighbor);
+                        nextFrontier.push(neighbor);
+                        gained += 1;
+                    }
+                });
+            });
+            frontier = nextFrontier;
+        }
+
+        return gained;
+    }
+
+    /**
+     * Selects the best color for the computer by simulating the full
+     * flood-fill for every candidate color on the whole board.
+     * Scores = own cells gained + (opponent cells denied × DENY_WEIGHT).
+     */
     identifyBestColor(
-        colorInformation: ColorInformation,
+        cells: LCCell[][],
+        definitions: LCDefinitions,
         newColorPlayer: string,
-        opponentColorInformation: ColorInformation = {}
+        opponent: LCPlayer
     ): string {
         if (!this.m_BaseCell) {
             return newColorPlayer;
         }
 
-        // Weight applied to denial value: 0 = pure offense, 1 = equal offense/defense.
-        const DENY_WEIGHT = 0.5;
+        // 1.5 = value blocking the human 1.5× relative to capturing for self.
+        const DENY_WEIGHT = 1.5;
 
-        const allColors = new Set([
-            ...Object.keys(colorInformation),
-            ...Object.keys(opponentColorInformation)
-        ]);
+        // Collect every color present on unoccupied cells across the whole board.
+        const candidateColors = new Set<string>();
+        cells.forEach((row) => {
+            row.forEach((cell) => {
+                if (!cell.m_Occupied) {
+                    candidateColors.add(cell.m_Color);
+                }
+            });
+        });
 
         let bestColor = this.m_BaseCell.m_Color;
         let bestScore = -1;
 
-        allColors.forEach((color) => {
+        candidateColors.forEach((color) => {
             if (color === newColorPlayer) {
                 return;
             }
@@ -141,8 +212,8 @@ export class LCPlayer {
                 return;
             }
 
-            const ownGain = colorInformation[color] ?? 0;
-            const denyGain = opponentColorInformation[color] ?? 0;
+            const ownGain = this.simulateCaptureCount(cells, definitions, color);
+            const denyGain = opponent.simulateCaptureCount(cells, definitions, color);
             const totalScore = ownGain + denyGain * DENY_WEIGHT;
 
             if (totalScore > bestScore) {

@@ -15,6 +15,8 @@ type ScoreStats = {
 };
 
 export class Board {
+    private static instance: Board | null = null;
+
     m_CanvasElement: CanvasRenderingContext2D | null;
     m_Definitions: Definitions;
     m_PlayerHuman: Player;
@@ -28,7 +30,7 @@ export class Board {
     m_GameOver: boolean;
     m_Highscore: Highscore;
 
-    constructor(definitions: Definitions, playerHuman: Player, playerComputer: Player) {
+    private constructor(definitions: Definitions, playerHuman: Player, playerComputer: Player) {
         this.m_CanvasElement = null;
         this.m_Definitions = definitions;
         this.m_PlayerHuman = playerHuman;
@@ -41,6 +43,19 @@ export class Board {
         this.m_ComputerStrategy = "minimax";
         this.m_GameOver = false;
         this.m_Highscore = new Highscore();
+    }
+
+    static initialize(definitions: Definitions, playerHuman: Player, playerComputer: Player): void {
+        if (!Board.instance) {
+            Board.instance = new Board(definitions, playerHuman, playerComputer);
+        }
+    }
+
+    static getInstance(): Board {
+        if (!Board.instance) {
+            throw new Error("Board not initialized");
+        }
+        return Board.instance;
     }
 
     init(gameField: string, buttonField: string, idWinner: string): void {

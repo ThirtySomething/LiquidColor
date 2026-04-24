@@ -5,6 +5,7 @@ import { Player } from "./player.js";
 import { Timer } from "./timer.js";
 import { Util } from "./util.js";
 export class Board {
+    static instance = null;
     m_CanvasElement;
     m_Definitions;
     m_PlayerHuman;
@@ -30,6 +31,17 @@ export class Board {
         this.m_ComputerStrategy = "minimax";
         this.m_GameOver = false;
         this.m_Highscore = new Highscore();
+    }
+    static initialize(definitions, playerHuman, playerComputer) {
+        if (!Board.instance) {
+            Board.instance = new Board(definitions, playerHuman, playerComputer);
+        }
+    }
+    static getInstance() {
+        if (!Board.instance) {
+            throw new Error("Board not initialized");
+        }
+        return Board.instance;
     }
     init(gameField, buttonField, idWinner) {
         this.m_IDGameField = gameField;

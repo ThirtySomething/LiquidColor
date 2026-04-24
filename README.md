@@ -12,7 +12,7 @@ To run this game you need a internet browser supporting JavaScript and HTML5. At
 
 ## Test
 
-You can test this game on my [site][url_my_site].
+You can test this game on [GitHub][url_github_liquidcolor].
 
 ## Supported Platforms
 
@@ -31,4 +31,4 @@ Saw this game on [Android][url_android]. Thought by myself - looks easy. This is
 [url_license]: https://github.com/ThirtySomething/LiquidColor/blob/master/LICENSE.TXT "LGPL-3.0"
 [url_sascha]: https://github.com/Foomy "Foomy"
 [url_jonas]: https://github.com/DonatJR "DonatJR"
-[url_my_site]: http://www.derpaul.net/wordpress/?page_id=740 "DerPaul"
+[url_github_liquidcolor]: https://thirtysomething.github.io/LiquidColor/ "LiquidColor@GitHub"

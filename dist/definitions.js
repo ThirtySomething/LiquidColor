@@ -1,4 +1,5 @@
 export class Definitions {
+    static instance = null;
     DimensionX;
     DimensionY;
     CellSize;
@@ -18,6 +19,20 @@ export class Definitions {
             { DX: -1, DY: 0 }
         ];
         this.reInit(dimX, dimY, cellSize);
+    }
+    static initialize(dimX, dimY, cellSize) {
+        if (!Definitions.instance) {
+            Definitions.instance = new Definitions(dimX, dimY, cellSize);
+        }
+        else {
+            Definitions.instance.reInit(dimX, dimY, cellSize);
+        }
+    }
+    static getInstance() {
+        if (!Definitions.instance) {
+            throw new Error("Definitions not initialized");
+        }
+        return Definitions.instance;
     }
     reInit(dimX, dimY, cellSize) {
         this.DimensionX = Number.parseInt(String(dimX), 10);

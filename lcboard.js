@@ -10,7 +10,7 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
     this.m_IDButtonField = null;
     this.m_IDWinner = null;
     // ------------------------------------------------------------
-    this.Init = function(GameField, ButtonField, IDWinner) {
+    this.Init = function (GameField, ButtonField, IDWinner) {
         this.m_IDGameField = GameField;
         this.m_IDButtonField = ButtonField;
         this.m_IDWinner = IDWinner;
@@ -26,7 +26,7 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
         }
     };
     // ------------------------------------------------------------
-    this.ReInit = function(IDDimX, IDDimY, IDCellSize, IDPlayerName) {
+    this.ReInit = function (IDDimX, IDDimY, IDCellSize, IDPlayerName) {
         var DimX = $("#" + IDDimX).val();
         var DimY = $("#" + IDDimY).val();
         var CellSize = $("#" + IDCellSize).val();
@@ -40,7 +40,7 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
         this.PlayerInit(this.m_IDWinner);
     };
     // ------------------------------------------------------------
-    this.PlayerInit = function(IDWinner) {
+    this.PlayerInit = function (IDWinner) {
         $("#" + IDWinner).html("");
 
         // Human will start in bottom left corner
@@ -62,7 +62,7 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
         );
     };
     // ------------------------------------------------------------
-    this.BoardInit = function() {
+    this.BoardInit = function () {
         var BoardWidth =
             this.m_Definitions.DimensionX * this.m_Definitions.CellSize;
         var BoardHeight =
@@ -74,8 +74,8 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
         this.m_Grid.GridInit(this.m_Definitions, this.m_CanvasElement);
     };
     // ------------------------------------------------------------
-    this.BoardButtonsInit = function(ButtonField) {
-        // Retrive margin size from CSS classn
+    this.BoardButtonsInit = function (ButtonField) {
+        // Retrieve margin size from CSS class
         var BtnMargin = parseInt($("#fakebtn").css("marginTop"));
         var NumberOfButtons = this.m_Definitions.Colors.length;
         var BtnWidth = parseInt(
@@ -95,7 +95,7 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
         $("#" + ButtonField).children().remove();
         for (var Loop = 0; Loop < NumberOfButtons; Loop++) {
             var CurCol = this.m_Definitions.Colors[Loop];
-            var Button = $("#" + ButtonField).append(
+            $("#" + ButtonField).append(
                 '<div id="' + CurCol + '"></div>'
             );
 
@@ -105,13 +105,13 @@ function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
             $("#" + CurCol).unbind("click").bind("click", {
                 Board: this,
                 Color: CurCol
-            }, function(event) {
+            }, function (event) {
                 event.data.Board.PerformMove(event.data.Color);
             });
         }
     };
     // ------------------------------------------------------------
-    this.PerformMove = function(NewColorPlayer) {
+    this.PerformMove = function (NewColorPlayer) {
         // Checks
         $("#moveinfo").hide();
         if (NewColorPlayer === this.m_PlayerHuman.m_BaseCell.m_Color) {

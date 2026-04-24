@@ -7,12 +7,12 @@ function LCPlayer(PlayerName, IDName, IDScore) {
     this.m_IDName = IDName;
     this.m_IDScore = IDScore;
     // ------------------------------------------------------------
-    this.CounterUpdate = function(Cells, Definitions) {
+    this.CounterUpdate = function (Cells, Definitions) {
         var CellCounter = 0;
         var CurrentPlayer = this;
 
-        Cells.forEach(function(CurrentRow) {
-            CurrentRow.forEach(function(CurrentCell) {
+        Cells.forEach(function (CurrentRow) {
+            CurrentRow.forEach(function (CurrentCell) {
                 if (
                     true === CurrentCell.m_Occupied &&
                     CurrentPlayer.m_PlayerName === CurrentCell.m_Owner
@@ -33,7 +33,7 @@ function LCPlayer(PlayerName, IDName, IDScore) {
         }
     };
     // ------------------------------------------------------------
-    this.Init = function(Board, PosX, PosY, IDWinner) {
+    this.Init = function (Board, PosX, PosY, IDWinner) {
         $("#" + this.m_IDName).html(this.m_PlayerName);
         this.m_IDWinner = IDWinner;
         this.m_BaseCell = Board.m_Grid.m_Cells[PosY][PosX];
@@ -46,37 +46,36 @@ function LCPlayer(PlayerName, IDName, IDScore) {
         );
     };
     // ------------------------------------------------------------
-    this.Move = function(Cells, Colors, Definitions, CanvasElement) {
+    this.Move = function (Cells, Colors, Definitions, CanvasElement) {
         this.m_BaseCell.m_Color = this.m_BaseCell.CellColorRandomGet(Colors);
         this.m_BaseCell.Draw(Definitions, CanvasElement);
         this.CellsMarkOwner(Cells, Definitions, CanvasElement);
     };
     // ------------------------------------------------------------
-    this.CellsMarkOwner = function(Cells, Definitions, CanvasElement) {
+    this.CellsMarkOwner = function (Cells, Definitions, CanvasElement) {
         var CellsCollect = [];
         var Player = this;
         var CellsWork = Player.m_BaseCell.NeighboursGet(Cells, Definitions);
-        http:
-            do {
-                CellsWork.forEach(function(CurrentCell) {
-                    CurrentCell.m_Color = Player.m_BaseCell.m_Color;
-                    CurrentCell.OwnerSet(Player.m_PlayerName);
-                    CurrentCell.Draw(Definitions, CanvasElement);
-                    var NewNeighbours = CurrentCell.NeighboursGet(Cells, Definitions);
-                    NewNeighbours.forEach(function(NewCell) {
-                        CellsCollect.push(NewCell);
-                    });
+        do {
+            CellsWork.forEach(function (CurrentCell) {
+                CurrentCell.m_Color = Player.m_BaseCell.m_Color;
+                CurrentCell.OwnerSet(Player.m_PlayerName);
+                CurrentCell.Draw(Definitions, CanvasElement);
+                var NewNeighbours = CurrentCell.NeighboursGet(Cells, Definitions);
+                NewNeighbours.forEach(function (NewCell) {
+                    CellsCollect.push(NewCell);
                 });
-                CellsWork = CellsCollect.filter(function(value, index, self) {
-                    return self.indexOf(value) === index;
-                });
-                CellsCollect = [];
-            } while (0 < CellsWork.length);
+            });
+            CellsWork = CellsCollect.filter(function (value, index, self) {
+                return self.indexOf(value) === index;
+            });
+            CellsCollect = [];
+        } while (0 < CellsWork.length);
 
         this.CounterUpdate(Cells, Definitions);
     };
     // ------------------------------------------------------------
-    this.IdentifyBestColor = function(ColorInformation, NewColorPlayer) {
+    this.IdentifyBestColor = function (ColorInformation, NewColorPlayer) {
         var BestColor = this.m_BaseCell.m_Color;
         var Number = -1;
         var Player = this;

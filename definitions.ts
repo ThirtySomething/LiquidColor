@@ -2,7 +2,8 @@ import type { Offset } from "./offset.js";
 
 export type { Offset } from "./offset.js";
 
-export class Definitions {
+export class Definitions 
+{
     private static instance: Definitions | null = null;
 
     DimensionX: number;
@@ -12,7 +13,8 @@ export class Definitions {
     Colors: string[];
     Offsets: Offset[];
 
-    private constructor(dimX: number | string, dimY: number | string, cellSize: number | string) {
+    private constructor(dimX: number | string, dimY: number | string, cellSize: number | string) 
+    {
         this.DimensionX = 0;
         this.DimensionY = 0;
         this.CellSize = 0;
@@ -27,22 +29,29 @@ export class Definitions {
         this.reInit(dimX, dimY, cellSize);
     }
 
-    static initialize(dimX: number | string, dimY: number | string, cellSize: number | string): void {
-        if (!Definitions.instance) {
+    static initialize(dimX: number | string, dimY: number | string, cellSize: number | string): void 
+    {
+        if (!Definitions.instance) 
+        {
             Definitions.instance = new Definitions(dimX, dimY, cellSize);
-        } else {
+        }
+        else 
+        {
             Definitions.instance.reInit(dimX, dimY, cellSize);
         }
     }
 
-    static getInstance(): Definitions {
-        if (!Definitions.instance) {
+    static getInstance(): Definitions 
+    {
+        if (!Definitions.instance) 
+        {
             throw new Error("Definitions not initialized");
         }
         return Definitions.instance;
     }
 
-    reInit(dimX: number | string, dimY: number | string, cellSize: number | string): void {
+    reInit(dimX: number | string, dimY: number | string, cellSize: number | string): void 
+    {
         this.DimensionX = Number.parseInt(String(dimX), 10);
         this.DimensionY = Number.parseInt(String(dimY), 10);
         this.CellSize = Number.parseInt(String(cellSize), 10);

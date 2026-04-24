@@ -1,3 +1,4 @@
+import { Board } from "./board.js";
 import { Cell } from "./cell.js";
 import { Definitions } from "./definitions.js";
 import { ComputerStrategyFactory } from "./strategies/computerstrategyfactory.js";
@@ -9,13 +10,18 @@ export class Player {
     m_IDName;
     m_IDScore;
     m_IDWinner;
-    constructor(playerName, idName, idScore) {
+    m_NotifyUI;
+    constructor(playerName, idName, idScore, notifyUI) {
         this.m_PlayerName = playerName;
         this.m_BaseCell = null;
         this.m_Offsets = [];
         this.m_IDName = idName;
         this.m_IDScore = idScore;
         this.m_IDWinner = "";
+        this.m_NotifyUI = notifyUI;
+    }
+    setNotifyUI(notifyUI) {
+        this.m_NotifyUI = notifyUI;
     }
     counterUpdate(cells, definitions) {
         let cellCounter = 0;
@@ -26,10 +32,9 @@ export class Player {
                 }
             });
         });
-        Util.setText(this.m_IDScore, String(cellCounter));
+        this.m_NotifyUI({ type: 'score', player: this.m_PlayerName, score: cellCounter });
         if (cellCounter >= definitions.Winner) {
-            Util.setText(this.m_IDWinner, `Player [${this.m_PlayerName}] won the game - has more than the half cells occupied.`);
-            Util.removeClass(this.m_IDWinner, "dspno");
+            this.m_NotifyUI({ type: 'winner', player: this.m_PlayerName });
         }
     }
     init(board, posX, posY, idWinner) {

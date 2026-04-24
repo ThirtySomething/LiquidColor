@@ -1,6 +1,7 @@
 import { Definitions } from "./definitions.js";
 import { Grid } from "./grid.js";
 import { Highscore } from "./highscore.js";
+import { Subject } from "./subject.js";
 import { Player } from "./player.js";
 import { Timer } from "./timer.js";
 import { Util } from "./util.js";
@@ -18,6 +19,7 @@ export class Board {
     m_ComputerStrategy;
     m_GameOver;
     m_Highscore;
+    m_UISubject;
     constructor(definitions, playerHuman, playerComputer) {
         this.m_CanvasElement = null;
         this.m_Definitions = definitions;
@@ -31,6 +33,7 @@ export class Board {
         this.m_ComputerStrategy = "minimax";
         this.m_GameOver = false;
         this.m_Highscore = new Highscore();
+        this.m_UISubject = new Subject();
     }
     static initialize(definitions, playerHuman, playerComputer) {
         if (!Board.instance) {
@@ -42,6 +45,9 @@ export class Board {
             throw new Error("Board not initialized");
         }
         return Board.instance;
+    }
+    getUISubject() {
+        return this.m_UISubject;
     }
     init(gameField, buttonField, idWinner) {
         this.m_IDGameField = gameField;

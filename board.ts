@@ -2,6 +2,7 @@ import { Definitions } from "./definitions.js";
 import { Grid } from "./grid.js";
 import { Highscore } from "./highscore.js";
 import type { HighscoreWinner } from "./highscorewinner.js";
+import { Subject } from "./subject.js";
 import { Player } from "./player.js";
 import type { ComputerStrategy } from "./strategies/computerstrategytype.js";
 import { Timer } from "./timer.js";
@@ -14,7 +15,8 @@ type ScoreStats = {
     total: number;
 };
 
-export class Board {
+export class Board 
+{
     private static instance: Board | null = null;
 
     m_CanvasElement: CanvasRenderingContext2D | null;
@@ -29,8 +31,10 @@ export class Board {
     m_ComputerStrategy: ComputerStrategy;
     m_GameOver: boolean;
     m_Highscore: Highscore;
+    m_UISubject: Subject;
 
-    private constructor(definitions: Definitions, playerHuman: Player, playerComputer: Player) {
+    private constructor(definitions: Definitions, playerHuman: Player, playerComputer: Player) 
+    {
         this.m_CanvasElement = null;
         this.m_Definitions = definitions;
         this.m_PlayerHuman = playerHuman;
@@ -43,29 +47,42 @@ export class Board {
         this.m_ComputerStrategy = "minimax";
         this.m_GameOver = false;
         this.m_Highscore = new Highscore();
+        this.m_UISubject = new Subject();
     }
 
-    static initialize(definitions: Definitions, playerHuman: Player, playerComputer: Player): void {
-        if (!Board.instance) {
+    static initialize(definitions: Definitions, playerHuman: Player, playerComputer: Player): void 
+    {
+        if (!Board.instance) 
+        {
             Board.instance = new Board(definitions, playerHuman, playerComputer);
         }
     }
 
-    static getInstance(): Board {
-        if (!Board.instance) {
+    static getInstance(): Board 
+    {
+        if (!Board.instance) 
+        {
             throw new Error("Board not initialized");
         }
         return Board.instance;
     }
 
-    init(gameField: string, buttonField: string, idWinner: string): void {
+    getUISubject(): Subject 
+    {
+        return this.m_UISubject;
+    }
+
+    init(gameField: string, buttonField: string, idWinner: string): void 
+    {
         this.m_IDGameField = gameField;
         this.m_IDButtonField = buttonField;
         this.m_IDWinner = idWinner;
         const graphics = document.getElementById(this.m_IDGameField) as HTMLCanvasElement | null;
-        if (graphics?.getContext) {
+        if (graphics?.getContext) 
+        {
             this.m_CanvasElement = graphics.getContext("2d");
-            if (!this.m_CanvasElement) {
+            if (!this.m_CanvasElement) 
+            {
                 return;
             }
 
@@ -87,7 +104,8 @@ export class Board {
         idCellSize: string,
         idPlayerName: string,
         idComputerStrategy: string
-    ): void {
+    ): void 
+    {
         const dimX = Util.getInputValue(idDimX);
         const dimY = Util.getInputValue(idDimY);
         const cellSize = Util.getInputValue(idCellSize);
@@ -104,19 +122,23 @@ export class Board {
         this.playerInit(this.m_IDWinner);
     }
 
-    readComputerStrategy(strategyValue: string): ComputerStrategy {
-        if (strategyValue === "greedy") {
+    readComputerStrategy(strategyValue: string): ComputerStrategy 
+    {
+        if (strategyValue === "greedy") 
+        {
             return "greedy";
         }
         return "minimax";
     }
 
-    playerInit(idWinner: string): void {
+    playerInit(idWinner: string): void 
+    {
         this.m_GameOver = false;
         this.m_Timer.reset();
         this.m_Timer.startTicker();
         const winnerElement = document.getElementById(idWinner);
-        if (winnerElement) {
+        if (winnerElement) 
+        {
             winnerElement.textContent = "";
             winnerElement.classList.add("dspno");
             winnerElement.style.display = "";
@@ -139,7 +161,8 @@ export class Board {
         );
     }
 
-    boardInit(): void {
+    boardInit(): void 
+    {
         const boardWidth = this.m_Definitions.DimensionX * this.m_Definitions.CellSize;
         const boardHeight = this.m_Definitions.DimensionY * this.m_Definitions.CellSize;
 
@@ -147,15 +170,18 @@ export class Board {
         const canvas = document.getElementById(this.m_IDGameField) as HTMLCanvasElement | null;
         Util.setElementSize(canvas, boardWidth, boardHeight);
 
-        if (!this.m_CanvasElement) {
+        if (!this.m_CanvasElement) 
+        {
             return;
         }
         this.m_Grid.gridInit(this.m_Definitions, this.m_CanvasElement);
     }
 
-    boardButtonsInit(buttonField: string): void {
+    boardButtonsInit(buttonField: string): void 
+    {
         const buttonContainer = document.getElementById(buttonField);
-        if (!buttonContainer) {
+        if (!buttonContainer) 
+        {
             return;
         }
         const btnMargin = Util.getCssNumberVar("--button-gap", 10);
@@ -168,7 +194,8 @@ export class Board {
         );
 
         Util.clearChildren(buttonField);
-        this.m_Definitions.Colors.forEach((currentColor) => {
+        this.m_Definitions.Colors.forEach((currentColor) => 
+        {
             const colorButton = document.createElement("button");
             colorButton.type = "button";
             colorButton.id = currentColor;
@@ -177,25 +204,30 @@ export class Board {
             colorButton.style.width = `${btnWidth}px`;
             colorButton.style.height = `${btnHeight}px`;
             colorButton.setAttribute("aria-label", `Choose ${currentColor} color`);
-            colorButton.addEventListener("click", () => {
+            colorButton.addEventListener("click", () => 
+            {
                 this.performMove(currentColor);
             });
             buttonContainer.appendChild(colorButton);
         });
     }
 
-    performMove(newColorPlayer: string): void {
-        if (this.m_GameOver || !this.m_PlayerHuman.m_BaseCell || !this.m_PlayerComputer.m_BaseCell) {
+    performMove(newColorPlayer: string): void 
+    {
+        if (this.m_GameOver || !this.m_PlayerHuman.m_BaseCell || !this.m_PlayerComputer.m_BaseCell) 
+        {
             return;
         }
 
         Util.hide("moveinfo");
-        if (newColorPlayer === this.m_PlayerHuman.m_BaseCell.m_Color) {
+        if (newColorPlayer === this.m_PlayerHuman.m_BaseCell.m_Color) 
+        {
             Util.setText("moveinfo", "You cannot select the color of yourself.");
             Util.show("moveinfo", "block");
             return;
         }
-        if (newColorPlayer === this.m_PlayerComputer.m_BaseCell.m_Color) {
+        if (newColorPlayer === this.m_PlayerComputer.m_BaseCell.m_Color) 
+        {
             Util.setText("moveinfo", "You cannot select the color of your opponent.");
             Util.show("moveinfo", "block");
             return;
@@ -210,7 +242,8 @@ export class Board {
             this.m_Definitions,
             this.m_CanvasElement
         );
-        if (this.evaluateGameState()) {
+        if (this.evaluateGameState()) 
+        {
             return;
         }
 
@@ -233,20 +266,26 @@ export class Board {
         this.evaluateGameState();
     }
 
-    getScoreStats(): ScoreStats {
+    getScoreStats(): ScoreStats 
+    {
         let human = 0;
         let computer = 0;
         let occupied = 0;
 
-        this.m_Grid.m_Cells.forEach((row) => {
-            row.forEach((cell) => {
-                if (cell.m_Occupied) {
+        this.m_Grid.m_Cells.forEach((row) => 
+        {
+            row.forEach((cell) => 
+            {
+                if (cell.m_Occupied) 
+                {
                     occupied += 1;
                 }
-                if (cell.m_Owner === this.m_PlayerHuman.m_PlayerName) {
+                if (cell.m_Owner === this.m_PlayerHuman.m_PlayerName) 
+                {
                     human += 1;
                 }
-                if (cell.m_Owner === this.m_PlayerComputer.m_PlayerName) {
+                if (cell.m_Owner === this.m_PlayerComputer.m_PlayerName) 
+                {
                     computer += 1;
                 }
             });
@@ -260,7 +299,8 @@ export class Board {
         };
     }
 
-    endGame(message: string, winner: HighscoreWinner): void {
+    endGame(message: string, winner: HighscoreWinner): void 
+    {
         this.m_GameOver = true;
         this.m_Timer.stop();
         this.m_Highscore.recordWin(winner);
@@ -270,10 +310,12 @@ export class Board {
         Util.show(this.m_IDWinner, "block");
     }
 
-    evaluateGameState(): boolean {
+    evaluateGameState(): boolean 
+    {
         const stats = this.getScoreStats();
 
-        if (stats.human >= this.m_Definitions.Winner) {
+        if (stats.human >= this.m_Definitions.Winner) 
+        {
             this.endGame(
                 `Player [${this.m_PlayerHuman.m_PlayerName}] won the game - has more than the half cells occupied.`,
                 "human"
@@ -281,7 +323,8 @@ export class Board {
             return true;
         }
 
-        if (stats.computer >= this.m_Definitions.Winner) {
+        if (stats.computer >= this.m_Definitions.Winner) 
+        {
             this.endGame(
                 `Player [${this.m_PlayerComputer.m_PlayerName}] won the game - has more than the half cells occupied.`,
                 "computer"
@@ -289,17 +332,21 @@ export class Board {
             return true;
         }
 
-        if (stats.occupied === stats.total) {
-            if (stats.human === stats.computer) {
+        if (stats.occupied === stats.total) 
+        {
+            if (stats.human === stats.computer) 
+            {
                 this.endGame("50:50 draw - both players occupy the same number of cells.", "draw");
             }
-            else if (stats.human > stats.computer) {
+            else if (stats.human > stats.computer) 
+            {
                 this.endGame(
                     `Player [${this.m_PlayerHuman.m_PlayerName}] won the game - more occupied cells at board end.`,
                     "human"
                 );
             }
-            else {
+            else 
+            {
                 this.endGame(
                     `Player [${this.m_PlayerComputer.m_PlayerName}] won the game - more occupied cells at board end.`,
                     "computer"

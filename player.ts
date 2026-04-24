@@ -1,8 +1,9 @@
-import type { Board } from "./board.js";
+import { Board } from "./board.js";
 import { Cell } from "./cell.js";
 import { Definitions } from "./definitions.js";
 import { ComputerStrategyFactory } from "./strategies/computerstrategyfactory.js";
 import type { ComputerStrategy } from "./strategies/computerstrategytype.js";
+import type { ObserverData } from "./observerdata.js";
 import { Util } from "./util.js";
 
 export class Player 
@@ -13,8 +14,9 @@ export class Player
     m_IDName: string;
     m_IDScore: string;
     m_IDWinner: string;
+    m_NotifyUI: (data: ObserverData) => void;
 
-    constructor(playerName: string, idName: string, idScore: string) 
+    constructor(playerName: string, idName: string, idScore: string, notifyUI: (data: ObserverData) => void) 
     {
         this.m_PlayerName = playerName;
         this.m_BaseCell = null;
@@ -22,6 +24,12 @@ export class Player
         this.m_IDName = idName;
         this.m_IDScore = idScore;
         this.m_IDWinner = "";
+        this.m_NotifyUI = notifyUI;
+    }
+
+    setNotifyUI(notifyUI: (data: ObserverData) => void): void 
+    {
+        this.m_NotifyUI = notifyUI;
     }
 
     counterUpdate(cells: Cell[][], definitions: Definitions): void 
@@ -39,14 +47,10 @@ export class Player
             });
         });
 
-        Util.setText(this.m_IDScore, String(cellCounter));
+        this.m_NotifyUI({ type: 'score', player: this.m_PlayerName, score: cellCounter });
         if (cellCounter >= definitions.Winner) 
         {
-            Util.setText(
-                this.m_IDWinner,
-                `Player [${this.m_PlayerName}] won the game - has more than the half cells occupied.`
-            );
-            Util.removeClass(this.m_IDWinner, "dspno");
+            this.m_NotifyUI({ type: 'winner', player: this.m_PlayerName });
         }
     }
 

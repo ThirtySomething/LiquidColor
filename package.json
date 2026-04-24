@@ -4,10 +4,13 @@
     "private": true,
     "scripts": {
         "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
-        "build": "tsc -p tsconfig.json && npm run build:bundle",
-        "build:bundle": "esbuild app.ts --bundle --platform=browser --format=iife --target=es2020 --outfile=dist/app.js",
-        "typecheck": "tsc --noEmit -p tsconfig.json",
-        "watch": "tsc --watch -p tsconfig.json"
+        "build": "npm run build:prod",
+        "build:dev": "tsc -p tsconfig.dev.json && npm run build:bundle:dev",
+        "build:prod": "tsc -p tsconfig.prod.json && npm run build:bundle:prod",
+        "build:bundle:dev": "esbuild app.ts --bundle --platform=browser --format=iife --target=es2020 --sourcemap --outfile=dist/app.js",
+        "build:bundle:prod": "esbuild app.ts --bundle --platform=browser --format=iife --target=es2020 --minify --outfile=dist/app.js && node -e \"require('fs').rmSync('dist/app.js.map', { force: true })\"",
+        "typecheck": "tsc --noEmit -p tsconfig.dev.json",
+        "watch": "tsc --watch -p tsconfig.dev.json"
     },
     "devDependencies": {
         "esbuild": "^0.25.3",

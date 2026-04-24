@@ -1,155 +1,233 @@
-function LCBoard(Definitions, PlayerHuman, PlayerComputer) {
-    "use strict";
-    // ------------------------------------------------------------
-    this.m_CanvasElement = null;
-    this.m_Definitions = Definitions;
-    this.m_PlayerHuman = PlayerHuman;
-    this.m_PlayerComputer = PlayerComputer;
-    this.m_Grid = new LCGrid();
-    this.m_IDGameField = null;
-    this.m_IDButtonField = null;
-    this.m_IDWinner = null;
-    // ------------------------------------------------------------
-    this.Init = function (GameField, ButtonField, IDWinner) {
-        this.m_IDGameField = GameField;
-        this.m_IDButtonField = ButtonField;
-        this.m_IDWinner = IDWinner;
-        var Graphics = document.getElementById(this.m_IDGameField);
-        if (Graphics.getContext) {
-            this.m_CanvasElement = Graphics.getContext("2d");
-            this.BoardInit();
-            this.BoardButtonsInit(this.m_IDButtonField);
-            this.PlayerInit(this.m_IDWinner);
-            $("#dimx").val(this.m_Definitions.DimensionX);
-            $("#dimy").val(this.m_Definitions.DimensionY);
-            $("#playername").val(this.m_PlayerHuman.m_PlayerName);
+class LCBoard {
+    constructor(definitions, playerHuman, playerComputer) {
+        this.m_CanvasElement = null;
+        this.m_Definitions = definitions;
+        this.m_PlayerHuman = playerHuman;
+        this.m_PlayerComputer = playerComputer;
+        this.m_Grid = new LCGrid();
+        this.m_IDGameField = null;
+        this.m_IDButtonField = null;
+        this.m_IDWinner = null;
+        this.m_GameOver = false;
+    }
+
+    init(gameField, buttonField, idWinner) {
+        this.m_IDGameField = gameField;
+        this.m_IDButtonField = buttonField;
+        this.m_IDWinner = idWinner;
+        const graphics = document.getElementById(this.m_IDGameField);
+        if (graphics?.getContext) {
+            this.m_CanvasElement = graphics.getContext("2d");
+            this.boardInit();
+            this.boardButtonsInit(this.m_IDButtonField);
+            this.playerInit(this.m_IDWinner);
+            setInputValue("dimx", this.m_Definitions.DimensionX);
+            setInputValue("dimy", this.m_Definitions.DimensionY);
+            setInputValue("playername", this.m_PlayerHuman.m_PlayerName);
         }
-    };
-    // ------------------------------------------------------------
-    this.ReInit = function (IDDimX, IDDimY, IDCellSize, IDPlayerName) {
-        var DimX = $("#" + IDDimX).val();
-        var DimY = $("#" + IDDimY).val();
-        var CellSize = $("#" + IDCellSize).val();
-        var PlayerName = $("#" + IDPlayerName).val();
+    }
 
-        this.m_Definitions.ReInit(DimX, DimY, CellSize);
-        this.m_PlayerHuman.m_PlayerName = PlayerName;
+    reInit(idDimX, idDimY, idCellSize, idPlayerName) {
+        const dimX = getInputValue(idDimX);
+        const dimY = getInputValue(idDimY);
+        const cellSize = getInputValue(idCellSize);
+        const playerName = getInputValue(idPlayerName);
 
-        this.BoardInit();
-        this.BoardButtonsInit(this.m_IDButtonField);
-        this.PlayerInit(this.m_IDWinner);
-    };
-    // ------------------------------------------------------------
-    this.PlayerInit = function (IDWinner) {
-        $("#" + IDWinner).html("");
+        this.m_Definitions.reInit(dimX, dimY, cellSize);
+        this.m_PlayerHuman.m_PlayerName = playerName;
 
-        // Human will start in bottom left corner
-        this.m_Grid.GridReset();
-        this.m_PlayerHuman.Init(
+        this.boardInit();
+        this.boardButtonsInit(this.m_IDButtonField);
+        this.playerInit(this.m_IDWinner);
+    }
+
+    playerInit(idWinner) {
+        this.m_GameOver = false;
+        const winnerElement = document.getElementById(idWinner);
+        if (winnerElement) {
+            winnerElement.textContent = "";
+            winnerElement.classList.add("dspno");
+            winnerElement.style.display = "";
+        }
+
+        // Human will start in bottom left corner.
+        this.m_Grid.gridReset();
+        this.m_PlayerHuman.init(
             this,
             0,
             this.m_Definitions.DimensionY - 1,
-            IDWinner
+            idWinner
         );
 
-        // Computer will start in top right corner
-        this.m_Grid.GridReset();
-        this.m_PlayerComputer.Init(
+        // Computer will start in top right corner.
+        this.m_Grid.gridReset();
+        this.m_PlayerComputer.init(
             this,
             this.m_Definitions.DimensionX - 1,
             0,
-            IDWinner
+            idWinner
         );
-    };
-    // ------------------------------------------------------------
-    this.BoardInit = function () {
-        var BoardWidth =
-            this.m_Definitions.DimensionX * this.m_Definitions.CellSize;
-        var BoardHeight =
-            this.m_Definitions.DimensionY * this.m_Definitions.CellSize;
+    }
 
-        $("#moveinfo").html("");
-        ElementSetSize($("#" + this.m_IDGameField), BoardWidth, BoardHeight);
-        $("#" + this.m_IDGameField).css("border", "1px solid black");
-        this.m_Grid.GridInit(this.m_Definitions, this.m_CanvasElement);
-    };
-    // ------------------------------------------------------------
-    this.BoardButtonsInit = function (ButtonField) {
-        // Retrieve margin size from CSS class
-        var BtnMargin = parseInt($("#fakebtn").css("marginTop"));
-        var NumberOfButtons = this.m_Definitions.Colors.length;
-        var BtnWidth = parseInt(
-            Math.floor(
-                this.m_Definitions.DimensionX * this.m_Definitions.CellSize / 5
-            )
+    boardInit() {
+        const boardWidth = this.m_Definitions.DimensionX * this.m_Definitions.CellSize;
+        const boardHeight = this.m_Definitions.DimensionY * this.m_Definitions.CellSize;
+
+        setText("moveinfo", "");
+        const canvas = document.getElementById(this.m_IDGameField);
+        setElementSize(canvas, boardWidth, boardHeight);
+        this.m_Grid.gridInit(this.m_Definitions, this.m_CanvasElement);
+    }
+
+    boardButtonsInit(buttonField) {
+        const buttonContainer = document.getElementById(buttonField);
+        if (!buttonContainer) {
+            return;
+        }
+        const btnMargin = getCssNumberVar("--button-gap", 10);
+        const numberOfButtons = this.m_Definitions.Colors.length;
+        const btnWidth = Number.parseInt(
+            Math.floor((this.m_Definitions.DimensionX * this.m_Definitions.CellSize) / 5),
+            10
         );
-        var BtnHeight = parseInt(
+        const btnHeight = Number.parseInt(
             Math.floor(
                 (this.m_Definitions.DimensionY * this.m_Definitions.CellSize -
-                    (NumberOfButtons + 1) * BtnMargin) /
-                NumberOfButtons
-            )
+                    (numberOfButtons + 1) * btnMargin) /
+                numberOfButtons
+            ),
+            10
         );
-        var GameBoard = this;
 
-        $("#" + ButtonField).children().remove();
-        for (var Loop = 0; Loop < NumberOfButtons; Loop++) {
-            var CurCol = this.m_Definitions.Colors[Loop];
-            $("#" + ButtonField).append(
-                '<div id="' + CurCol + '"></div>'
-            );
-
-            ElementSetSize($("#" + CurCol), BtnWidth, BtnHeight);
-            $("#" + CurCol).css("background-color", CurCol);
-            $("#" + CurCol).addClass("gamebtn");
-            $("#" + CurCol).unbind("click").bind("click", {
-                Board: this,
-                Color: CurCol
-            }, function (event) {
-                event.data.Board.PerformMove(event.data.Color);
+        clearChildren(buttonField);
+        this.m_Definitions.Colors.forEach((currentColor) => {
+            const colorButton = document.createElement("button");
+            colorButton.type = "button";
+            colorButton.id = currentColor;
+            colorButton.className = "gamebtn";
+            colorButton.style.backgroundColor = currentColor;
+            colorButton.style.width = `${btnWidth}px`;
+            colorButton.style.height = `${btnHeight}px`;
+            colorButton.setAttribute("aria-label", `Choose ${currentColor} color`);
+            colorButton.addEventListener("click", () => {
+                this.performMove(currentColor);
             });
-        }
-    };
-    // ------------------------------------------------------------
-    this.PerformMove = function (NewColorPlayer) {
-        // Checks
-        $("#moveinfo").hide();
-        if (NewColorPlayer === this.m_PlayerHuman.m_BaseCell.m_Color) {
-            $("#moveinfo").html("You cannot select the color of yourself.").show();
-            return;
-        }
-        if (NewColorPlayer === this.m_PlayerComputer.m_BaseCell.m_Color) {
-            $("#moveinfo")
-                .html("You cannot select the color of your opponent.")
-                .show();
+            buttonContainer.appendChild(colorButton);
+        });
+    }
+
+    performMove(newColorPlayer) {
+        if (this.m_GameOver) {
             return;
         }
 
-        // Human move
-        this.m_Grid.GridReset();
-        this.m_PlayerHuman.Move(
-            this.m_Grid.m_Cells, [NewColorPlayer],
+        hide("moveinfo");
+        if (newColorPlayer === this.m_PlayerHuman.m_BaseCell.m_Color) {
+            setText("moveinfo", "You cannot select the color of yourself.");
+            show("moveinfo", "block");
+            return;
+        }
+        if (newColorPlayer === this.m_PlayerComputer.m_BaseCell.m_Color) {
+            setText("moveinfo", "You cannot select the color of your opponent.");
+            show("moveinfo", "block");
+            return;
+        }
+
+        // Human move.
+        this.m_Grid.gridReset();
+        this.m_PlayerHuman.move(
+            this.m_Grid.m_Cells,
+            [newColorPlayer],
+            this.m_Definitions,
+            this.m_CanvasElement
+        );
+        if (this.evaluateGameState()) {
+            return;
+        }
+
+        // Computer move.
+        const computerCells = this.m_Grid.getPlayerCells(this.m_PlayerComputer);
+        const borderCells = this.m_Grid.identifyBorderCells(computerCells, this.m_Definitions);
+        const colors = this.m_Grid.playerColorsGet(borderCells, this.m_Definitions);
+        const newColorComputer = this.m_PlayerComputer.identifyBestColor(colors, newColorPlayer);
+
+        this.m_Grid.gridReset();
+        this.m_PlayerComputer.move(
+            this.m_Grid.m_Cells,
+            [newColorComputer],
             this.m_Definitions,
             this.m_CanvasElement
         );
 
-        // Computer move
-        var ComputerCells = this.m_Grid.GetPlayerCells(this.m_PlayerComputer);
-        var BorderCells = this.m_Grid.IdentifyBorderCells(
-            ComputerCells,
-            this.m_Definitions
-        );
-        var Colors = this.m_Grid.PlayerColorsGet(BorderCells, this.m_Definitions);
-        var NewColorComputer = this.m_PlayerComputer.IdentifyBestColor(
-            Colors,
-            NewColorPlayer
-        );
+        this.evaluateGameState();
+    }
 
-        this.m_Grid.GridReset();
-        this.m_PlayerComputer.Move(
-            this.m_Grid.m_Cells, [NewColorComputer],
-            this.m_Definitions,
-            this.m_CanvasElement
-        );
-    };
+    getScoreStats() {
+        let human = 0;
+        let computer = 0;
+        let occupied = 0;
+
+        this.m_Grid.m_Cells.forEach((row) => {
+            row.forEach((cell) => {
+                if (cell.m_Occupied) {
+                    occupied += 1;
+                }
+                if (cell.m_Owner === this.m_PlayerHuman.m_PlayerName) {
+                    human += 1;
+                }
+                if (cell.m_Owner === this.m_PlayerComputer.m_PlayerName) {
+                    computer += 1;
+                }
+            });
+        });
+
+        return {
+            human,
+            computer,
+            occupied,
+            total: this.m_Definitions.DimensionX * this.m_Definitions.DimensionY
+        };
+    }
+
+    endGame(message) {
+        this.m_GameOver = true;
+        setText(this.m_IDWinner, message);
+        removeClass(this.m_IDWinner, "dspno");
+        show(this.m_IDWinner, "block");
+    }
+
+    evaluateGameState() {
+        const stats = this.getScoreStats();
+
+        if (stats.human >= this.m_Definitions.Winner) {
+            this.endGame(
+                `Player [${this.m_PlayerHuman.m_PlayerName}] won the game - has more than the half cells occupied.`
+            );
+            return true;
+        }
+
+        if (stats.computer >= this.m_Definitions.Winner) {
+            this.endGame(
+                `Player [${this.m_PlayerComputer.m_PlayerName}] won the game - has more than the half cells occupied.`
+            );
+            return true;
+        }
+
+        if (stats.occupied === stats.total) {
+            if (stats.human === stats.computer) {
+                this.endGame("50:50 draw - both players occupy the same number of cells.");
+            } else if (stats.human > stats.computer) {
+                this.endGame(
+                    `Player [${this.m_PlayerHuman.m_PlayerName}] won the game - more occupied cells at board end.`
+                );
+            } else {
+                this.endGame(
+                    `Player [${this.m_PlayerComputer.m_PlayerName}] won the game - more occupied cells at board end.`
+                );
+            }
+            return true;
+        }
+
+        return false;
+    }
 }

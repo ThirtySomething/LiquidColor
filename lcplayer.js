@@ -1,98 +1,90 @@
-function LCPlayer(PlayerName, IDName, IDScore) {
-    "use strict";
-    // ------------------------------------------------------------
-    this.m_PlayerName = PlayerName;
-    this.m_BaseCell = null;
-    this.m_Offsets = [];
-    this.m_IDName = IDName;
-    this.m_IDScore = IDScore;
-    // ------------------------------------------------------------
-    this.CounterUpdate = function (Cells, Definitions) {
-        var CellCounter = 0;
-        var CurrentPlayer = this;
+class LCPlayer {
+    constructor(playerName, idName, idScore) {
+        this.m_PlayerName = playerName;
+        this.m_BaseCell = null;
+        this.m_Offsets = [];
+        this.m_IDName = idName;
+        this.m_IDScore = idScore;
+    }
 
-        Cells.forEach(function (CurrentRow) {
-            CurrentRow.forEach(function (CurrentCell) {
-                if (
-                    true === CurrentCell.m_Occupied &&
-                    CurrentPlayer.m_PlayerName === CurrentCell.m_Owner
-                ) {
-                    CellCounter += 1;
+    counterUpdate(cells, definitions) {
+        let cellCounter = 0;
+
+        cells.forEach((currentRow) => {
+            currentRow.forEach((currentCell) => {
+                if (currentCell.m_Occupied && this.m_PlayerName === currentCell.m_Owner) {
+                    cellCounter += 1;
                 }
             });
         });
 
-        $("#" + this.m_IDScore).html(CellCounter);
-        if (CellCounter >= Definitions.Winner) {
-            $("#" + this.m_IDWinner).html(
-                "Player [" +
-                this.m_PlayerName +
-                "] won the game - has more than the half cells occupied."
+        setText(this.m_IDScore, String(cellCounter));
+        if (cellCounter >= definitions.Winner) {
+            setText(
+                this.m_IDWinner,
+                `Player [${this.m_PlayerName}] won the game - has more than the half cells occupied.`
             );
-            $("#" + this.m_IDWinner).removeClass("dspno");
+            removeClass(this.m_IDWinner, "dspno");
         }
-    };
-    // ------------------------------------------------------------
-    this.Init = function (Board, PosX, PosY, IDWinner) {
-        $("#" + this.m_IDName).html(this.m_PlayerName);
-        this.m_IDWinner = IDWinner;
-        this.m_BaseCell = Board.m_Grid.m_Cells[PosY][PosX];
-        this.m_BaseCell.OwnerSet(this.m_PlayerName);
-        this.m_BaseCell.Draw(Board.m_Definitions, Board.m_CanvasElement);
-        this.CellsMarkOwner(
-            Board.m_Grid.m_Cells,
-            Board.m_Definitions,
-            Board.m_CanvasElement
+    }
+
+    init(board, posX, posY, idWinner) {
+        setText(this.m_IDName, this.m_PlayerName);
+        this.m_IDWinner = idWinner;
+        this.m_BaseCell = board.m_Grid.m_Cells[posY][posX];
+        this.m_BaseCell.ownerSet(this.m_PlayerName);
+        this.m_BaseCell.draw(board.m_Definitions, board.m_CanvasElement);
+        this.cellsMarkOwner(
+            board.m_Grid.m_Cells,
+            board.m_Definitions,
+            board.m_CanvasElement
         );
-    };
-    // ------------------------------------------------------------
-    this.Move = function (Cells, Colors, Definitions, CanvasElement) {
-        this.m_BaseCell.m_Color = this.m_BaseCell.CellColorRandomGet(Colors);
-        this.m_BaseCell.Draw(Definitions, CanvasElement);
-        this.CellsMarkOwner(Cells, Definitions, CanvasElement);
-    };
-    // ------------------------------------------------------------
-    this.CellsMarkOwner = function (Cells, Definitions, CanvasElement) {
-        var CellsCollect = [];
-        var Player = this;
-        var CellsWork = Player.m_BaseCell.NeighboursGet(Cells, Definitions);
+    }
+
+    move(cells, colors, definitions, canvasElement) {
+        this.m_BaseCell.m_Color = this.m_BaseCell.cellColorRandomGet(colors);
+        this.m_BaseCell.draw(definitions, canvasElement);
+        this.cellsMarkOwner(cells, definitions, canvasElement);
+    }
+
+    cellsMarkOwner(cells, definitions, canvasElement) {
+        let cellsCollect = [];
+        let cellsWork = this.m_BaseCell.neighboursGet(cells, definitions);
         do {
-            CellsWork.forEach(function (CurrentCell) {
-                CurrentCell.m_Color = Player.m_BaseCell.m_Color;
-                CurrentCell.OwnerSet(Player.m_PlayerName);
-                CurrentCell.Draw(Definitions, CanvasElement);
-                var NewNeighbours = CurrentCell.NeighboursGet(Cells, Definitions);
-                NewNeighbours.forEach(function (NewCell) {
-                    CellsCollect.push(NewCell);
+            cellsWork.forEach((currentCell) => {
+                currentCell.m_Color = this.m_BaseCell.m_Color;
+                currentCell.ownerSet(this.m_PlayerName);
+                currentCell.draw(definitions, canvasElement);
+                const newNeighbours = currentCell.neighboursGet(cells, definitions);
+                newNeighbours.forEach((newCell) => {
+                    cellsCollect.push(newCell);
                 });
             });
-            CellsWork = CellsCollect.filter(function (value, index, self) {
-                return self.indexOf(value) === index;
-            });
-            CellsCollect = [];
-        } while (0 < CellsWork.length);
 
-        this.CounterUpdate(Cells, Definitions);
-    };
-    // ------------------------------------------------------------
-    this.IdentifyBestColor = function (ColorInformation, NewColorPlayer) {
-        var BestColor = this.m_BaseCell.m_Color;
-        var Number = -1;
-        var Player = this;
+            cellsWork = cellsCollect.filter((value, index, self) => self.indexOf(value) === index);
+            cellsCollect = [];
+        } while (cellsWork.length > 0);
 
-        for (var Color in ColorInformation) {
-            if (Color === NewColorPlayer) {
-                continue;
-            }
-            if (Color === Player.m_BaseCell.m_Color) {
-                continue;
-            }
-            if (Number < ColorInformation[Color]) {
-                Number = ColorInformation[Color];
-                BestColor = Color;
-            }
-        }
+        this.counterUpdate(cells, definitions);
+    }
 
-        return BestColor;
-    };
+    identifyBestColor(colorInformation, newColorPlayer) {
+        let bestColor = this.m_BaseCell.m_Color;
+        let number = -1;
+
+        Object.keys(colorInformation).forEach((color) => {
+            if (color === newColorPlayer) {
+                return;
+            }
+            if (color === this.m_BaseCell.m_Color) {
+                return;
+            }
+            if (number < colorInformation[color]) {
+                number = colorInformation[color];
+                bestColor = color;
+            }
+        });
+
+        return bestColor;
+    }
 }

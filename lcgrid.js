@@ -1,90 +1,83 @@
-function LCGrid() {
-    "use strict";
-    // ------------------------------------------------------------
-    this.m_Cells = [];
-    // ------------------------------------------------------------
-    this.GridInit = function (Definitions, CanvasElement) {
+class LCGrid {
+    constructor() {
+        this.m_Cells = [];
+    }
+
+    gridInit(definitions, canvasElement) {
         this.m_Cells = [];
 
-        for (var LoopY = 0; LoopY < Definitions.DimensionY; LoopY++) {
-            this.m_Cells[LoopY] = [];
-            for (var LoopX = 0; LoopX < Definitions.DimensionX; LoopX++) {
-                var CurrentCell = new LCCell(LoopX, LoopY);
-                CurrentCell.m_Color = CurrentCell.CellColorRandomGet(
-                    Definitions.Colors
-                );
-                CurrentCell.Draw(Definitions, CanvasElement);
-                this.m_Cells[LoopY].push(CurrentCell);
+        for (let loopY = 0; loopY < definitions.DimensionY; loopY += 1) {
+            this.m_Cells[loopY] = [];
+            for (let loopX = 0; loopX < definitions.DimensionX; loopX += 1) {
+                const currentCell = new LCCell(loopX, loopY);
+                currentCell.m_Color = currentCell.cellColorRandomGet(definitions.Colors);
+                currentCell.draw(definitions, canvasElement);
+                this.m_Cells[loopY].push(currentCell);
             }
         }
-    };
-    // ------------------------------------------------------------
-    this.GridReset = function () {
-        this.m_Cells.forEach(function (CurrentRow) {
-            CurrentRow.forEach(function (CurrentCell) {
-                CurrentCell.m_DoRedraw = true;
+    }
+
+    gridReset() {
+        this.m_Cells.forEach((currentRow) => {
+            currentRow.forEach((currentCell) => {
+                currentCell.m_DoRedraw = true;
             });
         });
-    };
-    // ------------------------------------------------------------
-    this.GetPlayerCells = function (Player) {
-        var PlayerCells = [];
+    }
 
-        this.m_Cells.forEach(function (CurrentRow) {
-            CurrentRow.forEach(function (CurrentCell) {
-                if (CurrentCell.m_Owner === Player.m_PlayerName) {
-                    PlayerCells.push(CurrentCell);
+    getPlayerCells(player) {
+        const playerCells = [];
+
+        this.m_Cells.forEach((currentRow) => {
+            currentRow.forEach((currentCell) => {
+                if (currentCell.m_Owner === player.m_PlayerName) {
+                    playerCells.push(currentCell);
                 }
             });
         });
 
-        return PlayerCells;
-    };
-    // ------------------------------------------------------------
-    this.IdentifyBorderCells = function (Cells, Definitions) {
-        var BorderCells = [];
-        var Grid = this;
+        return playerCells;
+    }
 
-        Cells.forEach(function (CurrentCell) {
-            if (true === CurrentCell.IsBorderCell(Grid.m_Cells, Definitions)) {
-                BorderCells.push(CurrentCell);
+    identifyBorderCells(cells, definitions) {
+        const borderCells = [];
+
+        cells.forEach((currentCell) => {
+            if (currentCell.isBorderCell(this.m_Cells, definitions)) {
+                borderCells.push(currentCell);
             }
         });
 
-        return BorderCells;
-    };
-    // ------------------------------------------------------------
-    this.PlayerColorsGet = function (Cells, Definitions) {
-        var PlayerColors = [];
-        var Grid = this;
+        return borderCells;
+    }
 
-        Cells.forEach(function (CurrentCell) {
-            Definitions.Offsets.forEach(function (CurrentOffset) {
-                var Cell_PosY = CurrentCell.m_PosY + CurrentOffset.DY;
+    playerColorsGet(cells, definitions) {
+        const playerColors = {};
 
-                if (0 > Cell_PosY || Definitions.DimensionY <= Cell_PosY) {
+        cells.forEach((currentCell) => {
+            definitions.Offsets.forEach((currentOffset) => {
+                const cellPosY = currentCell.m_PosY + currentOffset.DY;
+
+                if (cellPosY < 0 || definitions.DimensionY <= cellPosY) {
                     return;
                 }
 
-                var Cell_PosX = CurrentCell.m_PosX + CurrentOffset.DX;
-                if (0 > Cell_PosX || Definitions.DimensionX <= Cell_PosX) {
+                const cellPosX = currentCell.m_PosX + currentOffset.DX;
+                if (cellPosX < 0 || definitions.DimensionX <= cellPosX) {
                     return;
                 }
 
-                var CurrentNeighbour = Grid.m_Cells[Cell_PosY][Cell_PosX];
+                const currentNeighbour = this.m_Cells[cellPosY][cellPosX];
 
-                if (true === CurrentNeighbour.m_Occupied) {
+                if (currentNeighbour.m_Occupied) {
                     return;
                 }
 
-                var ValueOld = 0;
-                if (true === PlayerColors.hasOwnProperty(CurrentNeighbour.m_Color)) {
-                    ValueOld = parseInt(PlayerColors[CurrentNeighbour.m_Color]);
-                }
-                PlayerColors[CurrentNeighbour.m_Color] = parseInt(ValueOld + 1);
+                const valueOld = playerColors[currentNeighbour.m_Color] || 0;
+                playerColors[currentNeighbour.m_Color] = valueOld + 1;
             });
         });
 
-        return PlayerColors;
-    };
+        return playerColors;
+    }
 }

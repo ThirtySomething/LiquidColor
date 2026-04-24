@@ -1,82 +1,172 @@
-body {
-    margin: 10px;
+:root {
+    --page-bg: #f2efe9;
+    --card-bg: #fffdf8;
+    --text-color: #1e2329;
+    --accent: #145a70;
+    --accent-soft: #d5eef2;
+    --border: #25313d;
+    --radius: 10px;
+    --space-1: 8px;
+    --space-2: 12px;
+    --space-3: 18px;
+    --space-4: 24px;
+    --button-gap: 10px;
 }
 
-.gameinfo {
-    font-family: Verdana, Geneva, sans-serif;
-    font-size: 14px;
-    font-style: bold;
-    font-variant: normal;
-    font-weight: 500;
-    line-height: 16px;
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 20% 15%, #e6f5f8 0%, transparent 45%),
+        radial-gradient(circle at 85% 70%, #f7e9db 0%, transparent 35%),
+        var(--page-bg);
+    color: var(--text-color);
+    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+.app-shell {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: var(--space-4);
+    display: grid;
+    gap: var(--space-3);
+}
+
+.title {
+    margin: 0;
+    letter-spacing: 0.04em;
+    font-size: clamp(1.6rem, 2.2vw, 2.2rem);
+    color: var(--accent);
+}
+
+.gameinfo,
+.setup,
+.messages,
+.playground {
+    background: var(--card-bg);
+    border: 1px solid color-mix(in srgb, var(--border) 65%, white);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 8%);
+}
+
+.gameinfo,
+.setup,
+.messages {
+    padding: var(--space-3);
+    line-height: 1.45;
 }
 
 .setup {
-    font-family: Verdana, Geneva, sans-serif;
-    font-size: 14px;
-    font-style: bold;
-    font-variant: normal;
-    font-weight: 500;
-    line-height: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: var(--space-2);
+}
+
+.form-row {
+    display: grid;
+    gap: 6px;
+}
+
+.form-row label {
+    font-weight: 600;
+}
+
+.form-row input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #9ea8af;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.actions {
+    grid-column: 1 / -1;
+}
+
+#btn_reset {
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--accent-soft);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#btn_reset:hover {
+    filter: brightness(0.98);
 }
 
 .playground {
-    margin: 10px;
-    padding: 10px;
+    padding: var(--space-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: flex-start;
 }
 
-.left {
-    float: left;
+.board-wrap {
+    display: grid;
+    gap: var(--space-2);
 }
 
-.right {
-    float: right;
-}
-
-.btnlbl {
-    width: 300px;
+#gamearea {
     display: block;
+    border: 1px solid var(--border);
+    background: #fff;
+}
+
+.button-column {
+    display: flex;
+    flex-direction: column;
 }
 
 .gamebtn {
-    margin: 10px;
-    padding: 0px;
-    border: 1px solid black;
+    margin: var(--button-gap);
+    padding: 0;
+    border: 1px solid #161616;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.score-row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.score-box {
+    display: flex;
+    gap: var(--space-1);
+    font-weight: 600;
 }
 
 .gamestatus {
-    font-family: Verdana, Geneva, sans-serif;
-    font-size: 14px;
-    font-style: bold;
-    font-variant: normal;
-    font-weight: 500;
-    line-height: 16px;
+    font-size: 0.95rem;
 }
 
 .dspno {
     display: none;
 }
 
-.gamebtn:hover {
-    cursor: pointer;
-}
+@media (max-width: 760px) {
+    .app-shell {
+        padding: var(--space-2);
+    }
 
-.clear {
-    clear: both;
-}
+    .playground {
+        padding: var(--space-2);
+    }
 
-.ml10 {
-    margin-left: 10px;
-}
+    .button-column {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
 
-.mr10 {
-    margin-right: 10px;
-}
-
-.mt10 {
-    margin-top: 10px;
-}
-
-.pt10 {
-    padding-top: 10px;
+    .gamebtn {
+        margin: 6px;
+    }
 }

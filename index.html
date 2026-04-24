@@ -1,102 +1,78 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Liquid Color, a simple strategy game in modern JavaScript.">
     <title>Liquid Color</title>
-    <link rel="stylesheet" type="text/css" href="./css-reset.css">
-    <link rel="stylesheet" type="text/css" href="./lc.css">
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script type="text/javascript" src="./util.js"></script>
-    <script type="text/javascript" src="./lcdefinitions.js"></script>
-    <script type="text/javascript" src="./lccell.js"></script>
-    <script type="text/javascript" src="./lcgrid.js"></script>
-    <script type="text/javascript" src="./lcboard.js"></script>
-    <script type="text/javascript" src="./lcplayer.js"></script>
-    <script>
-        var Definitions = new LCDefinitions(30, 20, 10);
-        var Human = new LCPlayer("Besucher", "name_human", "score_human");
-        var Computer = new LCPlayer("DerPaul", "name_computer", "score_computer");
-        var Board = new LCBoard(Definitions, Human, Computer);
-        $(document).ready(function() {
-            $("#compare").css("display", "none");
-            Board.Init("gamearea", "playbuttons", "winner", "btn_reset");
-            // ------------------------------------------------------------
-            $("#btn_reset").unbind("click").bind("click", {
-                Board: Board,
-                DimX: "dimx",
-                DimY: "dimy",
-                CellSize: "cellsize",
-                PlayerName: "playername"
-            }, function(event) {
-                event.data.Board.ReInit(event.data.DimX, event.data.DimY, event.data.CellSize, event.data
-                    .PlayerName);
-            });
-        });
-    </script>
+    <link rel="stylesheet" href="./css-reset.css">
+    <link rel="stylesheet" href="./lc.css">
+    <script defer src="./util.js"></script>
+    <script defer src="./lcdefinitions.js"></script>
+    <script defer src="./lccell.js"></script>
+    <script defer src="./lcgrid.js"></script>
+    <script defer src="./lcplayer.js"></script>
+    <script defer src="./lcboard.js"></script>
+    <script defer src="./app.js"></script>
 </head>
 
 <body>
-    <div id="gameinfo" class="gameinfo">
-        <!-- Rough game information. -->
-        This is Liquid Color, a simple game written in JavaScript. The goal is to get as much as possible cells in a contiguous color. To reach this goal, you have to select one color of the surrounding cells. You cannot select the current color of your opponent,
-        and of course you cannot also select your own current color. All other colors are available to select. The computer will start on the upper right corner, the human player will start on the lower left corner.
-    </div>
-    <div id="setup" class="setup mt10">
-        <!-- On a later step user can change cell and board size. -->
-        <div class="btnlbl">
-            <label for="dimx" class="left">Dimension X:</label>
-            <input type="text" id="dimx" name="dimx" value="60" class="right" />
-        </div>
-        <div class="btnlbl">
-            <label for="dimy" class="left">Dimension Y:</label>
-            <input type="text" id="dimy" name="dimy" value="40" class="right" />
-        </div>
-        <div class="btnlbl">
-            <label for="cellsize" class="left">Cell width:</label>
-            <input type="text" id="cellsize" name="cellsize" value="10" class="right" />
-        </div>
-        <div class="btnlbl">
-            <label for="playername" class="left">Playername:</label>
-            <input type="text" id="playername" name="playername" value="ThirtySomething" class="right" />
-        </div>
-        <div class="btnlbl">
-            <button id="btn_reset" type="button" class="right clear">Reset</button>
-        </div>
-    </div>
-    <div id="playground" class="clear playground">
-        <div class="left">
-            <canvas id="gamearea" class="left">
-                <!-- Game matrix is placed here. -->
-            </canvas>
-            <div class="clear pt10 gamestatus">
-                <div class="left">
-                    <!-- Displays number of occupied cells for human -->
-                    <div id="name_human" class="left mr10">Human</div>
-                    <div id="score_human" class="right">0</div>
+    <main class="app-shell">
+        <h1 class="title">Liquid Color</h1>
+
+        <section id="gameinfo" class="gameinfo" aria-label="Game instructions">
+            This is Liquid Color, a simple strategy game. The goal is to occupy as many cells as possible in one
+            contiguous color. You can select one color from surrounding cells, but not your own current color and not
+            your opponent's current color. The computer starts in the upper-right corner, and the human player starts in
+            the lower-left corner.
+        </section>
+
+        <section id="setup" class="setup" aria-label="Game setup">
+            <div class="form-row">
+                <label for="dimx">Dimension X</label>
+                <input type="number" id="dimx" name="dimx" value="60" min="2" step="1" inputmode="numeric">
+            </div>
+            <div class="form-row">
+                <label for="dimy">Dimension Y</label>
+                <input type="number" id="dimy" name="dimy" value="40" min="2" step="1" inputmode="numeric">
+            </div>
+            <div class="form-row">
+                <label for="cellsize">Cell width</label>
+                <input type="number" id="cellsize" name="cellsize" value="10" min="2" step="1" inputmode="numeric">
+            </div>
+            <div class="form-row">
+                <label for="playername">Player name</label>
+                <input type="text" id="playername" name="playername" value="ThirtySomething" autocomplete="nickname">
+            </div>
+            <div class="actions">
+                <button id="btn_reset" type="button">Reset</button>
+            </div>
+        </section>
+
+        <section id="playground" class="playground" aria-label="Game board">
+            <div class="board-wrap">
+                <canvas id="gamearea" aria-label="Liquid Color game board"></canvas>
+                <div class="gamestatus score-row">
+                    <div class="score-box">
+                        <span id="name_human">Human</span>
+                        <span id="score_human">0</span>
+                    </div>
+                    <div class="score-box">
+                        <span id="name_computer">Computer</span>
+                        <span id="score_computer">0</span>
+                    </div>
                 </div>
-                <div class="right">
-                    <!-- Displays number of occupied cells for computer -->
-                    <div id="score_computer" class="left">0</div>
-                    <div id="name_computer" class="right ml10">Computer</div>
-                </div>
             </div>
-        </div>
-        <div id="playbuttons" class="left">
-            <!-- Buttons for selecting colors are placed here. -->
-        </div>
-        <div class="clear pt10">
-            <div id="moveinfo" class="gamestatus dspno">
-                <!-- Displays status messages -->
-            </div>
-            <div id="winner" class="gamestatus dspno">
-                <!-- Displays winner messages -->
-            </div>
-        </div>
-    </div>
-    <div id="fakebtn" class="gamebtn dspno">
-        <!-- Used to retrieve class attribute of margin for button height calculation. -->
-    </div>
+
+            <div id="playbuttons" class="button-column" aria-label="Color selection buttons"></div>
+        </section>
+
+        <section class="messages" aria-live="polite">
+            <p id="moveinfo" class="gamestatus dspno"></p>
+            <p id="winner" class="gamestatus dspno"></p>
+        </section>
+    </main>
 </body>
 
 </html>

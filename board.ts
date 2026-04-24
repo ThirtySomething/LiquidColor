@@ -1,7 +1,7 @@
-import { LCDefinitions } from "./lcdefinitions.js";
-import { LCGrid } from "./lcgrid.js";
-import { LCPlayer, type LCComputerStrategy } from "./lcplayer.js";
-import { LCTimer } from "./lctimer.js";
+import { Definitions } from "./definitions.js";
+import { Grid } from "./grid.js";
+import { Player, type ComputerStrategy } from "./player.js";
+import { Timer } from "./timer.js";
 import {
     clearChildren,
     getCssNumberVar,
@@ -21,29 +21,29 @@ type ScoreStats = {
     total: number;
 };
 
-export class LCBoard {
+export class Board {
     m_CanvasElement: CanvasRenderingContext2D | null;
-    m_Definitions: LCDefinitions;
-    m_PlayerHuman: LCPlayer;
-    m_PlayerComputer: LCPlayer;
-    m_Grid: LCGrid;
+    m_Definitions: Definitions;
+    m_PlayerHuman: Player;
+    m_PlayerComputer: Player;
+    m_Grid: Grid;
     m_IDGameField: string;
     m_IDButtonField: string;
     m_IDWinner: string;
-    m_Timer: LCTimer;
-    m_ComputerStrategy: LCComputerStrategy;
+    m_Timer: Timer;
+    m_ComputerStrategy: ComputerStrategy;
     m_GameOver: boolean;
 
-    constructor(definitions: LCDefinitions, playerHuman: LCPlayer, playerComputer: LCPlayer) {
+    constructor(definitions: Definitions, playerHuman: Player, playerComputer: Player) {
         this.m_CanvasElement = null;
         this.m_Definitions = definitions;
         this.m_PlayerHuman = playerHuman;
         this.m_PlayerComputer = playerComputer;
-        this.m_Grid = new LCGrid();
+        this.m_Grid = new Grid();
         this.m_IDGameField = "";
         this.m_IDButtonField = "";
         this.m_IDWinner = "";
-        this.m_Timer = new LCTimer("gameduration");
+        this.m_Timer = new Timer("gameduration");
         this.m_ComputerStrategy = "minimax";
         this.m_GameOver = false;
     }
@@ -92,7 +92,7 @@ export class LCBoard {
         this.playerInit(this.m_IDWinner);
     }
 
-    readComputerStrategy(strategyValue: string): LCComputerStrategy {
+    readComputerStrategy(strategyValue: string): ComputerStrategy {
         if (strategyValue === "greedy") {
             return "greedy";
         }

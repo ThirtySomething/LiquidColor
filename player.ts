@@ -1,15 +1,15 @@
-import type { LCBoard } from "./lcboard.js";
-import { LCCell } from "./lccell.js";
-import { LCDefinitions } from "./lcdefinitions.js";
-import { ComputerStrategyFactory } from "./strategies/index.js";
-import type { LCComputerStrategy } from "./strategies/types.js";
+import type { Board } from "./board.js";
+import { Cell } from "./cell.js";
+import { Definitions } from "./definitions.js";
+import { ComputerStrategyFactory } from "./strategies/computerstrategyfactory.js";
+import type { ComputerStrategy } from "./strategies/computerstrategytype.js";
 import { removeClass, setText } from "./util.js";
 
-export type { LCComputerStrategy } from "./strategies/types.js";
+export type { ComputerStrategy } from "./strategies/computerstrategytype.js";
 
-export class LCPlayer {
+export class Player {
     m_PlayerName: string;
-    m_BaseCell: LCCell | null;
+    m_BaseCell: Cell | null;
     m_Offsets: unknown[];
     m_IDName: string;
     m_IDScore: string;
@@ -24,7 +24,7 @@ export class LCPlayer {
         this.m_IDWinner = "";
     }
 
-    counterUpdate(cells: LCCell[][], definitions: LCDefinitions): void {
+    counterUpdate(cells: Cell[][], definitions: Definitions): void {
         let cellCounter = 0;
 
         cells.forEach((currentRow) => {
@@ -45,7 +45,7 @@ export class LCPlayer {
         }
     }
 
-    init(board: LCBoard, posX: number, posY: number, idWinner: string): void {
+    init(board: Board, posX: number, posY: number, idWinner: string): void {
         setText(this.m_IDName, this.m_PlayerName);
         this.m_IDWinner = idWinner;
         const row = board.m_Grid.m_Cells[posY];
@@ -68,9 +68,9 @@ export class LCPlayer {
     }
 
     move(
-        cells: LCCell[][],
+        cells: Cell[][],
         colors: string[],
-        definitions: LCDefinitions,
+        definitions: Definitions,
         canvasElement: CanvasRenderingContext2D | null
     ): void {
         if (!this.m_BaseCell || !canvasElement) {
@@ -83,15 +83,15 @@ export class LCPlayer {
     }
 
     cellsMarkOwner(
-        cells: LCCell[][],
-        definitions: LCDefinitions,
+        cells: Cell[][],
+        definitions: Definitions,
         canvasElement: CanvasRenderingContext2D
     ): void {
         if (!this.m_BaseCell) {
             return;
         }
 
-        let cellsCollect: LCCell[] = [];
+        let cellsCollect: Cell[] = [];
         let cellsWork = this.m_BaseCell.neighboursGet(cells, definitions);
         do {
             cellsWork.forEach((currentCell) => {
@@ -116,11 +116,11 @@ export class LCPlayer {
     }
 
     identifyBestColor(
-        cells: LCCell[][],
-        definitions: LCDefinitions,
+        cells: Cell[][],
+        definitions: Definitions,
         newColorPlayer: string,
-        opponent: LCPlayer,
-        strategy: LCComputerStrategy = "minimax"
+        opponent: Player,
+        strategy: ComputerStrategy = "minimax"
     ): string {
         if (!this.m_BaseCell || !opponent.m_BaseCell) {
             return newColorPlayer;

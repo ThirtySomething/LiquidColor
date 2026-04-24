@@ -1,15 +1,15 @@
-export type LCOffset = {
+export type Offset = {
     DX: number;
     DY: number;
 };
 
-export class LCDefinitions {
+export class Definitions {
     DimensionX: number;
     DimensionY: number;
     CellSize: number;
     Winner: number;
     Colors: string[];
-    Offsets: LCOffset[];
+    Offsets: Offset[];
 
     constructor(dimX: number | string, dimY: number | string, cellSize: number | string) {
         this.DimensionX = 0;

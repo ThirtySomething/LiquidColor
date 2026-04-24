@@ -22,11 +22,11 @@
     },
     "files": [
         "util.ts",
-        "lcdefinitions.ts",
-        "lccell.ts",
-        "lcgrid.ts",
-        "lcplayer.ts",
-        "lcboard.ts",
+        "definitions.ts",
+        "cell.ts",
+        "grid.ts",
+        "player.ts",
+        "board.ts",
         "app.ts"
     ]
 }

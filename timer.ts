@@ -1,6 +1,6 @@
 import { setText } from "./util.js";
 
-export class LCTimer {
+export class Timer {
     m_IDDuration: string;
     m_StartTimestamp: number | null;
     m_Ticker: number | null;

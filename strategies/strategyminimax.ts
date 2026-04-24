@@ -1,9 +1,9 @@
-import { LCCell } from "../lccell.js";
-import { CaptureSimulator } from "./simulateCapture.js";
-import type { IComputerStrategy, LCStrategyInput } from "./types.js";
-
-export class MinimaxStrategy implements IComputerStrategy {
-    chooseColor(input: LCStrategyInput): string {
+import { Cell } from "../cell.js";
+import { CaptureSimulator } from "./capturesimulator.js";
+import type { IComputerStrategy } from "./icomputerstrategy.js";
+import type { StrategyInput } from "./strategyinput.js";
+export class StrategyMinimax implements IComputerStrategy {
+    chooseColor(input: StrategyInput): string {
         const {
             cells,
             definitions,
@@ -17,8 +17,8 @@ export class MinimaxStrategy implements IComputerStrategy {
         const DENY_WEIGHT = 1.2;
         const DIVERSITY_WEIGHT = 0.15;
 
-        const compOwned = new Set<LCCell>();
-        const humanOwned = new Set<LCCell>();
+        const compOwned = new Set<Cell>();
+        const humanOwned = new Set<Cell>();
         const allColors = new Set<string>();
 
         cells.forEach((row) => {

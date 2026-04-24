@@ -1,9 +1,10 @@
-import { LCCell } from "../lccell.js";
-import { CaptureSimulator } from "./simulateCapture.js";
-import type { IComputerStrategy, LCStrategyInput } from "./types.js";
+import { Cell } from "../cell.js";
+import { CaptureSimulator } from "./capturesimulator.js";
+import type { IComputerStrategy } from "./icomputerstrategy.js";
+import type { StrategyInput } from "./strategyinput.js";
 
-export class GreedyStrategy implements IComputerStrategy {
-    chooseColor(input: LCStrategyInput): string {
+export class StrategyGreedy implements IComputerStrategy {
+    chooseColor(input: StrategyInput): string {
         const {
             cells,
             definitions,
@@ -13,8 +14,8 @@ export class GreedyStrategy implements IComputerStrategy {
             compCurrentColor
         } = input;
 
-        const compOwned = new Set<LCCell>();
-        const humanOwned = new Set<LCCell>();
+        const compOwned = new Set<Cell>();
+        const humanOwned = new Set<Cell>();
         const allColors = new Set<string>();
 
         cells.forEach((row) => {

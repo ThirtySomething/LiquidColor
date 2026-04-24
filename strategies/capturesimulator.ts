@@ -1,20 +1,20 @@
-import { LCCell } from "../lccell.js";
-import { LCDefinitions } from "../lcdefinitions.js";
+import { Cell } from "../cell.js";
+import { Definitions } from "../definitions.js";
 
 export class CaptureSimulator {
     static simulate(
-        cells: LCCell[][],
-        definitions: LCDefinitions,
-        ownedSet: ReadonlySet<LCCell>,
-        extraBlocked: ReadonlySet<LCCell>,
+        cells: Cell[][],
+        definitions: Definitions,
+        ownedSet: ReadonlySet<Cell>,
+        extraBlocked: ReadonlySet<Cell>,
         color: string
-    ): { gained: number; newOwnedSet: Set<LCCell> } {
-        const newOwned = new Set<LCCell>(ownedSet);
+    ): { gained: number; newOwnedSet: Set<Cell> } {
+        const newOwned = new Set<Cell>(ownedSet);
         let frontier = Array.from(ownedSet);
         let gained = 0;
 
         while (frontier.length > 0) {
-            const next: LCCell[] = [];
+            const next: Cell[] = [];
             for (const cell of frontier) {
                 for (const offset of definitions.Offsets) {
                     const ny = cell.m_PosY + offset.DY;

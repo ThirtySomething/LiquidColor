@@ -1,24 +1,24 @@
-import { LCCell } from "./lccell.js";
-import { LCDefinitions } from "./lcdefinitions.js";
-import type { LCPlayer } from "./lcplayer.js";
+import { Cell } from "./cell.js";
+import { Definitions } from "./definitions.js";
+import type { Player } from "./player.js";
 
 type ColorCountMap = Record<string, number>;
 
-export class LCGrid {
-    m_Cells: LCCell[][];
+export class Grid {
+    m_Cells: Cell[][];
 
     constructor() {
         this.m_Cells = [];
     }
 
-    gridInit(definitions: LCDefinitions, canvasElement: CanvasRenderingContext2D): void {
+    gridInit(definitions: Definitions, canvasElement: CanvasRenderingContext2D): void {
         this.m_Cells = [];
 
         for (let loopY = 0; loopY < definitions.DimensionY; loopY += 1) {
-            const row: LCCell[] = [];
+            const row: Cell[] = [];
             this.m_Cells[loopY] = row;
             for (let loopX = 0; loopX < definitions.DimensionX; loopX += 1) {
-                const currentCell = new LCCell(loopX, loopY);
+                const currentCell = new Cell(loopX, loopY);
                 currentCell.m_Color = currentCell.cellColorRandomGet(definitions.Colors);
                 currentCell.draw(definitions, canvasElement);
                 row.push(currentCell);
@@ -34,8 +34,8 @@ export class LCGrid {
         });
     }
 
-    getPlayerCells(player: LCPlayer): LCCell[] {
-        const playerCells: LCCell[] = [];
+    getPlayerCells(player: Player): Cell[] {
+        const playerCells: Cell[] = [];
 
         this.m_Cells.forEach((currentRow) => {
             currentRow.forEach((currentCell) => {
@@ -48,10 +48,10 @@ export class LCGrid {
         return playerCells;
     }
 
-    identifyBorderCells(cells: LCCell[], definitions: LCDefinitions): LCCell[] {
-        const borderCells: LCCell[] = [];
+    identifyBorderCells(cells: Cell[], definitions: Definitions): Cell[] {
+        const borderCells: Cell[] = [];
 
-        cells.forEach((currentCell) => {
+        cells.forEach((currentCell: Cell) => {
             if (currentCell.isBorderCell(this.m_Cells, definitions)) {
                 borderCells.push(currentCell);
             }
@@ -60,7 +60,7 @@ export class LCGrid {
         return borderCells;
     }
 
-    playerColorsGet(cells: LCCell[], definitions: LCDefinitions): ColorCountMap {
+    playerColorsGet(cells: Cell[], definitions: Definitions): ColorCountMap {
         const playerColors: ColorCountMap = {};
 
         cells.forEach((currentCell) => {

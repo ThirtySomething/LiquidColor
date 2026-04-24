@@ -1,6 +1,6 @@
-import { LCDefinitions } from "./lcdefinitions.js";
+import { Definitions } from "./definitions.js";
 
-export class LCCell {
+export class Cell {
     m_PosX: number;
     m_PosY: number;
     m_Color: string;
@@ -17,7 +17,7 @@ export class LCCell {
         this.m_DoRedraw = true;
     }
 
-    draw(definitions: LCDefinitions, canvasElement: CanvasRenderingContext2D): void {
+    draw(definitions: Definitions, canvasElement: CanvasRenderingContext2D): void {
         if (this.m_DoRedraw) {
             const cellPosX = definitions.CellSize * this.m_PosX;
             const cellPosY = definitions.CellSize * this.m_PosY;
@@ -41,8 +41,8 @@ export class LCCell {
         this.m_Occupied = true;
     }
 
-    neighboursGet(cells: LCCell[][], definitions: LCDefinitions): LCCell[] {
-        const neighbours: LCCell[] = [];
+    neighboursGet(cells: Cell[][], definitions: Definitions): Cell[] {
+        const neighbours: Cell[] = [];
 
         definitions.Offsets.forEach((currentOffset) => {
             const cellPosY = this.m_PosY + currentOffset.DY;
@@ -85,7 +85,7 @@ export class LCCell {
         return colors[colorIndex] ?? this.m_Color;
     }
 
-    isBorderCell(cells: LCCell[][], definitions: LCDefinitions): boolean {
+    isBorderCell(cells: Cell[][], definitions: Definitions): boolean {
         let isBorder = false;
 
         definitions.Offsets.forEach((currentOffset) => {

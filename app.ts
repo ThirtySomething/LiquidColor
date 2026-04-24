@@ -1,11 +1,11 @@
-import { LCBoard } from "./lcboard.js";
-import { LCDefinitions } from "./lcdefinitions.js";
-import { LCPlayer } from "./lcplayer.js";
+import { Board } from "./board.js";
+import { Definitions } from "./definitions.js";
+import { Player } from "./player.js";
 
-const definitions = new LCDefinitions(30, 20, 15);
-const human = new LCPlayer("Besucher", "name_human", "score_human");
-const computer = new LCPlayer("DerPaul", "name_computer", "score_computer");
-const board = new LCBoard(definitions, human, computer);
+const definitions = new Definitions(30, 20, 15);
+const human = new Player("Besucher", "name_human", "score_human");
+const computer = new Player("DerPaul", "name_computer", "score_computer");
+const board = new Board(definitions, human, computer);
 
 function initApp(): void {
     const compare = document.getElementById("compare");

@@ -199,7 +199,6 @@ export class Board {
             return;
         }
 
-        // Simulate the full board for every candidate color to pick the best move.
         const newColorComputer = this.m_PlayerComputer.identifyBestColor(
             this.m_Grid.m_Cells,
             this.m_Definitions,

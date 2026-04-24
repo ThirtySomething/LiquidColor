@@ -27,6 +27,6 @@
         "grid.ts",
         "player.ts",
         "board.ts",
-        "app.ts"
+        "liquidcolor.ts"
     ]
 }

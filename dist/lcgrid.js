@@ -1,0 +1,67 @@
+"use strict";
+class LCGrid {
+    constructor() {
+        this.m_Cells = [];
+    }
+    gridInit(definitions, canvasElement) {
+        this.m_Cells = [];
+        for (let loopY = 0; loopY < definitions.DimensionY; loopY += 1) {
+            this.m_Cells[loopY] = [];
+            for (let loopX = 0; loopX < definitions.DimensionX; loopX += 1) {
+                const currentCell = new LCCell(loopX, loopY);
+                currentCell.m_Color = currentCell.cellColorRandomGet(definitions.Colors);
+                currentCell.draw(definitions, canvasElement);
+                this.m_Cells[loopY].push(currentCell);
+            }
+        }
+    }
+    gridReset() {
+        this.m_Cells.forEach((currentRow) => {
+            currentRow.forEach((currentCell) => {
+                currentCell.m_DoRedraw = true;
+            });
+        });
+    }
+    getPlayerCells(player) {
+        const playerCells = [];
+        this.m_Cells.forEach((currentRow) => {
+            currentRow.forEach((currentCell) => {
+                if (currentCell.m_Owner === player.m_PlayerName) {
+                    playerCells.push(currentCell);
+                }
+            });
+        });
+        return playerCells;
+    }
+    identifyBorderCells(cells, definitions) {
+        const borderCells = [];
+        cells.forEach((currentCell) => {
+            if (currentCell.isBorderCell(this.m_Cells, definitions)) {
+                borderCells.push(currentCell);
+            }
+        });
+        return borderCells;
+    }
+    playerColorsGet(cells, definitions) {
+        const playerColors = {};
+        cells.forEach((currentCell) => {
+            definitions.Offsets.forEach((currentOffset) => {
+                const cellPosY = currentCell.m_PosY + currentOffset.DY;
+                if (cellPosY < 0 || definitions.DimensionY <= cellPosY) {
+                    return;
+                }
+                const cellPosX = currentCell.m_PosX + currentOffset.DX;
+                if (cellPosX < 0 || definitions.DimensionX <= cellPosX) {
+                    return;
+                }
+                const currentNeighbour = this.m_Cells[cellPosY][cellPosX];
+                if (currentNeighbour.m_Occupied) {
+                    return;
+                }
+                const valueOld = playerColors[currentNeighbour.m_Color] || 0;
+                playerColors[currentNeighbour.m_Color] = valueOld + 1;
+            });
+        });
+        return playerColors;
+    }
+}

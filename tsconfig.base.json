@@ -22,9 +22,11 @@
     },
     "files": [
         "util.ts",
+        "offset.ts",
         "definitions.ts",
         "cell.ts",
         "grid.ts",
+        "highscorewinner.ts",
         "highscore.ts",
         "player.ts",
         "board.ts",

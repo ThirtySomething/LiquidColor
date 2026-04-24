@@ -1,9 +1,11 @@
 import type { LCBoard } from "./lcboard.js";
 import { LCCell } from "./lccell.js";
 import { LCDefinitions } from "./lcdefinitions.js";
+import { chooseComputerColor } from "./strategies/index.js";
+import type { LCComputerStrategy } from "./strategies/types.js";
 import { removeClass, setText } from "./util.js";
 
-export type LCComputerStrategy = "minimax" | "greedy";
+export type { LCComputerStrategy } from "./strategies/types.js";
 
 export class LCPlayer {
     m_PlayerName: string;
@@ -113,220 +115,6 @@ export class LCPlayer {
         this.counterUpdate(cells, definitions);
     }
 
-    /**
-     * Pure flood-fill simulation (no board mutation).
-     * Expands `ownedSet` into unoccupied cells matching `color`, treating
-     * every cell in `extraBlocked` as occupied even if the live data says
-     * otherwise (used for 2-ply lookahead where simulated gains must be
-     * blocked for the opponent's response simulation).
-     * Returns the number of cells gained and the full updated ownership set.
-     */
-    private static simulateCapture(
-        cells: LCCell[][],
-        definitions: LCDefinitions,
-        ownedSet: ReadonlySet<LCCell>,
-        extraBlocked: ReadonlySet<LCCell>,
-        color: string
-    ): { gained: number; newOwnedSet: Set<LCCell> } {
-        const newOwned = new Set<LCCell>(ownedSet);
-        let frontier = Array.from(ownedSet);
-        let gained = 0;
-
-        while (frontier.length > 0) {
-            const next: LCCell[] = [];
-            for (const cell of frontier) {
-                for (const offset of definitions.Offsets) {
-                    const ny = cell.m_PosY + offset.DY;
-                    const nx = cell.m_PosX + offset.DX;
-                    if (ny < 0 || ny >= definitions.DimensionY || nx < 0 || nx >= definitions.DimensionX) {
-                        continue;
-                    }
-                    const neighbor = cells[ny]?.[nx];
-                    if (!neighbor || newOwned.has(neighbor) || extraBlocked.has(neighbor)) {
-                        continue;
-                    }
-                    if (!neighbor.m_Occupied && neighbor.m_Color === color) {
-                        newOwned.add(neighbor);
-                        next.push(neighbor);
-                        gained++;
-                    }
-                }
-            }
-            frontier = next;
-        }
-
-        return { gained, newOwnedSet: newOwned };
-    }
-
-    private identifyBestColorGreedy(
-        cells: LCCell[][],
-        definitions: LCDefinitions,
-        newColorPlayer: string,
-        opponent: LCPlayer
-    ): string {
-        if (!this.m_BaseCell || !opponent.m_BaseCell) {
-            return newColorPlayer;
-        }
-
-        const compOwned = new Set<LCCell>();
-        const humanOwned = new Set<LCCell>();
-        cells.forEach((row) => {
-            row.forEach((cell) => {
-                if (cell.m_Owner === this.m_PlayerName) {
-                    compOwned.add(cell);
-                } else if (cell.m_Owner === opponent.m_PlayerName) {
-                    humanOwned.add(cell);
-                }
-            });
-        });
-
-        const compCurrentColor = this.m_BaseCell.m_Color;
-
-        const allColors = new Set<string>();
-        cells.forEach((row) => {
-            row.forEach((cell) => {
-                if (!cell.m_Occupied) {
-                    allColors.add(cell.m_Color);
-                }
-            });
-        });
-
-        let bestColor = compCurrentColor;
-        let bestGain = -1;
-
-        for (const compColor of allColors) {
-            if (compColor === newColorPlayer || compColor === compCurrentColor) {
-                continue;
-            }
-
-            const { gained } = LCPlayer.simulateCapture(cells, definitions, compOwned, humanOwned, compColor);
-            if (gained > bestGain) {
-                bestGain = gained;
-                bestColor = compColor;
-            }
-        }
-
-        return bestColor;
-    }
-
-    /**
-     * 2-ply minimax color selection.
-     *
-     * For every candidate computer color C:
-     *   1st ply – simulate computer capturing with C  → compGain, newCompOwned
-     *   2nd ply – find the human's best response color from the resulting board
-     *             (human cannot pick C or their own current color)
-     *            → bestHumanGain
-     *   score   = compGain - bestHumanGain × DENY_WEIGHT
-     *             + frontierColorDiversity × DIVERSITY_WEIGHT
-     *
-     * frontierColorDiversity counts how many distinct colors the computer's
-     * new territory borders — a larger palette means more good moves next turn.
-     */
-    private identifyBestColorMinimax(
-        cells: LCCell[][],
-        definitions: LCDefinitions,
-        newColorPlayer: string,
-        opponent: LCPlayer
-    ): string {
-        if (!this.m_BaseCell || !opponent.m_BaseCell) {
-            return newColorPlayer;
-        }
-
-        // Minimax weights.
-        const DENY_WEIGHT = 1.2;       // human's best-response gain is penalised 1.2×
-        const DIVERSITY_WEIGHT = 0.15; // future-options tiebreaker (bounded by color count)
-
-        // Build live ownership sets.
-        const compOwned = new Set<LCCell>();
-        const humanOwned = new Set<LCCell>();
-        cells.forEach((row) => {
-            row.forEach((cell) => {
-                if (cell.m_Owner === this.m_PlayerName) {
-                    compOwned.add(cell);
-                } else if (cell.m_Owner === opponent.m_PlayerName) {
-                    humanOwned.add(cell);
-                }
-            });
-        });
-
-        const compCurrentColor = this.m_BaseCell.m_Color;
-        const humanCurrentColor = opponent.m_BaseCell.m_Color; // = newColorPlayer after human's move
-
-        // All colors present on unoccupied cells.
-        const allColors = new Set<string>();
-        cells.forEach((row) => {
-            row.forEach((cell) => {
-                if (!cell.m_Occupied) {
-                    allColors.add(cell.m_Color);
-                }
-            });
-        });
-
-        let bestColor = compCurrentColor;
-        let bestScore = -Infinity;
-
-        for (const compColor of allColors) {
-            if (compColor === newColorPlayer) {
-                continue; // human just played this — it becomes computer's color, disallowed
-            }
-            if (compColor === compCurrentColor) {
-                continue; // can't re-select own current color
-            }
-
-            // --- 1st ply: computer picks compColor ---
-            const { gained: compGain, newOwnedSet: compOwned2 } =
-                LCPlayer.simulateCapture(cells, definitions, compOwned, humanOwned, compColor);
-
-            // --- Frontier color diversity: unique unoccupied colors adjacent to new territory ---
-            const frontierColors = new Set<string>();
-            for (const cell of compOwned2) {
-                for (const offset of definitions.Offsets) {
-                    const ny = cell.m_PosY + offset.DY;
-                    const nx = cell.m_PosX + offset.DX;
-                    if (ny < 0 || ny >= definitions.DimensionY || nx < 0 || nx >= definitions.DimensionX) {
-                        continue;
-                    }
-                    const neighbor = cells[ny]?.[nx];
-                    if (neighbor && !neighbor.m_Occupied && !compOwned2.has(neighbor) && !humanOwned.has(neighbor)) {
-                        frontierColors.add(neighbor.m_Color);
-                    }
-                }
-            }
-
-            // --- 2nd ply: find human's best response from the resulting board ---
-            // After computer plays compColor, human cannot pick compColor (it's now
-            // the computer's color) or humanCurrentColor (their own).
-            let bestHumanGain = 0;
-            for (const humanColor of allColors) {
-                if (humanColor === compColor) {
-                    continue;
-                }
-                if (humanColor === humanCurrentColor) {
-                    continue;
-                }
-                const { gained: humanGain } =
-                    LCPlayer.simulateCapture(cells, definitions, humanOwned, compOwned2, humanColor);
-                if (humanGain > bestHumanGain) {
-                    bestHumanGain = humanGain;
-                }
-            }
-
-            // Final score: own gain − human's best-response gain + frontier diversity bonus.
-            const score =
-                compGain
-                - bestHumanGain * DENY_WEIGHT
-                + frontierColors.size * DIVERSITY_WEIGHT;
-
-            if (score > bestScore) {
-                bestScore = score;
-                bestColor = compColor;
-            }
-        }
-
-        return bestColor;
-    }
-
     identifyBestColor(
         cells: LCCell[][],
         definitions: LCDefinitions,
@@ -334,10 +122,18 @@ export class LCPlayer {
         opponent: LCPlayer,
         strategy: LCComputerStrategy = "minimax"
     ): string {
-        if (strategy === "greedy") {
-            return this.identifyBestColorGreedy(cells, definitions, newColorPlayer, opponent);
+        if (!this.m_BaseCell || !opponent.m_BaseCell) {
+            return newColorPlayer;
         }
 
-        return this.identifyBestColorMinimax(cells, definitions, newColorPlayer, opponent);
+        return chooseComputerColor(strategy, {
+            cells,
+            definitions,
+            newColorPlayer,
+            compPlayerName: this.m_PlayerName,
+            humanPlayerName: opponent.m_PlayerName,
+            compCurrentColor: this.m_BaseCell.m_Color,
+            humanCurrentColor: opponent.m_BaseCell.m_Color
+        });
     }
 }

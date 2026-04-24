@@ -207,6 +207,152 @@
     }
   };
 
+  // strategies/simulateCapture.ts
+  function simulateCapture(cells, definitions2, ownedSet, extraBlocked, color) {
+    const newOwned = new Set(ownedSet);
+    let frontier = Array.from(ownedSet);
+    let gained = 0;
+    while (frontier.length > 0) {
+      const next = [];
+      for (const cell of frontier) {
+        for (const offset of definitions2.Offsets) {
+          const ny = cell.m_PosY + offset.DY;
+          const nx = cell.m_PosX + offset.DX;
+          if (ny < 0 || ny >= definitions2.DimensionY || nx < 0 || nx >= definitions2.DimensionX) {
+            continue;
+          }
+          const neighbor = cells[ny]?.[nx];
+          if (!neighbor || newOwned.has(neighbor) || extraBlocked.has(neighbor)) {
+            continue;
+          }
+          if (!neighbor.m_Occupied && neighbor.m_Color === color) {
+            newOwned.add(neighbor);
+            next.push(neighbor);
+            gained++;
+          }
+        }
+      }
+      frontier = next;
+    }
+    return { gained, newOwnedSet: newOwned };
+  }
+
+  // strategies/greedyStrategy.ts
+  function chooseGreedyColor(input) {
+    const {
+      cells,
+      definitions: definitions2,
+      newColorPlayer,
+      compPlayerName,
+      humanPlayerName,
+      compCurrentColor
+    } = input;
+    const compOwned = /* @__PURE__ */ new Set();
+    const humanOwned = /* @__PURE__ */ new Set();
+    const allColors = /* @__PURE__ */ new Set();
+    cells.forEach((row) => {
+      row.forEach((cell) => {
+        if (cell.m_Owner === compPlayerName) {
+          compOwned.add(cell);
+        } else if (cell.m_Owner === humanPlayerName) {
+          humanOwned.add(cell);
+        }
+        if (!cell.m_Occupied) {
+          allColors.add(cell.m_Color);
+        }
+      });
+    });
+    let bestColor = compCurrentColor;
+    let bestGain = -1;
+    for (const compColor of allColors) {
+      if (compColor === newColorPlayer || compColor === compCurrentColor) {
+        continue;
+      }
+      const { gained } = simulateCapture(cells, definitions2, compOwned, humanOwned, compColor);
+      if (gained > bestGain) {
+        bestGain = gained;
+        bestColor = compColor;
+      }
+    }
+    return bestColor;
+  }
+
+  // strategies/minimaxStrategy.ts
+  function chooseMinimaxColor(input) {
+    const {
+      cells,
+      definitions: definitions2,
+      newColorPlayer,
+      compPlayerName,
+      humanPlayerName,
+      compCurrentColor,
+      humanCurrentColor
+    } = input;
+    const DENY_WEIGHT = 1.2;
+    const DIVERSITY_WEIGHT = 0.15;
+    const compOwned = /* @__PURE__ */ new Set();
+    const humanOwned = /* @__PURE__ */ new Set();
+    const allColors = /* @__PURE__ */ new Set();
+    cells.forEach((row) => {
+      row.forEach((cell) => {
+        if (cell.m_Owner === compPlayerName) {
+          compOwned.add(cell);
+        } else if (cell.m_Owner === humanPlayerName) {
+          humanOwned.add(cell);
+        }
+        if (!cell.m_Occupied) {
+          allColors.add(cell.m_Color);
+        }
+      });
+    });
+    let bestColor = compCurrentColor;
+    let bestScore = -Infinity;
+    for (const compColor of allColors) {
+      if (compColor === newColorPlayer || compColor === compCurrentColor) {
+        continue;
+      }
+      const { gained: compGain, newOwnedSet: compOwned2 } = simulateCapture(cells, definitions2, compOwned, humanOwned, compColor);
+      const frontierColors = /* @__PURE__ */ new Set();
+      for (const cell of compOwned2) {
+        for (const offset of definitions2.Offsets) {
+          const ny = cell.m_PosY + offset.DY;
+          const nx = cell.m_PosX + offset.DX;
+          if (ny < 0 || ny >= definitions2.DimensionY || nx < 0 || nx >= definitions2.DimensionX) {
+            continue;
+          }
+          const neighbor = cells[ny]?.[nx];
+          if (neighbor && !neighbor.m_Occupied && !compOwned2.has(neighbor) && !humanOwned.has(neighbor)) {
+            frontierColors.add(neighbor.m_Color);
+          }
+        }
+      }
+      let bestHumanGain = 0;
+      for (const humanColor of allColors) {
+        if (humanColor === compColor || humanColor === humanCurrentColor) {
+          continue;
+        }
+        const { gained: humanGain } = simulateCapture(cells, definitions2, humanOwned, compOwned2, humanColor);
+        if (humanGain > bestHumanGain) {
+          bestHumanGain = humanGain;
+        }
+      }
+      const score = compGain - bestHumanGain * DENY_WEIGHT + frontierColors.size * DIVERSITY_WEIGHT;
+      if (score > bestScore) {
+        bestScore = score;
+        bestColor = compColor;
+      }
+    }
+    return bestColor;
+  }
+
+  // strategies/index.ts
+  function chooseComputerColor(strategy, input) {
+    if (strategy === "greedy") {
+      return chooseGreedyColor(input);
+    }
+    return chooseMinimaxColor(input);
+  }
+
   // util.ts
   function setElementSize(element, width, height) {
     if (!element) {
@@ -264,7 +410,7 @@
   }
 
   // lcplayer.ts
-  var LCPlayer = class _LCPlayer {
+  var LCPlayer = class {
     constructor(playerName, idName, idScore) {
       __publicField(this, "m_PlayerName");
       __publicField(this, "m_BaseCell");
@@ -348,171 +494,19 @@
       } while (cellsWork.length > 0);
       this.counterUpdate(cells, definitions2);
     }
-    /**
-     * Pure flood-fill simulation (no board mutation).
-     * Expands `ownedSet` into unoccupied cells matching `color`, treating
-     * every cell in `extraBlocked` as occupied even if the live data says
-     * otherwise (used for 2-ply lookahead where simulated gains must be
-     * blocked for the opponent's response simulation).
-     * Returns the number of cells gained and the full updated ownership set.
-     */
-    static simulateCapture(cells, definitions2, ownedSet, extraBlocked, color) {
-      const newOwned = new Set(ownedSet);
-      let frontier = Array.from(ownedSet);
-      let gained = 0;
-      while (frontier.length > 0) {
-        const next = [];
-        for (const cell of frontier) {
-          for (const offset of definitions2.Offsets) {
-            const ny = cell.m_PosY + offset.DY;
-            const nx = cell.m_PosX + offset.DX;
-            if (ny < 0 || ny >= definitions2.DimensionY || nx < 0 || nx >= definitions2.DimensionX) {
-              continue;
-            }
-            const neighbor = cells[ny]?.[nx];
-            if (!neighbor || newOwned.has(neighbor) || extraBlocked.has(neighbor)) {
-              continue;
-            }
-            if (!neighbor.m_Occupied && neighbor.m_Color === color) {
-              newOwned.add(neighbor);
-              next.push(neighbor);
-              gained++;
-            }
-          }
-        }
-        frontier = next;
-      }
-      return { gained, newOwnedSet: newOwned };
-    }
-    identifyBestColorGreedy(cells, definitions2, newColorPlayer, opponent) {
-      if (!this.m_BaseCell || !opponent.m_BaseCell) {
-        return newColorPlayer;
-      }
-      const compOwned = /* @__PURE__ */ new Set();
-      const humanOwned = /* @__PURE__ */ new Set();
-      cells.forEach((row) => {
-        row.forEach((cell) => {
-          if (cell.m_Owner === this.m_PlayerName) {
-            compOwned.add(cell);
-          } else if (cell.m_Owner === opponent.m_PlayerName) {
-            humanOwned.add(cell);
-          }
-        });
-      });
-      const compCurrentColor = this.m_BaseCell.m_Color;
-      const allColors = /* @__PURE__ */ new Set();
-      cells.forEach((row) => {
-        row.forEach((cell) => {
-          if (!cell.m_Occupied) {
-            allColors.add(cell.m_Color);
-          }
-        });
-      });
-      let bestColor = compCurrentColor;
-      let bestGain = -1;
-      for (const compColor of allColors) {
-        if (compColor === newColorPlayer || compColor === compCurrentColor) {
-          continue;
-        }
-        const { gained } = _LCPlayer.simulateCapture(cells, definitions2, compOwned, humanOwned, compColor);
-        if (gained > bestGain) {
-          bestGain = gained;
-          bestColor = compColor;
-        }
-      }
-      return bestColor;
-    }
-    /**
-     * 2-ply minimax color selection.
-     *
-     * For every candidate computer color C:
-     *   1st ply – simulate computer capturing with C  → compGain, newCompOwned
-     *   2nd ply – find the human's best response color from the resulting board
-     *             (human cannot pick C or their own current color)
-     *            → bestHumanGain
-     *   score   = compGain - bestHumanGain × DENY_WEIGHT
-     *             + frontierColorDiversity × DIVERSITY_WEIGHT
-     *
-     * frontierColorDiversity counts how many distinct colors the computer's
-     * new territory borders — a larger palette means more good moves next turn.
-     */
-    identifyBestColorMinimax(cells, definitions2, newColorPlayer, opponent) {
-      if (!this.m_BaseCell || !opponent.m_BaseCell) {
-        return newColorPlayer;
-      }
-      const DENY_WEIGHT = 1.2;
-      const DIVERSITY_WEIGHT = 0.15;
-      const compOwned = /* @__PURE__ */ new Set();
-      const humanOwned = /* @__PURE__ */ new Set();
-      cells.forEach((row) => {
-        row.forEach((cell) => {
-          if (cell.m_Owner === this.m_PlayerName) {
-            compOwned.add(cell);
-          } else if (cell.m_Owner === opponent.m_PlayerName) {
-            humanOwned.add(cell);
-          }
-        });
-      });
-      const compCurrentColor = this.m_BaseCell.m_Color;
-      const humanCurrentColor = opponent.m_BaseCell.m_Color;
-      const allColors = /* @__PURE__ */ new Set();
-      cells.forEach((row) => {
-        row.forEach((cell) => {
-          if (!cell.m_Occupied) {
-            allColors.add(cell.m_Color);
-          }
-        });
-      });
-      let bestColor = compCurrentColor;
-      let bestScore = -Infinity;
-      for (const compColor of allColors) {
-        if (compColor === newColorPlayer) {
-          continue;
-        }
-        if (compColor === compCurrentColor) {
-          continue;
-        }
-        const { gained: compGain, newOwnedSet: compOwned2 } = _LCPlayer.simulateCapture(cells, definitions2, compOwned, humanOwned, compColor);
-        const frontierColors = /* @__PURE__ */ new Set();
-        for (const cell of compOwned2) {
-          for (const offset of definitions2.Offsets) {
-            const ny = cell.m_PosY + offset.DY;
-            const nx = cell.m_PosX + offset.DX;
-            if (ny < 0 || ny >= definitions2.DimensionY || nx < 0 || nx >= definitions2.DimensionX) {
-              continue;
-            }
-            const neighbor = cells[ny]?.[nx];
-            if (neighbor && !neighbor.m_Occupied && !compOwned2.has(neighbor) && !humanOwned.has(neighbor)) {
-              frontierColors.add(neighbor.m_Color);
-            }
-          }
-        }
-        let bestHumanGain = 0;
-        for (const humanColor of allColors) {
-          if (humanColor === compColor) {
-            continue;
-          }
-          if (humanColor === humanCurrentColor) {
-            continue;
-          }
-          const { gained: humanGain } = _LCPlayer.simulateCapture(cells, definitions2, humanOwned, compOwned2, humanColor);
-          if (humanGain > bestHumanGain) {
-            bestHumanGain = humanGain;
-          }
-        }
-        const score = compGain - bestHumanGain * DENY_WEIGHT + frontierColors.size * DIVERSITY_WEIGHT;
-        if (score > bestScore) {
-          bestScore = score;
-          bestColor = compColor;
-        }
-      }
-      return bestColor;
-    }
     identifyBestColor(cells, definitions2, newColorPlayer, opponent, strategy = "minimax") {
-      if (strategy === "greedy") {
-        return this.identifyBestColorGreedy(cells, definitions2, newColorPlayer, opponent);
+      if (!this.m_BaseCell || !opponent.m_BaseCell) {
+        return newColorPlayer;
       }
-      return this.identifyBestColorMinimax(cells, definitions2, newColorPlayer, opponent);
+      return chooseComputerColor(strategy, {
+        cells,
+        definitions: definitions2,
+        newColorPlayer,
+        compPlayerName: this.m_PlayerName,
+        humanPlayerName: opponent.m_PlayerName,
+        compCurrentColor: this.m_BaseCell.m_Color,
+        humanCurrentColor: opponent.m_BaseCell.m_Color
+      });
     }
   };
 

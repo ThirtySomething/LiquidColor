@@ -41,6 +41,12 @@
     margin: 0 auto;
     padding: var(--space-4);
     display: grid;
+    grid-template-areas:
+        "title title"
+        "gameinfo gameinfo"
+        "setup setup"
+        "playground highscore"
+        "messages messages";
     gap: var(--space-3);
 }
 
@@ -49,12 +55,14 @@
     letter-spacing: 0.04em;
     font-size: clamp(1.6rem, 2.2vw, 2.2rem);
     color: var(--accent);
+    grid-area: title;
 }
 
 .gameinfo,
 .setup,
 .messages,
-.playground {
+.playground,
+.highscore-panel {
     background: var(--card-bg);
     border: 1px solid color-mix(in srgb, var(--border) 65%, white);
     border-radius: var(--radius);
@@ -68,15 +76,42 @@
     line-height: 1.45;
 }
 
+.gameinfo {
+    grid-area: gameinfo;
+}
+
+.setup {
+    grid-area: setup;
+}
+
+.playground {
+    grid-area: playground;
+}
+
+.highscore-panel {
+    grid-area: highscore;
+}
+
+.messages {
+    grid-area: messages;
+}
+
 .setup {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    grid-template-columns: 1fr;
     gap: var(--space-2);
+}
+
+.form-row-group {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
 }
 
 .form-row {
     display: grid;
     gap: 6px;
+    flex: 1;
 }
 
 .form-row label {
@@ -101,6 +136,7 @@
 
 .actions {
     grid-column: 1 / -1;
+    align-self: flex-end;
 }
 
 #btn_reset {
@@ -126,10 +162,7 @@
 
 .highscore-panel {
     min-width: 210px;
-    padding: var(--space-2);
-    border: 1px solid color-mix(in srgb, var(--border) 55%, white);
-    border-radius: 8px;
-    background: linear-gradient(180deg, #eef7f9 0%, #f8fbfc 100%);
+    padding: var(--space-3);
     display: grid;
     gap: var(--space-1);
 }

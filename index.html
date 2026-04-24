@@ -26,56 +26,41 @@
             </section>
 
             <section id="setup" class="setup" aria-label="Game setup">
-                <div class="form-row">
-                    <label for="dimx">Dimension X</label>
-                    <input type="number" id="dimx" name="dimx" value="60" min="2" step="1" inputmode="numeric">
+                <div class="form-row-group">
+                    <div class="form-row">
+                        <label for="dimx">Dimension X</label>
+                        <input type="number" id="dimx" name="dimx" value="60" min="2" step="1" inputmode="numeric">
+                    </div>
+                    <div class="form-row">
+                        <label for="dimy">Dimension Y</label>
+                        <input type="number" id="dimy" name="dimy" value="40" min="2" step="1" inputmode="numeric">
+                    </div>
+                    <div class="form-row">
+                        <label for="cellsize">Cell width</label>
+                        <input type="number" id="cellsize" name="cellsize" value="10" min="2" step="1"
+                            inputmode="numeric">
+                    </div>
                 </div>
-                <div class="form-row">
-                    <label for="dimy">Dimension Y</label>
-                    <input type="number" id="dimy" name="dimy" value="40" min="2" step="1" inputmode="numeric">
-                </div>
-                <div class="form-row">
-                    <label for="cellsize">Cell width</label>
-                    <input type="number" id="cellsize" name="cellsize" value="10" min="2" step="1" inputmode="numeric">
-                </div>
-                <div class="form-row">
-                    <label for="playername">Player name</label>
-                    <input type="text" id="playername" name="playername" value="ThirtySomething"
-                        autocomplete="nickname">
-                </div>
-                <div class="form-row">
-                    <label for="computerstrategy">Computer strategy</label>
-                    <select id="computerstrategy" name="computerstrategy">
-                        <option value="minimax" selected>Minimax (2-ply)</option>
-                        <option value="greedy">Greedy (max immediate gain)</option>
-                    </select>
-                </div>
-                <div class="actions">
-                    <button id="btn_reset" type="button">Reset</button>
+                <div class="form-row-group">
+                    <div class="form-row">
+                        <label for="playername">Player name</label>
+                        <input type="text" id="playername" name="playername" value="ThirtySomething"
+                            autocomplete="nickname">
+                    </div>
+                    <div class="form-row">
+                        <label for="computerstrategy">Computer strategy</label>
+                        <select id="computerstrategy" name="computerstrategy">
+                            <option value="minimax" selected>Minimax (2-ply)</option>
+                            <option value="greedy">Greedy (max immediate gain)</option>
+                        </select>
+                    </div>
+                    <div class="actions">
+                        <button id="btn_reset" type="button">Reset</button>
+                    </div>
                 </div>
             </section>
 
             <section id="playground" class="playground" aria-label="Game board">
-                <aside class="highscore-panel" aria-label="Highscore board">
-                    <h2 class="highscore-title">Highscores</h2>
-                    <div class="highscore-row">
-                        <span id="highscore_name_human">Human</span>
-                        <span id="highscore_human">0</span>
-                    </div>
-                    <div class="highscore-row">
-                        <span id="highscore_name_computer">Computer</span>
-                        <span id="highscore_computer">0</span>
-                    </div>
-                    <div class="highscore-row">
-                        <span>Draws</span>
-                        <span id="highscore_draws">0</span>
-                    </div>
-                    <div class="highscore-row highscore-total">
-                        <span>Total games</span>
-                        <span id="highscore_total">0</span>
-                    </div>
-                </aside>
-
                 <div class="board-wrap">
                     <canvas id="gamearea" aria-label="Liquid Color game board"></canvas>
                     <div class="gamestatus score-row">
@@ -91,6 +76,26 @@
                 </div>
 
                 <div id="playbuttons" class="button-column" aria-label="Color selection buttons"></div>
+            </section>
+
+            <section class="highscore-panel" aria-label="Highscore board">
+                <h2 class="highscore-title">Highscores</h2>
+                <div class="highscore-row">
+                    <span id="highscore_name_human">Human</span>
+                    <span id="highscore_human">0</span>
+                </div>
+                <div class="highscore-row">
+                    <span id="highscore_name_computer">Computer</span>
+                    <span id="highscore_computer">0</span>
+                </div>
+                <div class="highscore-row">
+                    <span>Draws</span>
+                    <span id="highscore_draws">0</span>
+                </div>
+                <div class="highscore-row highscore-total">
+                    <span>Total games</span>
+                    <span id="highscore_total">0</span>
+                </div>
             </section>
 
             <section class="messages" aria-live="polite">

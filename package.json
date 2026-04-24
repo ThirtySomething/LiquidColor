@@ -5,7 +5,7 @@
     "scripts": {
         "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
         "build": "tsc -p tsconfig.json && npm run build:bundle",
-        "build:bundle": "esbuild app.ts --bundle --platform=browser --format=iife --target=es2020 --outfile=dist/app.bundle.js",
+        "build:bundle": "esbuild app.ts --bundle --platform=browser --format=iife --target=es2020 --outfile=dist/app.js",
         "typecheck": "tsc --noEmit -p tsconfig.json",
         "watch": "tsc --watch -p tsconfig.json"
     },

@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { Highscore, LocalStorageHighscoreRepository, type HighscoreRepository, type HighscoreSnapshot } from "../src/highscore";
+import {
+    Highscore,
+    LocalStorageHighscoreRepository,
+    type HighscoreRepository,
+    type HighscoreSnapshot
+} from "../src/highscore";
 
 const STORAGE_KEY = LocalStorageHighscoreRepository.STORAGE_KEY;
 
@@ -41,10 +46,7 @@ describe("Highscore", () => {
     });
 
     it("loads valid persisted snapshot and can render score and total", () => {
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify({ humanWins: 2, computerWins: 3, draws: 4 })
-        );
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ humanWins: 2, computerWins: 3, draws: 4 }));
         const highscore = new Highscore();
 
         highscore.render("Alice", "CPU");
@@ -70,10 +72,7 @@ describe("Highscore", () => {
     });
 
     it("falls back to zero state when stored numbers are not valid", () => {
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify({ humanWins: "x", computerWins: 1, draws: 0 })
-        );
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ humanWins: "x", computerWins: 1, draws: 0 }));
 
         const highscore = new Highscore();
 

@@ -29,13 +29,7 @@ describe("CaptureSimulator", () => {
 
         cells[1][2].m_Color = "red";
 
-        const result = CaptureSimulator.simulate(
-            cells,
-            definitions,
-            new Set([base]),
-            new Set<Cell>(),
-            "green"
-        );
+        const result = CaptureSimulator.simulate(cells, definitions, new Set([base]), new Set<Cell>(), "green");
 
         expect(result.gained).toBe(7);
         expect(result.newOwnedSet.size).toBe(8);
@@ -51,13 +45,7 @@ describe("CaptureSimulator", () => {
         base.m_Occupied = true;
         const blocked = cells[0][1];
 
-        const result = CaptureSimulator.simulate(
-            cells,
-            definitions,
-            new Set([base]),
-            new Set([blocked]),
-            "blue"
-        );
+        const result = CaptureSimulator.simulate(cells, definitions, new Set([base]), new Set([blocked]), "blue");
 
         expect(result.newOwnedSet.has(blocked)).toBe(false);
         expect(result.gained).toBe(2);

@@ -5,13 +5,14 @@ import { Definitions } from "../src/definitions";
 import { Grid } from "../src/grid";
 import type { Player } from "../src/player";
 
-const getCanvasCtx = (): CanvasRenderingContext2D => ({
-    beginPath: vi.fn(),
-    rect: vi.fn(),
-    fill: vi.fn(),
-    stroke: vi.fn(),
-    fillStyle: ""
-} as unknown as CanvasRenderingContext2D);
+const getCanvasCtx = (): CanvasRenderingContext2D =>
+    ({
+        beginPath: vi.fn(),
+        rect: vi.fn(),
+        fill: vi.fn(),
+        stroke: vi.fn(),
+        fillStyle: ""
+    }) as unknown as CanvasRenderingContext2D;
 
 describe("Grid", () => {
     it("gridInit creates configured dimensions and assigns colors", () => {
@@ -93,10 +94,7 @@ describe("Grid", () => {
         Definitions.initialize(3, 3, 10);
         const definitions = Definitions.getInstance();
         const grid = new Grid();
-        grid.m_Cells = [
-            [new Cell(0, 0)],
-            []
-        ];
+        grid.m_Cells = [[new Cell(0, 0)], []];
 
         const source = new Cell(0, 1);
         source.m_Occupied = true;

@@ -5,13 +5,14 @@ import { Cell } from "../src/cell";
 import { Definitions } from "../src/definitions";
 import { Player } from "../src/player";
 
-const getCanvasCtx = (): CanvasRenderingContext2D => ({
-    beginPath: vi.fn(),
-    rect: vi.fn(),
-    fill: vi.fn(),
-    stroke: vi.fn(),
-    fillStyle: ""
-} as unknown as CanvasRenderingContext2D);
+const getCanvasCtx = (): CanvasRenderingContext2D =>
+    ({
+        beginPath: vi.fn(),
+        rect: vi.fn(),
+        fill: vi.fn(),
+        stroke: vi.fn(),
+        fillStyle: ""
+    }) as unknown as CanvasRenderingContext2D;
 
 const buildCells = (): Cell[][] => {
     return [

@@ -3,13 +3,14 @@ import { describe, expect, it, vi } from "vitest";
 import { Cell } from "../src/cell";
 import { Definitions } from "../src/definitions";
 
-const getCanvasCtx = (): CanvasRenderingContext2D => ({
-    beginPath: vi.fn(),
-    rect: vi.fn(),
-    fill: vi.fn(),
-    stroke: vi.fn(),
-    fillStyle: ""
-} as unknown as CanvasRenderingContext2D);
+const getCanvasCtx = (): CanvasRenderingContext2D =>
+    ({
+        beginPath: vi.fn(),
+        rect: vi.fn(),
+        fill: vi.fn(),
+        stroke: vi.fn(),
+        fillStyle: ""
+    }) as unknown as CanvasRenderingContext2D;
 
 describe("Cell", () => {
     it("draw paints only when m_DoRedraw is true", () => {

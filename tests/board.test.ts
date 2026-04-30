@@ -7,13 +7,14 @@ import { GamePhase } from "../src/gamephase";
 import { Player } from "../src/player";
 import type { RandomSource } from "../src/randomsource";
 
-const mockCtx = (): CanvasRenderingContext2D => ({
-    beginPath: vi.fn(),
-    rect: vi.fn(),
-    fill: vi.fn(),
-    stroke: vi.fn(),
-    fillStyle: ""
-} as unknown as CanvasRenderingContext2D);
+const mockCtx = (): CanvasRenderingContext2D =>
+    ({
+        beginPath: vi.fn(),
+        rect: vi.fn(),
+        fill: vi.fn(),
+        stroke: vi.fn(),
+        fillStyle: ""
+    }) as unknown as CanvasRenderingContext2D;
 
 const setupDom = (): HTMLCanvasElement => {
     document.body.innerHTML = `
@@ -225,10 +226,20 @@ describe("Board", () => {
         const board = createBoard();
         const endGameSpy = vi.spyOn(board, "endGame").mockImplementation(() => undefined);
 
-        vi.spyOn(board, "getScoreStats").mockReturnValue({ human: board.m_Definitions.Winner, computer: 0, occupied: 0, total: 4 });
+        vi.spyOn(board, "getScoreStats").mockReturnValue({
+            human: board.m_Definitions.Winner,
+            computer: 0,
+            occupied: 0,
+            total: 4
+        });
         expect(board.evaluateGameState()).toBe(true);
 
-        vi.spyOn(board, "getScoreStats").mockReturnValue({ human: 0, computer: board.m_Definitions.Winner, occupied: 0, total: 4 });
+        vi.spyOn(board, "getScoreStats").mockReturnValue({
+            human: 0,
+            computer: board.m_Definitions.Winner,
+            occupied: 0,
+            total: 4
+        });
         expect(board.evaluateGameState()).toBe(true);
 
         vi.spyOn(board, "getScoreStats").mockReturnValue({ human: 2, computer: 2, occupied: 4, total: 4 });
@@ -278,9 +289,7 @@ describe("Board", () => {
         const humanMoveSpy = vi.spyOn(board.m_PlayerHuman, "move").mockImplementation(() => undefined);
         const computerMoveSpy = vi.spyOn(board.m_PlayerComputer, "move").mockImplementation(() => undefined);
         const identifySpy = vi.spyOn(board.m_PlayerComputer, "identifyBestColor").mockReturnValue("green");
-        const evaluateSpy = vi.spyOn(board, "evaluateGameState")
-            .mockReturnValueOnce(false)
-            .mockReturnValueOnce(false);
+        const evaluateSpy = vi.spyOn(board, "evaluateGameState").mockReturnValueOnce(false).mockReturnValueOnce(false);
 
         board.performMove("green");
 
@@ -389,7 +398,12 @@ describe("Board", () => {
         board.m_Grid.m_Cells = [[new Cell(0, 0)]];
 
         const sparseSnapshot = {
-            cells: [[{ color: "red", owner: "Human", occupied: true }, { color: "blue", owner: "CPU", occupied: true }]],
+            cells: [
+                [
+                    { color: "red", owner: "Human", occupied: true },
+                    { color: "blue", owner: "CPU", occupied: true }
+                ]
+            ],
             phase: "inprogress" as const,
             ui: { winnerText: "", winnerVisible: false, moveInfoText: "", moveInfoVisible: false },
             highscore: { humanWins: 0, computerWins: 0, draws: 0 }
@@ -521,6 +535,5 @@ describe("Board", () => {
             board.reInit("dimx", "dimy", "cellsize", "playername", "computerstrategy");
             expect(board.m_Phase.name).toBe("inprogress");
         });
-
     });
 });

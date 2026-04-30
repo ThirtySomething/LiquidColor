@@ -12,8 +12,13 @@ describe("CommandResetGame", () => {
         const command = new CommandResetGame(board, "x", "y", "size", "name", "strategy");
         command.execute();
 
-        expect((board as unknown as { reInit: ReturnType<typeof vi.fn> }).reInit)
-            .toHaveBeenCalledWith("x", "y", "size", "name", "strategy");
+        expect((board as unknown as { reInit: ReturnType<typeof vi.fn> }).reInit).toHaveBeenCalledWith(
+            "x",
+            "y",
+            "size",
+            "name",
+            "strategy"
+        );
     });
 
     it("undo currently logs placeholder message", () => {

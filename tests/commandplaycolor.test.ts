@@ -32,7 +32,8 @@ const createBoardStub = (): BoardStub => {
     };
 
     return {
-        createStateSnapshot: vi.fn()
+        createStateSnapshot: vi
+            .fn()
             .mockReturnValueOnce(snapshotBefore)
             .mockReturnValueOnce(snapshotAfter)
             .mockReturnValue(snapshotAfter),
@@ -93,10 +94,12 @@ describe("CommandPlayColor", () => {
 
     it("stores compact deltas with only changed cells", () => {
         const snapshotBefore: BoardStateSnapshot = {
-            cells: [[
-                { color: "red", owner: "", occupied: false },
-                { color: "blue", owner: "", occupied: false }
-            ]],
+            cells: [
+                [
+                    { color: "red", owner: "", occupied: false },
+                    { color: "blue", owner: "", occupied: false }
+                ]
+            ],
             phase: "inprogress",
             ui: {
                 winnerText: "",
@@ -113,14 +116,17 @@ describe("CommandPlayColor", () => {
 
         const snapshotAfter: BoardStateSnapshot = {
             ...snapshotBefore,
-            cells: [[
-                { color: "green", owner: "Human", occupied: true },
-                { color: "blue", owner: "", occupied: false }
-            ]]
+            cells: [
+                [
+                    { color: "green", owner: "Human", occupied: true },
+                    { color: "blue", owner: "", occupied: false }
+                ]
+            ]
         };
 
         const board: BoardStub = {
-            createStateSnapshot: vi.fn()
+            createStateSnapshot: vi
+                .fn()
                 .mockReturnValueOnce(snapshotBefore)
                 .mockReturnValueOnce(snapshotAfter)
                 .mockReturnValue(snapshotAfter),
@@ -143,14 +149,10 @@ describe("CommandPlayColor", () => {
             };
         };
 
-        expect(internals.redoDelta.cells).toEqual([
-            { y: 0, x: 0, color: "green", owner: "Human", occupied: true }
-        ]);
+        expect(internals.redoDelta.cells).toEqual([{ y: 0, x: 0, color: "green", owner: "Human", occupied: true }]);
         expect(internals.redoDelta.phase).toBeUndefined();
         expect(internals.redoDelta.ui).toBeUndefined();
         expect(internals.redoDelta.highscore).toBeUndefined();
-        expect(internals.undoDelta.cells).toEqual([
-            { y: 0, x: 0, color: "red", owner: "", occupied: false }
-        ]);
+        expect(internals.undoDelta.cells).toEqual([{ y: 0, x: 0, color: "red", owner: "", occupied: false }]);
     });
 });

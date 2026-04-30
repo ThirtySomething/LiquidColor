@@ -39,7 +39,7 @@ export class Board {
         this.m_Timer = dependencies.timer ?? new Timer("gameduration", dependencies.timerRuntime);
         this.m_ComputerStrategy = "minimax";
         this.m_Phase = GamePhase.Setup();
-        this.m_Highscore = new Highscore(dependencies.highscoreRepository);
+        this.m_Highscore = dependencies.highscore ?? new Highscore(dependencies.highscoreRepository);
         this.m_RandomSource = dependencies.randomSource ?? MathRandomSource;
         this.m_UISubject = new Subject();
         this.m_CommandInvoker = new CommandInvoker();

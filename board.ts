@@ -3,7 +3,7 @@ import { CommandPlayColor } from "./commands/commandplaycolor.js";
 import { Definitions } from "./definitions.js";
 import { GamePhase, type GamePhaseName, type IGamePhase } from "./gamephase.js";
 import { Grid } from "./grid.js";
-import { Highscore, type HighscoreRepository } from "./highscore.js";
+import { Highscore, type HighscoreRepository, type HighscoreSnapshot } from "./highscore.js";
 import type { HighscoreWinner } from "./highscorewinner.js";
 import { Player } from "./player.js";
 import { MathRandomSource, type RandomSource } from "./randomsource.js";
@@ -44,9 +44,24 @@ export type BoardStateSnapshot = {
     };
 };
 
+export interface BoardTimer {
+    reset(): void;
+    startTicker(): void;
+    startCounting(): void;
+    stop(): void;
+}
+
+export interface BoardHighscore {
+    recordWin(winner: HighscoreWinner): void;
+    render(humanName: string, computerName: string): void;
+    createSnapshot(): HighscoreSnapshot;
+    restoreSnapshot(snapshot: HighscoreSnapshot): void;
+}
+
 export type BoardDependencies = {
-    timer?: Timer;
+    timer?: BoardTimer;
     timerRuntime?: TimerRuntime;
+    highscore?: BoardHighscore;
     highscoreRepository?: HighscoreRepository;
     randomSource?: RandomSource;
 };
@@ -62,10 +77,10 @@ export class Board {
     m_IDGameField: string;
     m_IDButtonField: string;
     m_IDWinner: string;
-    m_Timer: Timer;
+    m_Timer: BoardTimer;
     m_ComputerStrategy: ComputerStrategy;
     m_Phase: IGamePhase;
-    m_Highscore: Highscore;
+    m_Highscore: BoardHighscore;
     m_RandomSource: RandomSource;
     m_UISubject: Subject;
     m_CommandInvoker: CommandInvoker;
@@ -87,7 +102,7 @@ export class Board {
         this.m_Timer = dependencies.timer ?? new Timer("gameduration", dependencies.timerRuntime);
         this.m_ComputerStrategy = "minimax";
         this.m_Phase = GamePhase.Setup();
-        this.m_Highscore = new Highscore(dependencies.highscoreRepository);
+        this.m_Highscore = dependencies.highscore ?? new Highscore(dependencies.highscoreRepository);
         this.m_RandomSource = dependencies.randomSource ?? MathRandomSource;
         this.m_UISubject = new Subject();
         this.m_CommandInvoker = new CommandInvoker();

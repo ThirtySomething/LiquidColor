@@ -1,13 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { Board } from "../board";
+import { type BoardHighscore, type BoardTimer, Board } from "../board";
 import { Cell } from "../cell";
 import { Definitions } from "../definitions";
 import { GamePhase } from "../gamephase";
-import type { HighscoreRepository, HighscoreSnapshot } from "../highscore";
 import { Player } from "../player";
 import type { RandomSource } from "../randomsource";
-import { type TimerRuntime, Timer } from "../timer";
 
 const mockCtx = (): CanvasRenderingContext2D => ({
     beginPath: vi.fn(),
@@ -440,44 +438,48 @@ describe("Board", () => {
         expect(board.m_PlayerComputer.m_BaseCell).toBeNull();
     });
 
-    it("accepts injected timer, storage repository, and random source", () => {
+    it("accepts injected timer, highscore, and random source interfaces", () => {
         localStorage.clear();
         setupDom();
         Definitions.initialize(2, 2, 10);
         const definitions = Definitions.getInstance();
         const human = new Player("Human", "name_human", "score_human", () => undefined);
         const computer = new Player("CPU", "name_computer", "score_computer", () => undefined);
-
-        class InMemoryRepository implements HighscoreRepository {
-            private m_Snapshot: HighscoreSnapshot | null = { humanWins: 2, computerWins: 1, draws: 3 };
-
-            load(): HighscoreSnapshot | null {
-                return this.m_Snapshot;
-            }
-
-            save(snapshot: HighscoreSnapshot): void {
-                this.m_Snapshot = { ...snapshot };
-            }
-        }
-
-        const timerRuntime: TimerRuntime = {
-            now: () => 1_000,
-            setInterval: vi.fn(() => 1),
-            clearInterval: vi.fn()
+        const timer: BoardTimer = {
+            reset: vi.fn(),
+            startTicker: vi.fn(),
+            startCounting: vi.fn(),
+            stop: vi.fn()
         };
-        const timer = new Timer("gameduration", timerRuntime);
+        const highscore: BoardHighscore = {
+            recordWin: vi.fn(),
+            render: vi.fn((humanName: string, computerName: string) => {
+                document.getElementById("highscore_name_human")!.textContent = humanName;
+                document.getElementById("highscore_name_computer")!.textContent = computerName;
+                document.getElementById("highscore_human")!.textContent = "2";
+                document.getElementById("highscore_computer")!.textContent = "1";
+                document.getElementById("highscore_draws")!.textContent = "3";
+                document.getElementById("highscore_total")!.textContent = "6";
+            }),
+            createSnapshot: vi.fn(() => ({ humanWins: 2, computerWins: 1, draws: 3 })),
+            restoreSnapshot: vi.fn()
+        };
         const randomSource: RandomSource = { next: vi.fn(() => 0) };
         resetBoardSingleton();
         Board.initialize(definitions, human, computer, {
             timer,
-            highscoreRepository: new InMemoryRepository(),
+            highscore,
             randomSource
         });
         const board = Board.getInstance();
         board.init("gamearea", "playbuttons", "winner");
 
         expect(board.m_Timer).toBe(timer);
+        expect(board.m_Highscore).toBe(highscore);
         expect(board.m_RandomSource).toBe(randomSource);
+        expect(highscore.render).toHaveBeenCalledWith("Human", "CPU");
+        expect(timer.reset).toHaveBeenCalled();
+        expect(timer.startTicker).toHaveBeenCalled();
         expect(document.getElementById("highscore_total")?.textContent).toBe("6");
         expect(randomSource.next).toHaveBeenCalled();
     });

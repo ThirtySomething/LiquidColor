@@ -1,9 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { type TimerRuntime, Timer } from "../src/timer";
+import { setTestDom } from "./test-utils";
 
 const setupDom = (): void => {
-    document.body.innerHTML = '<div id="gameduration"></div>';
+    setTestDom('<div id="gameduration"></div>');
 };
 
 describe("Timer", () => {

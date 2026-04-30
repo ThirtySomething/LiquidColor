@@ -1,10 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { UiFacade } from "../src/uifacade";
+import { mockCanvasElementContext, setTestDom } from "./test-utils";
 
 describe("UiFacade", () => {
     it("handles text/display/class operations and missing elements", () => {
-        document.body.innerHTML = '<div id="x" class="old"><span>child</span></div><input id="inp" value="hello">';
+        setTestDom('<div id="x" class="old"><span>child</span></div><input id="inp" value="hello">');
 
         expect(UiFacade.getInputValue("inp")).toBe("hello");
         UiFacade.setInputValue("inp", 7);
@@ -59,10 +60,10 @@ describe("UiFacade", () => {
     });
 
     it("gets canvas context, including null branch when canvas/context is unavailable", () => {
-        document.body.innerHTML = '<canvas id="ok"></canvas><div id="bad"></div>';
+        setTestDom('<canvas id="ok"></canvas><div id="bad"></div>');
         const canvas = document.getElementById("ok") as HTMLCanvasElement;
         const fakeCtx = {} as CanvasRenderingContext2D;
-        (canvas as unknown as { getContext: () => CanvasRenderingContext2D }).getContext = () => fakeCtx;
+        mockCanvasElementContext(canvas, fakeCtx);
 
         expect(UiFacade.getCanvasElement("ok")).toBe(canvas);
         expect(UiFacade.getCanvasContext("ok")).toBe(fakeCtx);
@@ -71,7 +72,7 @@ describe("UiFacade", () => {
     });
 
     it("creates color button and appendChild wires click handler", () => {
-        document.body.innerHTML = '<div id="p"></div>';
+        setTestDom('<div id="p"></div>');
         const parent = document.getElementById("p") as HTMLElement;
         const clickSpy = vi.fn();
 

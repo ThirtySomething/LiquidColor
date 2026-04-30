@@ -6,10 +6,10 @@ import { Definitions } from "../src/definitions";
 import { GamePhase } from "../src/gamephase";
 import { Player } from "../src/player";
 import type { RandomSource } from "../src/randomsource";
-import { createMockCanvasContext } from "./test-utils";
+import { createMockCanvasContext, mockCanvasElementContext, setTestDom } from "./test-utils";
 
 const setupDom = (): HTMLCanvasElement => {
-    document.body.innerHTML = `
+    setTestDom(`
         <canvas id="gamearea"></canvas>
         <div id="playbuttons"></div>
         <p id="winner" class="dspno" style="display:none"></p>
@@ -30,10 +30,10 @@ const setupDom = (): HTMLCanvasElement => {
         <span id="highscore_computer"></span>
         <span id="highscore_draws"></span>
         <span id="highscore_total"></span>
-    `;
+    `);
 
     const canvas = document.getElementById("gamearea") as HTMLCanvasElement;
-    (canvas as unknown as { getContext: () => CanvasRenderingContext2D }).getContext = () => createMockCanvasContext();
+    mockCanvasElementContext(canvas, createMockCanvasContext());
     return canvas;
 };
 
@@ -371,7 +371,7 @@ describe("Board", () => {
         localStorage.clear();
         setupDom();
         const canvas = document.getElementById("gamearea") as HTMLCanvasElement;
-        (canvas as unknown as { getContext: () => null }).getContext = () => null;
+        mockCanvasElementContext(canvas, null);
 
         Definitions.initialize(2, 2, 10);
         const definitions = Definitions.getInstance();

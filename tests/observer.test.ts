@@ -5,6 +5,7 @@ import type { ObserverData } from "../src/observerdata";
 import { ScoreObserver } from "../src/scoreobserver";
 import { Subject } from "../src/subject";
 import { WinnerObserver } from "../src/winnerobserver";
+import { setTestDom } from "./test-utils";
 
 describe("Observers and Subject", () => {
     it("subject attaches, notifies and detaches observers", () => {
@@ -23,7 +24,7 @@ describe("Observers and Subject", () => {
     });
 
     it("score observer updates matching score element", () => {
-        document.body.innerHTML = '<div id="score"></div>';
+        setTestDom('<div id="score"></div>');
 
         const observer = new ScoreObserver();
         observer.update({ type: "score", player: "P", scoreElementId: "score", score: 7 });
@@ -37,7 +38,7 @@ describe("Observers and Subject", () => {
     });
 
     it("winner observer sets winner message and removes hidden class", () => {
-        document.body.innerHTML = '<p id="winner" class="dspno"></p>';
+        setTestDom('<p id="winner" class="dspno"></p>');
 
         const observer = new WinnerObserver();
         observer.update({ type: "winner", player: "Alice" });

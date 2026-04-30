@@ -6,6 +6,123 @@
 
 This is a single player game written in TypeScript and Vue.js. It takes advantage of HTML5 canvas.
 
+The app combines a small Vue shell with game-domain logic in TypeScript classes.
+
+## Current Architecture (TypeScript)
+
+The current codebase applies several patterns:
+
+- **State pattern** for game phases (`setup`, `inprogress`, `gameover`)
+- **Command pattern** for move/reset execution and undo/redo
+- **Strategy pattern** for AI behavior (`greedy`, `minimax`)
+- **Observer pattern** for score/winner UI notifications
+- **Repository pattern** for highscore persistence
+- **Facade pattern** for UI DOM access
+- **Dependency injection (lightweight)** for timer runtime, storage, and randomness
+
+## Code Map
+
+### Entry + Composition
+
+- `liquidcolor.ts`
+  : App entrypoint. Creates `Definitions`, players, board dependencies, wires observers, mounts Vue, and binds Reset/Undo/Redo actions.
+
+- `boarddependencies.ts`
+  : Central composition helper for default runtime dependencies (`BrowserTimerRuntime`, `LocalStorageHighscoreRepository`, `MathRandomSource`).
+
+### Core Game Domain
+
+- `board.ts`
+  : Main orchestrator of gameplay and UI updates. Handles initialization, moves, game-state evaluation, snapshots/restore, and command invoker integration.
+
+- `definitions.ts`
+  : Board/game configuration (dimensions, cell size, winner threshold) with sanitization/clamping.
+
+- `gamephase.ts`
+  : State objects for phase-specific behavior (`canAcceptMove`, `isOver`).
+
+- `grid.ts`
+  : Grid creation/reset, player cell discovery, border analysis, and available-color counting.
+
+- `cell.ts`
+  : Cell state, drawing, neighborhood traversal logic, border detection, random color pick.
+
+- `player.ts`
+  : Player actions (init/move), flood-capture propagation, scoring updates, AI color decision delegation.
+
+### Commands (Undo/Redo)
+
+- `commands/commandinvoker.ts`
+  : Executes commands and maintains undo/redo stacks.
+
+- `commands/commandplaycolor.ts`
+  : Color-move command with **delta-based** undo/redo payloads (changed cells + changed metadata) instead of full snapshots.
+
+- `commands/commandresetgame.ts`
+  : Reset command delegating to board re-initialization.
+
+### AI Strategies
+
+- `strategies/computerstrategyfactory.ts`
+  : Strategy selection and delegation.
+
+- `strategies/strategygreedy.ts`
+  : Chooses best immediate gain.
+
+- `strategies/strategyminimax.ts`
+  : Two-ply style evaluation with deny/diversity weighting.
+
+- `strategies/capturesimulator.ts`
+  : Shared simulation utility used by both strategies.
+
+### UI + Infrastructure
+
+- `uifacade.ts`
+  : Single facade for DOM queries/updates and UI element creation.
+
+- `util.ts`
+  : Thin utility wrappers delegating to UI facade.
+
+- `timer.ts`
+  : Game timer logic with injectable runtime (`now`, interval scheduler).
+
+- `subject.ts`, `scoreobserver.ts`, `winnerobserver.ts`, `iobserver.ts`, `observerdata.ts`
+  : Observer pipeline for UI notifications.
+
+### Persistence
+
+- `highscore.ts`
+  : Highscore domain model and repository abstraction.
+
+- `localstoragehighscorerepository.ts`
+  : LocalStorage implementation of highscore persistence.
+
+### Types / Supporting Files
+
+- `highscorewinner.ts`, `offset.ts`, `randomsource.ts`
+  : Shared domain types and injectable random source interface.
+
+## Architecture Diagram
+
+![LiquidColor Architecture](doc/LiquidColor%20Architecture.png)
+
+> Source: [`doc/architecture.puml`](doc/architecture.puml)
+
+## Runtime Flow
+
+1. App bootstraps in `liquidcolor.ts` and initializes board dependencies.
+2. `board.init()` creates canvas/grid, buttons, player setup, timer, and highscore rendering.
+3. A color button click executes `CommandPlayColor` through `CommandInvoker`.
+4. Board validates move, applies human move, computes AI move through selected strategy, and evaluates win/draw conditions.
+5. Undo/redo uses command deltas to restore only changed state efficiently.
+
+## Undo/Redo
+
+Undo and redo are supported for color-move commands.
+
+- History is **unlimited** (no fixed max depth).
+- Move commands store **delta payloads** (changed cells/metadata), not full-grid snapshots.
+
 ## Local Start
 
 1. Install dependencies:
@@ -14,28 +131,32 @@ This is a single player game written in TypeScript and Vue.js. It takes advantag
 npm install
 ```
 
-1. Build the browser bundle:
+2. Build the browser bundle:
 
 ```bash
 npm run build:dev
 ```
 
-1. Open `index.html` directly in your browser (double-click or use your browser's "Open file" action).
+3. Open `index.html` directly in your browser (double-click or use your browser's "Open file" action).
 
 The game does not require a local web server after the bundle has been built.
 
 ## Requirements
 
-To run this game you need a internet browser supporting JavaScript and HTML5. At least all modern browsers will fit.
+To run this game you need an internet browser supporting JavaScript and HTML5 canvas. Modern browsers are supported.
+
+## Build, Lint, Test
+
+```bash
+npm run build:dev
+npm run lint
+npm run typecheck
+npm test
+```
 
 ## Test
 
 You can test this game on [GitHub][url_github_liquidcolor].
-
-## Undo/Redo
-
-The game supports undo and redo for color moves with a maximum history depth of 15 moves. When the limit is
-reached, the oldest move is dropped from the history.
 
 ## Supported Platforms
 

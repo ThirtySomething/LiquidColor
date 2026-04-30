@@ -1,8 +1,6 @@
 import type { ICommand } from "./icommand.js";
 
 export class CommandInvoker {
-    private static readonly MAX_HISTORY = 15;
-
     private commands: ICommand[] = [];
     private undoStack: ICommand[] = [];
 
@@ -13,9 +11,6 @@ export class CommandInvoker {
         }
 
         this.commands.push(command);
-        if (this.commands.length > CommandInvoker.MAX_HISTORY) {
-            this.commands.shift();
-        }
         this.undoStack = [];
     }
 

@@ -38,14 +38,14 @@ describe("CommandInvoker", () => {
         expect(invoker.getCommandHistory()).toHaveLength(1);
     });
 
-    it("caps command history at MAX_HISTORY", () => {
+    it("keeps full command history without capping", () => {
         const invoker = new CommandInvoker();
 
         for (let i = 0; i < 20; i += 1) {
             invoker.execute(makeCommand());
         }
 
-        expect(invoker.getCommandHistory()).toHaveLength(15);
+        expect(invoker.getCommandHistory()).toHaveLength(20);
     });
 
     it("clears redo stack when new command is executed", () => {

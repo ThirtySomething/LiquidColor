@@ -1,5 +1,4 @@
 export class CommandInvoker {
-    static MAX_HISTORY = 15;
     commands = [];
     undoStack = [];
     execute(command, trackHistory = true) {
@@ -8,9 +7,6 @@ export class CommandInvoker {
             return;
         }
         this.commands.push(command);
-        if (this.commands.length > CommandInvoker.MAX_HISTORY) {
-            this.commands.shift();
-        }
         this.undoStack = [];
     }
     undo() {

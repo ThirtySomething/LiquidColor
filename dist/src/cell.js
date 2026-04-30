@@ -33,31 +33,31 @@ export class Cell {
     }
     neighboursGet(cells, definitions) {
         const neighbours = [];
-        definitions.Offsets.forEach((currentOffset) => {
+        for (const currentOffset of definitions.Offsets) {
             const cellPosY = this.m_PosY + currentOffset.DY;
             if (cellPosY < 0 || definitions.DimensionY <= cellPosY) {
-                return;
+                continue;
             }
             const cellPosX = this.m_PosX + currentOffset.DX;
             if (cellPosX < 0 || definitions.DimensionX <= cellPosX) {
-                return;
+                continue;
             }
             const row = cells[cellPosY];
             if (!row) {
-                return;
+                continue;
             }
             const currentNeighbour = row[cellPosX];
             if (!currentNeighbour) {
-                return;
+                continue;
             }
             if (!currentNeighbour.m_DoRedraw) {
-                return;
+                continue;
             }
             if ((!currentNeighbour.m_Occupied && this.m_Color === currentNeighbour.m_Color) ||
                 (this.m_Owner === currentNeighbour.m_Owner && this.m_Color !== currentNeighbour.m_Color)) {
                 neighbours.push(currentNeighbour);
             }
-        });
+        }
         return neighbours;
     }
     cellColorRandomGet(colors, randomSource = MathRandomSource) {
@@ -65,28 +65,27 @@ export class Cell {
         return colors[colorIndex] ?? this.m_Color;
     }
     isBorderCell(cells, definitions) {
-        let isBorder = false;
-        definitions.Offsets.forEach((currentOffset) => {
+        for (const currentOffset of definitions.Offsets) {
             const cellPosY = this.m_PosY + currentOffset.DY;
             if (cellPosY < 0 || definitions.DimensionY <= cellPosY) {
-                return;
+                continue;
             }
             const cellPosX = this.m_PosX + currentOffset.DX;
             if (cellPosX < 0 || definitions.DimensionX <= cellPosX) {
-                return;
+                continue;
             }
             const row = cells[cellPosY];
             if (!row) {
-                return;
+                continue;
             }
             const currentNeighbour = row[cellPosX];
             if (!currentNeighbour) {
-                return;
+                continue;
             }
             if (!currentNeighbour.m_Occupied) {
-                isBorder = true;
+                return true;
             }
-        });
-        return isBorder;
+        }
+        return false;
     }
 }

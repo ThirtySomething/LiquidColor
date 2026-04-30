@@ -35,6 +35,7 @@
         "gamephase.ts",
         "player.ts",
         "board.ts",
+        "boarddependencies.ts",
         "liquidcolor.ts"
     ]
 }

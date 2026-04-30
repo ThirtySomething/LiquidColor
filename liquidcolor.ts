@@ -1,5 +1,6 @@
 import { createApp } from "vue/dist/vue.esm-bundler.js";
 import { Board } from "./board.js";
+import { createBoardDependencies } from "./boarddependencies.js";
 import { CommandResetGame } from "./commands/commandresetgame.js";
 import { Definitions } from "./definitions.js";
 import packageInfo from "./package.json";
@@ -11,7 +12,8 @@ Definitions.initialize(30, 20, 15);
 const definitions = Definitions.getInstance();
 const human = new Player("Besucher", "name_human", "score_human", () => { });
 const computer = new Player("DerPaul", "name_computer", "score_computer", () => { });
-Board.initialize(definitions, human, computer);
+const boardDependencies = createBoardDependencies();
+Board.initialize(definitions, human, computer, boardDependencies);
 
 const board = Board.getInstance();
 const appVersion = packageInfo.version;

@@ -5,17 +5,19 @@ import { GamePhase, type IGamePhase } from "./gamephase.js";
 import { Grid } from "./grid.js";
 import { Highscore } from "./highscore.js";
 import type { HighscoreWinner } from "./highscorewinner.js";
-import { type CellMutation, Player } from "./player.js";
+import { Player } from "./player.js";
 import { MathRandomSource, type RandomSource } from "./randomsource.js";
 import type { ComputerStrategy } from "./strategies/computerstrategytype.js";
 import { Subject } from "./subject.js";
 import { Timer } from "./timer.js";
 import type { BoardDependencies } from "./types/boarddependencies.js";
 import type { BoardHighscore } from "./types/boardhighscore.js";
+import type { BoardMoveDeltas } from "./types/boardmovedeltas.js";
 import type { BoardStateDelta } from "./types/boardstatedelta.js";
 import type { BoardStateSnapshot } from "./types/boardstatesnapshot.js";
 import type { BoardTimer } from "./types/boardtimer.js";
 import type { CellDelta } from "./types/celldelta.js";
+import type { CellMutation } from "./types/cellmutation.js";
 import type { CellState } from "./types/cellstate.js";
 import type { ScoreStats } from "./types/scorestats.js";
 import { UiFacade } from "./uifacade.js";
@@ -23,13 +25,9 @@ import { Util } from "./util.js";
 
 export type { BoardDependencies } from "./types/boarddependencies.js";
 export type { BoardHighscore } from "./types/boardhighscore.js";
+export type { BoardMoveDeltas } from "./types/boardmovedeltas.js";
 export type { BoardStateSnapshot } from "./types/boardstatesnapshot.js";
 export type { BoardTimer } from "./types/boardtimer.js";
-
-export type BoardMoveDeltas = {
-    redoDelta: BoardStateDelta;
-    undoDelta: BoardStateDelta;
-};
 
 export class Board {
     private static instance: Board | null = null;

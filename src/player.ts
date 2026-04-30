@@ -5,15 +5,11 @@ import type { ObserverData } from "./observerdata.js";
 import { type RandomSource, MathRandomSource } from "./randomsource.js";
 import { ComputerStrategyFactory } from "./strategies/computerstrategyfactory.js";
 import type { ComputerStrategy } from "./strategies/computerstrategytype.js";
+import type { CellMutation } from "./types/cellmutation.js";
 import type { CellState } from "./types/cellstate.js";
 import { Util } from "./util.js";
 
-export type CellMutation = {
-    y: number;
-    x: number;
-    before: CellState;
-    after: CellState;
-};
+export type { CellMutation } from "./types/cellmutation.js";
 
 export class Player {
     m_PlayerName: string;

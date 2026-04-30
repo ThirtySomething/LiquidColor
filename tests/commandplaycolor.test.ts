@@ -34,7 +34,8 @@ const createBoardStub = (): BoardStub => {
     return {
         createStateSnapshot: vi.fn()
             .mockReturnValueOnce(snapshotBefore)
-            .mockReturnValueOnce(snapshotAfter),
+            .mockReturnValueOnce(snapshotAfter)
+            .mockReturnValue(snapshotAfter),
         performMove: vi.fn(),
         restoreStateSnapshot: vi.fn()
     };
@@ -88,5 +89,68 @@ describe("CommandPlayColor", () => {
 
         expect(() => command.execute()).not.toThrow();
         expect(board.performMove).toHaveBeenCalledWith("");
+    });
+
+    it("stores compact deltas with only changed cells", () => {
+        const snapshotBefore: BoardStateSnapshot = {
+            cells: [[
+                { color: "red", owner: "", occupied: false },
+                { color: "blue", owner: "", occupied: false }
+            ]],
+            phase: "inprogress",
+            ui: {
+                winnerText: "",
+                winnerVisible: false,
+                moveInfoText: "",
+                moveInfoVisible: false
+            },
+            highscore: {
+                humanWins: 0,
+                computerWins: 0,
+                draws: 0
+            }
+        };
+
+        const snapshotAfter: BoardStateSnapshot = {
+            ...snapshotBefore,
+            cells: [[
+                { color: "green", owner: "Human", occupied: true },
+                { color: "blue", owner: "", occupied: false }
+            ]]
+        };
+
+        const board: BoardStub = {
+            createStateSnapshot: vi.fn()
+                .mockReturnValueOnce(snapshotBefore)
+                .mockReturnValueOnce(snapshotAfter)
+                .mockReturnValue(snapshotAfter),
+            performMove: vi.fn(),
+            restoreStateSnapshot: vi.fn()
+        };
+
+        const command = new CommandPlayColor(board as unknown as Board, "green");
+        command.execute();
+
+        const internals = command as unknown as {
+            redoDelta: {
+                cells: Array<{ y: number; x: number; color: string; owner: string; occupied: boolean }>;
+                phase?: BoardStateSnapshot["phase"];
+                ui?: BoardStateSnapshot["ui"];
+                highscore?: BoardStateSnapshot["highscore"];
+            };
+            undoDelta: {
+                cells: Array<{ y: number; x: number; color: string; owner: string; occupied: boolean }>;
+            };
+        };
+
+        expect(internals.redoDelta.cells).toEqual([
+            { y: 0, x: 0, color: "green", owner: "Human", occupied: true }
+        ]);
+        expect(internals.redoDelta.phase).toBeUndefined();
+        expect(internals.redoDelta.ui).toBeUndefined();
+        expect(internals.redoDelta.highscore).toBeUndefined();
+        expect(internals.undoDelta.cells).toEqual([
+            { y: 0, x: 0, color: "red", owner: "", occupied: false }
+        ]);
     });
 });

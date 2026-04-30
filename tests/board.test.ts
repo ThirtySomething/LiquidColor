@@ -376,6 +376,38 @@ describe("Board", () => {
         expect(() => board.boardInit()).not.toThrow();
     });
 
+    it("createStateSnapshot falls back when winner and moveinfo elements are missing", () => {
+        const board = createBoard();
+        const winner = document.getElementById("winner");
+        const moveinfo = document.getElementById("moveinfo");
+        winner?.remove();
+        moveinfo?.remove();
+
+        const snapshot = board.createStateSnapshot();
+
+        expect(snapshot.ui.winnerText).toBe("");
+        expect(snapshot.ui.winnerVisible).toBe(false);
+        expect(snapshot.ui.moveInfoText).toBe("");
+        expect(snapshot.ui.moveInfoVisible).toBe(false);
+    });
+
+    it("restoreStateSnapshot handles existing but empty base rows", () => {
+        const board = createBoard();
+        board.m_Grid.m_Cells = [[], []];
+
+        const snapshot = {
+            cells: [[], []],
+            phase: "inprogress" as const,
+            ui: { winnerText: "", winnerVisible: false, moveInfoText: "", moveInfoVisible: false },
+            highscore: { humanWins: 0, computerWins: 0, draws: 0 }
+        };
+
+        board.restoreStateSnapshot(snapshot);
+
+        expect(board.m_PlayerHuman.m_BaseCell).toBeNull();
+        expect(board.m_PlayerComputer.m_BaseCell).toBeNull();
+    });
+
     it("accepts injected timer, storage repository, and random source", () => {
         localStorage.clear();
         setupDom();

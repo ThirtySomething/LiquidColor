@@ -1,8 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { Cell } from "../cell";
 import { Definitions } from "../definitions";
 import type { RandomSource } from "../randomsource";
+import { CaptureSimulator } from "../strategies/capturesimulator";
 import { ComputerStrategyFactory } from "../strategies/computerstrategyfactory";
 import { StrategyGreedy } from "../strategies/strategygreedy";
 import type { StrategyInput } from "../strategies/strategyinput";
@@ -120,5 +121,35 @@ describe("Strategies", () => {
 
         expect(["blue", "yellow", "red"]).toContain(color);
         expect(color).not.toBe("green");
+    });
+
+    it("greedy tie-break uses random source when gains are equal", () => {
+        const { input } = buildOwnedGrid();
+        const randomSource: RandomSource = { next: () => 1 };
+        const spy = vi.spyOn(CaptureSimulator, "simulate").mockReturnValue({
+            gained: 1,
+            newOwnedSet: new Set<Cell>()
+        });
+
+        const selected = new StrategyGreedy(randomSource).chooseColor(input);
+
+        expect(selected).toBe("yellow");
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it("minimax tie-break uses random source when scores are equal", () => {
+        const { input } = buildOwnedGrid();
+        const randomSource: RandomSource = { next: () => 1 };
+        const spy = vi.spyOn(CaptureSimulator, "simulate").mockImplementation((_, __, owned) => {
+            if (owned.has(input.cells[0][0])) {
+                return { gained: 0, newOwnedSet: new Set<Cell>() };
+            }
+            return { gained: 0, newOwnedSet: new Set<Cell>() };
+        });
+
+        const selected = new StrategyMinimax(randomSource).chooseColor(input);
+
+        expect(selected).toBe("yellow");
+        expect(spy).toHaveBeenCalled();
     });
 });

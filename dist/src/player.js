@@ -58,14 +58,14 @@ export class Player {
     }
     computeScoreDelta(mutations) {
         let delta = 0;
-        mutations.forEach((mutation) => {
+        for (const mutation of mutations.values()) {
             const beforeOwned = mutation.before.occupied && mutation.before.owner === this.m_PlayerName;
             const afterOwned = mutation.after.occupied && mutation.after.owner === this.m_PlayerName;
             if (beforeOwned === afterOwned) {
-                return;
+                continue;
             }
             delta += afterOwned ? 1 : -1;
-        });
+        }
         return delta;
     }
     counterUpdate(cells, definitions, scoreDelta) {
@@ -74,13 +74,13 @@ export class Player {
         }
         else {
             this.m_CellCounter = 0;
-            cells.forEach((currentRow) => {
-                currentRow.forEach((currentCell) => {
+            for (const currentRow of cells) {
+                for (const currentCell of currentRow) {
                     if (currentCell.m_Occupied && this.m_PlayerName === currentCell.m_Owner) {
                         this.m_CellCounter += 1;
                     }
-                });
-            });
+                }
+            }
             this.m_HasScoreBaseline = true;
         }
         this.m_NotifyUI({
@@ -146,13 +146,13 @@ export class Player {
             if (mutations) {
                 Player.trackMutationEnd(currentCell, mutations);
             }
-            currentCell.neighboursGet(cells, definitions).forEach((newCell) => {
+            for (const newCell of currentCell.neighboursGet(cells, definitions)) {
                 if (queued.has(newCell)) {
-                    return;
+                    continue;
                 }
                 queued.add(newCell);
                 queue.push(newCell);
-            });
+            }
         }
         const scoreDelta = mutations ? this.computeScoreDelta(mutations) : undefined;
         this.counterUpdate(cells, definitions, scoreDelta);

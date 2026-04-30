@@ -1,11 +1,16 @@
 import { Cell } from "../cell.js";
+import { type RandomSource, MathRandomSource } from "../randomsource.js";
 import { CaptureSimulator } from "./capturesimulator.js";
 import type { IComputerStrategy } from "./icomputerstrategy.js";
 import type { StrategyInput } from "./strategyinput.js";
-export class StrategyMinimax implements IComputerStrategy
-{
-    chooseColor(input: StrategyInput): string
-    {
+export class StrategyMinimax implements IComputerStrategy {
+    private m_RandomSource: RandomSource;
+
+    constructor(randomSource: RandomSource = MathRandomSource) {
+        this.m_RandomSource = randomSource;
+    }
+
+    chooseColor(input: StrategyInput): string {
         const {
             cells,
             definitions,
@@ -23,20 +28,15 @@ export class StrategyMinimax implements IComputerStrategy
         const humanOwned = new Set<Cell>();
         const allColors = new Set<string>();
 
-        cells.forEach((row) =>
-        {
-            row.forEach((cell) =>
-            {
-                if (cell.m_Owner === compPlayerName)
-                {
+        cells.forEach((row) => {
+            row.forEach((cell) => {
+                if (cell.m_Owner === compPlayerName) {
                     compOwned.add(cell);
                 }
-                else if (cell.m_Owner === humanPlayerName)
-                {
+                else if (cell.m_Owner === humanPlayerName) {
                     humanOwned.add(cell);
                 }
-                if (!cell.m_Occupied)
-                {
+                if (!cell.m_Occupied) {
                     allColors.add(cell.m_Color);
                 }
             });
@@ -45,10 +45,8 @@ export class StrategyMinimax implements IComputerStrategy
         let bestColor = compCurrentColor;
         let bestScore = -Infinity;
 
-        for (const compColor of allColors)
-        {
-            if (compColor === newColorPlayer || compColor === compCurrentColor)
-            {
+        for (const compColor of allColors) {
+            if (compColor === newColorPlayer || compColor === compCurrentColor) {
                 continue;
             }
 
@@ -56,36 +54,29 @@ export class StrategyMinimax implements IComputerStrategy
                 CaptureSimulator.simulate(cells, definitions, compOwned, humanOwned, compColor);
 
             const frontierColors = new Set<string>();
-            for (const cell of compOwned2)
-            {
-                for (const offset of definitions.Offsets)
-                {
+            for (const cell of compOwned2) {
+                for (const offset of definitions.Offsets) {
                     const ny = cell.m_PosY + offset.DY;
                     const nx = cell.m_PosX + offset.DX;
-                    if (ny < 0 || ny >= definitions.DimensionY || nx < 0 || nx >= definitions.DimensionX)
-                    {
+                    if (ny < 0 || ny >= definitions.DimensionY || nx < 0 || nx >= definitions.DimensionX) {
                         continue;
                     }
                     const neighbor = cells[ny]?.[nx];
-                    if (neighbor && !neighbor.m_Occupied && !compOwned2.has(neighbor) && !humanOwned.has(neighbor))
-                    {
+                    if (neighbor && !neighbor.m_Occupied && !compOwned2.has(neighbor) && !humanOwned.has(neighbor)) {
                         frontierColors.add(neighbor.m_Color);
                     }
                 }
             }
 
             let bestHumanGain = 0;
-            for (const humanColor of allColors)
-            {
-                if (humanColor === compColor || humanColor === humanCurrentColor)
-                {
+            for (const humanColor of allColors) {
+                if (humanColor === compColor || humanColor === humanCurrentColor) {
                     continue;
                 }
 
                 const { gained: humanGain } =
                     CaptureSimulator.simulate(cells, definitions, humanOwned, compOwned2, humanColor);
-                if (humanGain > bestHumanGain)
-                {
+                if (humanGain > bestHumanGain) {
                     bestHumanGain = humanGain;
                 }
             }
@@ -95,9 +86,11 @@ export class StrategyMinimax implements IComputerStrategy
                 - bestHumanGain * DENY_WEIGHT
                 + frontierColors.size * DIVERSITY_WEIGHT;
 
-            if (score > bestScore)
-            {
+            if (score > bestScore) {
                 bestScore = score;
+                bestColor = compColor;
+            }
+            else if (score === bestScore && this.m_RandomSource.next() >= 0.5) {
                 bestColor = compColor;
             }
         }

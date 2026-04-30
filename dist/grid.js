@@ -1,18 +1,19 @@
 import { Cell } from "./cell.js";
 import { Definitions } from "./definitions.js";
+import { MathRandomSource } from "./randomsource.js";
 export class Grid {
     m_Cells;
     constructor() {
         this.m_Cells = [];
     }
-    gridInit(definitions, canvasElement) {
+    gridInit(definitions, canvasElement, randomSource = MathRandomSource) {
         this.m_Cells = [];
         for (let loopY = 0; loopY < definitions.DimensionY; loopY += 1) {
             const row = [];
             this.m_Cells[loopY] = row;
             for (let loopX = 0; loopX < definitions.DimensionX; loopX += 1) {
                 const currentCell = new Cell(loopX, loopY);
-                currentCell.m_Color = currentCell.cellColorRandomGet(definitions.Colors);
+                currentCell.m_Color = currentCell.cellColorRandomGet(definitions.Colors, randomSource);
                 currentCell.draw(definitions, canvasElement);
                 row.push(currentCell);
             }

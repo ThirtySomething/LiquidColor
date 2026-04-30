@@ -1,12 +1,25 @@
 import { Util } from "./util.js";
+export const BrowserTimerRuntime = {
+    now() {
+        return Date.now();
+    },
+    setInterval(callback, delayMs) {
+        return window.setInterval(callback, delayMs);
+    },
+    clearInterval(intervalId) {
+        window.clearInterval(intervalId);
+    }
+};
 export class Timer {
     m_IDDuration;
     m_StartTimestamp;
     m_Ticker;
-    constructor(idDuration) {
+    m_Runtime;
+    constructor(idDuration, runtime = BrowserTimerRuntime) {
         this.m_IDDuration = idDuration;
         this.m_StartTimestamp = null;
         this.m_Ticker = null;
+        this.m_Runtime = runtime;
     }
     formatDuration(ms) {
         const totalSeconds = Math.max(0, Math.floor(ms / 1000));
@@ -17,20 +30,20 @@ export class Timer {
     updateDisplay() {
         const elapsedMs = this.m_StartTimestamp === null
             ? 0
-            : Date.now() - this.m_StartTimestamp;
+            : this.m_Runtime.now() - this.m_StartTimestamp;
         Util.setText(this.m_IDDuration, `Duration: ${this.formatDuration(elapsedMs)}`);
     }
     startTicker() {
         if (this.m_Ticker !== null) {
-            window.clearInterval(this.m_Ticker);
+            this.m_Runtime.clearInterval(this.m_Ticker);
         }
-        this.m_Ticker = window.setInterval(() => {
+        this.m_Ticker = this.m_Runtime.setInterval(() => {
             this.updateDisplay();
         }, 1000);
     }
     reset() {
         if (this.m_Ticker !== null) {
-            window.clearInterval(this.m_Ticker);
+            this.m_Runtime.clearInterval(this.m_Ticker);
             this.m_Ticker = null;
         }
         this.m_StartTimestamp = null;
@@ -40,12 +53,12 @@ export class Timer {
         if (this.m_StartTimestamp !== null) {
             return;
         }
-        this.m_StartTimestamp = Date.now();
+        this.m_StartTimestamp = this.m_Runtime.now();
         this.updateDisplay();
     }
     stop() {
         if (this.m_Ticker !== null) {
-            window.clearInterval(this.m_Ticker);
+            this.m_Runtime.clearInterval(this.m_Ticker);
             this.m_Ticker = null;
         }
         this.updateDisplay();

@@ -1,14 +1,15 @@
 import { CommandInvoker } from "./commands/commandinvoker.js";
 import { CommandPlayColor } from "./commands/commandplaycolor.js";
 import { Definitions } from "./definitions.js";
-import { type GamePhaseName, type IGamePhase, GamePhase } from "./gamephase.js";
+import { GamePhase, type GamePhaseName, type IGamePhase } from "./gamephase.js";
 import { Grid } from "./grid.js";
-import { Highscore } from "./highscore.js";
+import { Highscore, type HighscoreRepository } from "./highscore.js";
 import type { HighscoreWinner } from "./highscorewinner.js";
 import { Player } from "./player.js";
+import { MathRandomSource, type RandomSource } from "./randomsource.js";
 import type { ComputerStrategy } from "./strategies/computerstrategytype.js";
 import { Subject } from "./subject.js";
-import { Timer } from "./timer.js";
+import { Timer, type TimerRuntime } from "./timer.js";
 import { UiFacade } from "./uifacade.js";
 import { Util } from "./util.js";
 
@@ -43,6 +44,13 @@ export type BoardStateSnapshot = {
     };
 };
 
+export type BoardDependencies = {
+    timer?: Timer;
+    timerRuntime?: TimerRuntime;
+    highscoreRepository?: HighscoreRepository;
+    randomSource?: RandomSource;
+};
+
 export class Board {
     private static instance: Board | null = null;
 
@@ -58,10 +66,16 @@ export class Board {
     m_ComputerStrategy: ComputerStrategy;
     m_Phase: IGamePhase;
     m_Highscore: Highscore;
+    m_RandomSource: RandomSource;
     m_UISubject: Subject;
     m_CommandInvoker: CommandInvoker;
 
-    private constructor(definitions: Definitions, playerHuman: Player, playerComputer: Player) {
+    private constructor(
+        definitions: Definitions,
+        playerHuman: Player,
+        playerComputer: Player,
+        dependencies: BoardDependencies = {}
+    ) {
         this.m_CanvasElement = null;
         this.m_Definitions = definitions;
         this.m_PlayerHuman = playerHuman;
@@ -70,10 +84,11 @@ export class Board {
         this.m_IDGameField = "";
         this.m_IDButtonField = "";
         this.m_IDWinner = "";
-        this.m_Timer = new Timer("gameduration");
+        this.m_Timer = dependencies.timer ?? new Timer("gameduration", dependencies.timerRuntime);
         this.m_ComputerStrategy = "minimax";
         this.m_Phase = GamePhase.Setup();
-        this.m_Highscore = new Highscore();
+        this.m_Highscore = new Highscore(dependencies.highscoreRepository);
+        this.m_RandomSource = dependencies.randomSource ?? MathRandomSource;
         this.m_UISubject = new Subject();
         this.m_CommandInvoker = new CommandInvoker();
     }
@@ -83,9 +98,14 @@ export class Board {
         return trimmed.length > 0 ? trimmed : "Besucher";
     }
 
-    static initialize(definitions: Definitions, playerHuman: Player, playerComputer: Player): void {
+    static initialize(
+        definitions: Definitions,
+        playerHuman: Player,
+        playerComputer: Player,
+        dependencies: BoardDependencies = {}
+    ): void {
         if (!Board.instance) {
-            Board.instance = new Board(definitions, playerHuman, playerComputer);
+            Board.instance = new Board(definitions, playerHuman, playerComputer, dependencies);
         }
     }
 
@@ -279,7 +299,7 @@ export class Board {
         if (!this.m_CanvasElement) {
             return;
         }
-        this.m_Grid.gridInit(this.m_Definitions, this.m_CanvasElement);
+        this.m_Grid.gridInit(this.m_Definitions, this.m_CanvasElement, this.m_RandomSource);
     }
 
     boardButtonsInit(buttonField: string): void {
@@ -330,7 +350,8 @@ export class Board {
             this.m_Grid.m_Cells,
             [newColorPlayer],
             this.m_Definitions,
-            this.m_CanvasElement
+            this.m_CanvasElement,
+            this.m_RandomSource
         );
         if (this.evaluateGameState()) {
             return;
@@ -341,7 +362,8 @@ export class Board {
             this.m_Definitions,
             newColorPlayer,
             this.m_PlayerHuman,
-            this.m_ComputerStrategy
+            this.m_ComputerStrategy,
+            this.m_RandomSource
         );
 
         this.m_Grid.gridReset();
@@ -349,7 +371,8 @@ export class Board {
             this.m_Grid.m_Cells,
             [newColorComputer],
             this.m_Definitions,
-            this.m_CanvasElement
+            this.m_CanvasElement,
+            this.m_RandomSource
         );
 
         this.evaluateGameState();

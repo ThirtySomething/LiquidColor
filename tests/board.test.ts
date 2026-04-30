@@ -4,7 +4,10 @@ import { Board } from "../board";
 import { Cell } from "../cell";
 import { Definitions } from "../definitions";
 import { GamePhase } from "../gamephase";
+import type { HighscoreRepository, HighscoreSnapshot } from "../highscore";
 import { Player } from "../player";
+import type { RandomSource } from "../randomsource";
+import { type TimerRuntime, Timer } from "../timer";
 
 const mockCtx = (): CanvasRenderingContext2D => ({
     beginPath: vi.fn(),
@@ -371,6 +374,48 @@ describe("Board", () => {
         board.m_CanvasElement = null;
 
         expect(() => board.boardInit()).not.toThrow();
+    });
+
+    it("accepts injected timer, storage repository, and random source", () => {
+        localStorage.clear();
+        setupDom();
+        Definitions.initialize(2, 2, 10);
+        const definitions = Definitions.getInstance();
+        const human = new Player("Human", "name_human", "score_human", () => undefined);
+        const computer = new Player("CPU", "name_computer", "score_computer", () => undefined);
+
+        class InMemoryRepository implements HighscoreRepository {
+            private m_Snapshot: HighscoreSnapshot | null = { humanWins: 2, computerWins: 1, draws: 3 };
+
+            load(): HighscoreSnapshot | null {
+                return this.m_Snapshot;
+            }
+
+            save(snapshot: HighscoreSnapshot): void {
+                this.m_Snapshot = { ...snapshot };
+            }
+        }
+
+        const timerRuntime: TimerRuntime = {
+            now: () => 1_000,
+            setInterval: vi.fn(() => 1),
+            clearInterval: vi.fn()
+        };
+        const timer = new Timer("gameduration", timerRuntime);
+        const randomSource: RandomSource = { next: vi.fn(() => 0) };
+        resetBoardSingleton();
+        Board.initialize(definitions, human, computer, {
+            timer,
+            highscoreRepository: new InMemoryRepository(),
+            randomSource
+        });
+        const board = Board.getInstance();
+        board.init("gamearea", "playbuttons", "winner");
+
+        expect(board.m_Timer).toBe(timer);
+        expect(board.m_RandomSource).toBe(randomSource);
+        expect(document.getElementById("highscore_total")?.textContent).toBe("6");
+        expect(randomSource.next).toHaveBeenCalled();
     });
 
     describe("game phase transitions", () => {

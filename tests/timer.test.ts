@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { Timer } from "../timer";
+import { type TimerRuntime, Timer } from "../timer";
 
 const setupDom = (): void => {
     document.body.innerHTML = '<div id="gameduration"></div>';
@@ -73,5 +73,29 @@ describe("Timer", () => {
         expect(clearSpy).toHaveBeenCalled();
         expect(timer.m_Ticker).toBeNull();
         expect(document.getElementById("gameduration")?.textContent).toBe("Duration: 00:06");
+    });
+
+    it("supports injected runtime for deterministic clock and scheduler", () => {
+        let now = 1_000;
+        let callback: (() => void) | null = null;
+        const runtime: TimerRuntime = {
+            now: () => now,
+            setInterval: (cb) => {
+                callback = cb;
+                return 77;
+            },
+            clearInterval: vi.fn()
+        };
+
+        const timer = new Timer("gameduration", runtime);
+        timer.startCounting();
+        timer.startTicker();
+
+        now = 3_000;
+        callback?.();
+
+        expect(document.getElementById("gameduration")?.textContent).toBe("Duration: 00:02");
+        timer.stop();
+        expect(runtime.clearInterval).toHaveBeenCalledWith(77);
     });
 });

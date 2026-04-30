@@ -2,6 +2,7 @@ import { Board } from "./board.js";
 import { Cell } from "./cell.js";
 import { Definitions } from "./definitions.js";
 import type { ObserverData } from "./observerdata.js";
+import { type RandomSource, MathRandomSource } from "./randomsource.js";
 import { ComputerStrategyFactory } from "./strategies/computerstrategyfactory.js";
 import type { ComputerStrategy } from "./strategies/computerstrategytype.js";
 import { Util } from "./util.js";
@@ -77,13 +78,14 @@ export class Player {
         cells: Cell[][],
         colors: string[],
         definitions: Definitions,
-        canvasElement: CanvasRenderingContext2D | null
+        canvasElement: CanvasRenderingContext2D | null,
+        randomSource: RandomSource = MathRandomSource
     ): void {
         if (!this.m_BaseCell || !canvasElement) {
             return;
         }
 
-        this.m_BaseCell.m_Color = this.m_BaseCell.cellColorRandomGet(colors);
+        this.m_BaseCell.m_Color = this.m_BaseCell.cellColorRandomGet(colors, randomSource);
         this.m_BaseCell.draw(definitions, canvasElement);
         this.cellsMarkOwner(cells, definitions, canvasElement);
     }
@@ -126,7 +128,8 @@ export class Player {
         definitions: Definitions,
         newColorPlayer: string,
         opponent: Player,
-        strategy: ComputerStrategy = "minimax"
+        strategy: ComputerStrategy = "minimax",
+        randomSource: RandomSource = MathRandomSource
     ): string {
         if (!this.m_BaseCell || !opponent.m_BaseCell) {
             return newColorPlayer;
@@ -140,6 +143,6 @@ export class Player {
             humanPlayerName: opponent.m_PlayerName,
             compCurrentColor: this.m_BaseCell.m_Color,
             humanCurrentColor: opponent.m_BaseCell.m_Color
-        });
+        }, randomSource);
     }
 }

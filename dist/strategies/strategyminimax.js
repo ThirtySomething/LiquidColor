@@ -1,6 +1,11 @@
 import { Cell } from "../cell.js";
+import { MathRandomSource } from "../randomsource.js";
 import { CaptureSimulator } from "./capturesimulator.js";
 export class StrategyMinimax {
+    m_RandomSource;
+    constructor(randomSource = MathRandomSource) {
+        this.m_RandomSource = randomSource;
+    }
     chooseColor(input) {
         const { cells, definitions, newColorPlayer, compPlayerName, humanPlayerName, compCurrentColor, humanCurrentColor } = input;
         const DENY_WEIGHT = 1.2;
@@ -57,6 +62,9 @@ export class StrategyMinimax {
                 + frontierColors.size * DIVERSITY_WEIGHT;
             if (score > bestScore) {
                 bestScore = score;
+                bestColor = compColor;
+            }
+            else if (score === bestScore && this.m_RandomSource.next() >= 0.5) {
                 bestColor = compColor;
             }
         }

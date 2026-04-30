@@ -1,4 +1,5 @@
 import { Definitions } from "./definitions.js";
+import { MathRandomSource } from "./randomsource.js";
 export class Cell {
     m_PosX;
     m_PosY;
@@ -59,8 +60,8 @@ export class Cell {
         });
         return neighbours;
     }
-    cellColorRandomGet(colors) {
-        const colorIndex = Math.floor(Math.random() * colors.length);
+    cellColorRandomGet(colors, randomSource = MathRandomSource) {
+        const colorIndex = Math.floor(randomSource.next() * colors.length);
         return colors[colorIndex] ?? this.m_Color;
     }
     isBorderCell(cells, definitions) {

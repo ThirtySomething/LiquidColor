@@ -1,6 +1,11 @@
 import { Cell } from "../cell.js";
+import { MathRandomSource } from "../randomsource.js";
 import { CaptureSimulator } from "./capturesimulator.js";
 export class StrategyGreedy {
+    m_RandomSource;
+    constructor(randomSource = MathRandomSource) {
+        this.m_RandomSource = randomSource;
+    }
     chooseColor(input) {
         const { cells, definitions, newColorPlayer, compPlayerName, humanPlayerName, compCurrentColor } = input;
         const compOwned = new Set();
@@ -28,6 +33,9 @@ export class StrategyGreedy {
             const { gained } = CaptureSimulator.simulate(cells, definitions, compOwned, humanOwned, compColor);
             if (gained > bestGain) {
                 bestGain = gained;
+                bestColor = compColor;
+            }
+            else if (gained === bestGain && this.m_RandomSource.next() >= 0.5) {
                 bestColor = compColor;
             }
         }

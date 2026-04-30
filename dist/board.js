@@ -5,6 +5,7 @@ import { GamePhase } from "./gamephase.js";
 import { Grid } from "./grid.js";
 import { Highscore } from "./highscore.js";
 import { Player } from "./player.js";
+import { MathRandomSource } from "./randomsource.js";
 import { Subject } from "./subject.js";
 import { Timer } from "./timer.js";
 import { UiFacade } from "./uifacade.js";
@@ -23,9 +24,10 @@ export class Board {
     m_ComputerStrategy;
     m_Phase;
     m_Highscore;
+    m_RandomSource;
     m_UISubject;
     m_CommandInvoker;
-    constructor(definitions, playerHuman, playerComputer) {
+    constructor(definitions, playerHuman, playerComputer, dependencies = {}) {
         this.m_CanvasElement = null;
         this.m_Definitions = definitions;
         this.m_PlayerHuman = playerHuman;
@@ -34,10 +36,11 @@ export class Board {
         this.m_IDGameField = "";
         this.m_IDButtonField = "";
         this.m_IDWinner = "";
-        this.m_Timer = new Timer("gameduration");
+        this.m_Timer = dependencies.timer ?? new Timer("gameduration", dependencies.timerRuntime);
         this.m_ComputerStrategy = "minimax";
         this.m_Phase = GamePhase.Setup();
-        this.m_Highscore = new Highscore();
+        this.m_Highscore = new Highscore(dependencies.highscoreRepository);
+        this.m_RandomSource = dependencies.randomSource ?? MathRandomSource;
         this.m_UISubject = new Subject();
         this.m_CommandInvoker = new CommandInvoker();
     }
@@ -45,9 +48,9 @@ export class Board {
         const trimmed = playerName.trim();
         return trimmed.length > 0 ? trimmed : "Besucher";
     }
-    static initialize(definitions, playerHuman, playerComputer) {
+    static initialize(definitions, playerHuman, playerComputer, dependencies = {}) {
         if (!Board.instance) {
-            Board.instance = new Board(definitions, playerHuman, playerComputer);
+            Board.instance = new Board(definitions, playerHuman, playerComputer, dependencies);
         }
     }
     static getInstance() {
@@ -198,7 +201,7 @@ export class Board {
         if (!this.m_CanvasElement) {
             return;
         }
-        this.m_Grid.gridInit(this.m_Definitions, this.m_CanvasElement);
+        this.m_Grid.gridInit(this.m_Definitions, this.m_CanvasElement, this.m_RandomSource);
     }
     boardButtonsInit(buttonField) {
         const buttonContainer = UiFacade.getElement(buttonField);
@@ -237,13 +240,13 @@ export class Board {
         }
         this.m_Timer.startCounting();
         this.m_Grid.gridReset();
-        this.m_PlayerHuman.move(this.m_Grid.m_Cells, [newColorPlayer], this.m_Definitions, this.m_CanvasElement);
+        this.m_PlayerHuman.move(this.m_Grid.m_Cells, [newColorPlayer], this.m_Definitions, this.m_CanvasElement, this.m_RandomSource);
         if (this.evaluateGameState()) {
             return;
         }
-        const newColorComputer = this.m_PlayerComputer.identifyBestColor(this.m_Grid.m_Cells, this.m_Definitions, newColorPlayer, this.m_PlayerHuman, this.m_ComputerStrategy);
+        const newColorComputer = this.m_PlayerComputer.identifyBestColor(this.m_Grid.m_Cells, this.m_Definitions, newColorPlayer, this.m_PlayerHuman, this.m_ComputerStrategy, this.m_RandomSource);
         this.m_Grid.gridReset();
-        this.m_PlayerComputer.move(this.m_Grid.m_Cells, [newColorComputer], this.m_Definitions, this.m_CanvasElement);
+        this.m_PlayerComputer.move(this.m_Grid.m_Cells, [newColorComputer], this.m_Definitions, this.m_CanvasElement, this.m_RandomSource);
         this.evaluateGameState();
     }
     getScoreStats() {

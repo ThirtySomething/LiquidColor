@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { Cell } from "../cell";
 import { Definitions } from "../definitions";
+import type { RandomSource } from "../randomsource";
 import { ComputerStrategyFactory } from "../strategies/computerstrategyfactory";
 import { StrategyGreedy } from "../strategies/strategygreedy";
 import type { StrategyInput } from "../strategies/strategyinput";
@@ -109,5 +110,15 @@ describe("Strategies", () => {
 
         expect(new StrategyGreedy().chooseColor(input)).toBe("red");
         expect(new StrategyMinimax().chooseColor(input)).toBe("red");
+    });
+
+    it("factory accepts injected random source for AI tie-breaking", () => {
+        const { input } = buildOwnedGrid();
+        const randomSource: RandomSource = { next: () => 1 };
+
+        const color = ComputerStrategyFactory.chooseComputerColor("greedy", input, randomSource);
+
+        expect(["blue", "yellow", "red"]).toContain(color);
+        expect(color).not.toBe("green");
     });
 });

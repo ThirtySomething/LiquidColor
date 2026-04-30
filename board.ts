@@ -1,6 +1,7 @@
 import { CommandInvoker } from "./commands/commandinvoker.js";
 import { CommandPlayColor } from "./commands/commandplaycolor.js";
 import { Definitions } from "./definitions.js";
+import { type GamePhaseName, type IGamePhase, GamePhase } from "./gamephase.js";
 import { Grid } from "./grid.js";
 import { Highscore } from "./highscore.js";
 import type { HighscoreWinner } from "./highscorewinner.js";
@@ -32,7 +33,7 @@ type BoardUiState = {
 
 export type BoardStateSnapshot = {
     cells: CellState[][];
-    gameOver: boolean;
+    phase: GamePhaseName;
     ui: BoardUiState;
     highscore: {
         humanWins: number;
@@ -54,7 +55,7 @@ export class Board {
     m_IDWinner: string;
     m_Timer: Timer;
     m_ComputerStrategy: ComputerStrategy;
-    m_GameOver: boolean;
+    m_Phase: IGamePhase;
     m_Highscore: Highscore;
     m_UISubject: Subject;
     m_CommandInvoker: CommandInvoker;
@@ -70,7 +71,7 @@ export class Board {
         this.m_IDWinner = "";
         this.m_Timer = new Timer("gameduration");
         this.m_ComputerStrategy = "minimax";
-        this.m_GameOver = false;
+        this.m_Phase = GamePhase.Setup();
         this.m_Highscore = new Highscore();
         this.m_UISubject = new Subject();
         this.m_CommandInvoker = new CommandInvoker();
@@ -114,7 +115,7 @@ export class Board {
 
         return {
             cells,
-            gameOver: this.m_GameOver,
+            phase: this.m_Phase.name,
             ui: {
                 winnerText: winnerElement?.textContent ?? "",
                 winnerVisible: winnerElement ? !winnerElement.classList.contains("dspno") : false,
@@ -160,7 +161,7 @@ export class Board {
             ? (computerBaseRow[this.m_Definitions.DimensionX - 1] ?? null)
             : null;
 
-        this.m_GameOver = snapshot.gameOver;
+        this.m_Phase = GamePhase.from(snapshot.phase);
         this.m_Highscore.restoreSnapshot(snapshot.highscore);
         this.m_Highscore.render(this.m_PlayerHuman.m_PlayerName, this.m_PlayerComputer.m_PlayerName);
 
@@ -249,7 +250,7 @@ export class Board {
     }
 
     playerInit(idWinner: string): void {
-        this.m_GameOver = false;
+        this.m_Phase = GamePhase.InProgress();
         this.m_Timer.reset();
         this.m_Timer.startTicker();
         const winnerElement = document.getElementById(idWinner);
@@ -323,7 +324,7 @@ export class Board {
     }
 
     performMove(newColorPlayer: string): void {
-        if (this.m_GameOver || !this.m_PlayerHuman.m_BaseCell || !this.m_PlayerComputer.m_BaseCell) {
+        if (!this.m_Phase.canAcceptMove() || !this.m_PlayerHuman.m_BaseCell || !this.m_PlayerComputer.m_BaseCell) {
             return;
         }
 
@@ -399,7 +400,7 @@ export class Board {
     }
 
     endGame(message: string, winner: HighscoreWinner): void {
-        this.m_GameOver = true;
+        this.m_Phase = GamePhase.GameOver();
         this.m_Timer.stop();
         this.m_Highscore.recordWin(winner);
         this.m_Highscore.render(this.m_PlayerHuman.m_PlayerName, this.m_PlayerComputer.m_PlayerName);

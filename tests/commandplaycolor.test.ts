@@ -12,7 +12,7 @@ type BoardStub = {
 const createBoardStub = (): BoardStub => {
     const snapshotBefore: BoardStateSnapshot = {
         cells: [],
-        gameOver: false,
+        phase: "inprogress",
         ui: {
             winnerText: "",
             winnerVisible: false,
@@ -28,7 +28,7 @@ const createBoardStub = (): BoardStub => {
 
     const snapshotAfter: BoardStateSnapshot = {
         ...snapshotBefore,
-        gameOver: true
+        phase: "gameover"
     };
 
     return {

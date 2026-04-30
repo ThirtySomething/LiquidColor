@@ -30,6 +30,7 @@
         "grid.ts",
         "highscorewinner.ts",
         "highscore.ts",
+        "gamephase.ts",
         "player.ts",
         "board.ts",
         "liquidcolor.ts"

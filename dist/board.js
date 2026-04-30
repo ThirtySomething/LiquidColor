@@ -1,6 +1,7 @@
 import { CommandInvoker } from "./commands/commandinvoker.js";
 import { CommandPlayColor } from "./commands/commandplaycolor.js";
 import { Definitions } from "./definitions.js";
+import { GamePhase } from "./gamephase.js";
 import { Grid } from "./grid.js";
 import { Highscore } from "./highscore.js";
 import { Player } from "./player.js";
@@ -19,7 +20,7 @@ export class Board {
     m_IDWinner;
     m_Timer;
     m_ComputerStrategy;
-    m_GameOver;
+    m_Phase;
     m_Highscore;
     m_UISubject;
     m_CommandInvoker;
@@ -34,7 +35,7 @@ export class Board {
         this.m_IDWinner = "";
         this.m_Timer = new Timer("gameduration");
         this.m_ComputerStrategy = "minimax";
-        this.m_GameOver = false;
+        this.m_Phase = GamePhase.Setup();
         this.m_Highscore = new Highscore();
         this.m_UISubject = new Subject();
         this.m_CommandInvoker = new CommandInvoker();
@@ -70,7 +71,7 @@ export class Board {
         })));
         return {
             cells,
-            gameOver: this.m_GameOver,
+            phase: this.m_Phase.name,
             ui: {
                 winnerText: winnerElement?.textContent ?? "",
                 winnerVisible: winnerElement ? !winnerElement.classList.contains("dspno") : false,
@@ -110,7 +111,7 @@ export class Board {
         this.m_PlayerComputer.m_BaseCell = computerBaseRow
             ? (computerBaseRow[this.m_Definitions.DimensionX - 1] ?? null)
             : null;
-        this.m_GameOver = snapshot.gameOver;
+        this.m_Phase = GamePhase.from(snapshot.phase);
         this.m_Highscore.restoreSnapshot(snapshot.highscore);
         this.m_Highscore.render(this.m_PlayerHuman.m_PlayerName, this.m_PlayerComputer.m_PlayerName);
         const stats = this.getScoreStats();
@@ -183,7 +184,7 @@ export class Board {
         return "minimax";
     }
     playerInit(idWinner) {
-        this.m_GameOver = false;
+        this.m_Phase = GamePhase.InProgress();
         this.m_Timer.reset();
         this.m_Timer.startTicker();
         const winnerElement = document.getElementById(idWinner);
@@ -237,7 +238,7 @@ export class Board {
         });
     }
     performMove(newColorPlayer) {
-        if (this.m_GameOver || !this.m_PlayerHuman.m_BaseCell || !this.m_PlayerComputer.m_BaseCell) {
+        if (!this.m_Phase.canAcceptMove() || !this.m_PlayerHuman.m_BaseCell || !this.m_PlayerComputer.m_BaseCell) {
             return;
         }
         Util.hide("moveinfo");
@@ -287,7 +288,7 @@ export class Board {
         };
     }
     endGame(message, winner) {
-        this.m_GameOver = true;
+        this.m_Phase = GamePhase.GameOver();
         this.m_Timer.stop();
         this.m_Highscore.recordWin(winner);
         this.m_Highscore.render(this.m_PlayerHuman.m_PlayerName, this.m_PlayerComputer.m_PlayerName);

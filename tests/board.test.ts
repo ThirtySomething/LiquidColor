@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Board } from "../board";
 import { Cell } from "../cell";
 import { Definitions } from "../definitions";
+import { GamePhase } from "../gamephase";
 import { Player } from "../player";
 
 const mockCtx = (): CanvasRenderingContext2D => ({
@@ -133,13 +134,13 @@ describe("Board", () => {
 
     it("performMove exits when game is over or bases are missing", () => {
         const board = createBoard();
-        board.m_GameOver = true;
+        board.m_Phase = GamePhase.GameOver();
         const humanMoveSpy = vi.spyOn(board.m_PlayerHuman, "move");
 
         board.performMove("red");
         expect(humanMoveSpy).not.toHaveBeenCalled();
 
-        board.m_GameOver = false;
+        board.m_Phase = GamePhase.InProgress();
         board.m_PlayerHuman.m_BaseCell = null;
         board.performMove("blue");
         expect(humanMoveSpy).not.toHaveBeenCalled();
@@ -149,7 +150,7 @@ describe("Board", () => {
         const board = createBoard();
 
         const snapshot = board.createStateSnapshot();
-        board.m_GameOver = true;
+        board.m_Phase = GamePhase.GameOver();
         const winner = document.getElementById("winner") as HTMLElement;
         winner.textContent = "Changed";
         winner.classList.remove("dspno");
@@ -157,7 +158,7 @@ describe("Board", () => {
 
         board.restoreStateSnapshot(snapshot);
 
-        expect(board.m_GameOver).toBe(snapshot.gameOver);
+        expect(board.m_Phase.name).toBe(snapshot.phase);
         expect(document.getElementById("winner")?.textContent).toBe(snapshot.ui.winnerText);
     });
 
@@ -183,7 +184,7 @@ describe("Board", () => {
         const recordWinSpy = vi.spyOn(board.m_Highscore, "recordWin");
         board.endGame("Done", "human");
 
-        expect(board.m_GameOver).toBe(true);
+        expect(board.m_Phase.isOver()).toBe(true);
         expect(recordWinSpy).toHaveBeenCalledWith("human");
         expect(document.getElementById("winner")?.textContent).toBe("Done");
     });
@@ -283,7 +284,7 @@ describe("Board", () => {
                 [{ color: "red", owner: "Human", occupied: true }],
                 [{ color: "blue", owner: "CPU", occupied: true }]
             ],
-            gameOver: false,
+            phase: "inprogress" as const,
             ui: { winnerText: "", winnerVisible: false, moveInfoText: "", moveInfoVisible: false },
             highscore: { humanWins: 0, computerWins: 0, draws: 0 }
         };
@@ -298,7 +299,7 @@ describe("Board", () => {
 
         const emptySnapshot = {
             cells: [],
-            gameOver: false,
+            phase: "inprogress" as const,
             ui: { winnerText: "", winnerVisible: false, moveInfoText: "", moveInfoVisible: false },
             highscore: { humanWins: 0, computerWins: 0, draws: 0 }
         };
@@ -356,7 +357,7 @@ describe("Board", () => {
 
         const sparseSnapshot = {
             cells: [[{ color: "red", owner: "Human", occupied: true }, { color: "blue", owner: "CPU", occupied: true }]],
-            gameOver: false,
+            phase: "inprogress" as const,
             ui: { winnerText: "", winnerVisible: false, moveInfoText: "", moveInfoVisible: false },
             highscore: { humanWins: 0, computerWins: 0, draws: 0 }
         };
@@ -370,5 +371,45 @@ describe("Board", () => {
         board.m_CanvasElement = null;
 
         expect(() => board.boardInit()).not.toThrow();
+    });
+
+    describe("game phase transitions", () => {
+        it("phase starts as setup before init is called", () => {
+            localStorage.clear();
+            setupDom();
+            Definitions.initialize(2, 2, 10);
+            const definitions = Definitions.getInstance();
+            const human = new Player("Human", "name_human", "score_human", () => undefined);
+            const computer = new Player("CPU", "name_computer", "score_computer", () => undefined);
+            Board.initialize(definitions, human, computer);
+            const board = Board.getInstance();
+
+            expect(board.m_Phase.name).toBe("setup");
+            expect(board.m_Phase.canAcceptMove()).toBe(false);
+            expect(board.m_Phase.isOver()).toBe(false);
+        });
+
+        it("phase is inprogress after board init", () => {
+            const board = createBoard();
+            expect(board.m_Phase.name).toBe("inprogress");
+            expect(board.m_Phase.canAcceptMove()).toBe(true);
+            expect(board.m_Phase.isOver()).toBe(false);
+        });
+
+        it("transitions to gameover after endGame", () => {
+            const board = createBoard();
+            board.endGame("Done", "human");
+            expect(board.m_Phase.name).toBe("gameover");
+            expect(board.m_Phase.canAcceptMove()).toBe(false);
+            expect(board.m_Phase.isOver()).toBe(true);
+        });
+
+        it("transitions back to inprogress after reInit", () => {
+            const board = createBoard();
+            board.endGame("Done", "human");
+            board.reInit("dimx", "dimy", "cellsize", "playername", "computerstrategy");
+            expect(board.m_Phase.name).toBe("inprogress");
+        });
+
     });
 });

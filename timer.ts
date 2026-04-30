@@ -1,10 +1,7 @@
+import type { TimerRuntime } from "./types/timerruntime.js";
 import { Util } from "./util.js";
 
-export interface TimerRuntime {
-    now(): number;
-    setInterval(callback: () => void, delayMs: number): number;
-    clearInterval(intervalId: number): void;
-}
+export type { TimerRuntime } from "./types/timerruntime.js";
 
 export const BrowserTimerRuntime: TimerRuntime = {
     now(): number {

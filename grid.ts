@@ -2,8 +2,7 @@ import { Cell } from "./cell.js";
 import { Definitions } from "./definitions.js";
 import type { Player } from "./player.js";
 import { type RandomSource, MathRandomSource } from "./randomsource.js";
-
-type ColorCountMap = Record<string, number>;
+import type { ColorCountMap } from "./types/colorcountmap.js";
 
 export class Grid {
     m_Cells: Cell[][];

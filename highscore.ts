@@ -1,22 +1,15 @@
-import type { HighscoreWinner } from "./highscorewinner.js";
 import { LocalStorageHighscoreRepository } from "./localstoragehighscorerepository.js";
+import type { HighscoreData } from "./types/highscoredata.js";
+import type { HighscoreRepository } from "./types/highscorerepository.js";
+import type { HighscoreSnapshot } from "./types/highscoresnapshot.js";
+import type { HighscoreWinner } from "./types/highscorewinner.js";
 import { Util } from "./util.js";
 
-export type { HighscoreWinner } from "./highscorewinner.js";
 export { LocalStorageHighscoreRepository } from "./localstoragehighscorerepository.js";
-
-type HighscoreData = {
-    humanWins: number;
-    computerWins: number;
-    draws: number;
-};
-
-export type HighscoreSnapshot = HighscoreData;
-
-export interface HighscoreRepository {
-    load(): HighscoreSnapshot | null;
-    save(snapshot: HighscoreSnapshot): void;
-}
+export type { HighscoreData } from "./types/highscoredata.js";
+export type { HighscoreRepository } from "./types/highscorerepository.js";
+export type { HighscoreSnapshot } from "./types/highscoresnapshot.js";
+export type { HighscoreWinner } from "./types/highscorewinner.js";
 
 export class Highscore {
     private m_Data: HighscoreData;

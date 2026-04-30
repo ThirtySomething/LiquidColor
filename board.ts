@@ -1,70 +1,27 @@
 import { CommandInvoker } from "./commands/commandinvoker.js";
 import { CommandPlayColor } from "./commands/commandplaycolor.js";
 import { Definitions } from "./definitions.js";
-import { GamePhase, type GamePhaseName, type IGamePhase } from "./gamephase.js";
+import { GamePhase, type IGamePhase } from "./gamephase.js";
 import { Grid } from "./grid.js";
-import { Highscore, type HighscoreRepository, type HighscoreSnapshot } from "./highscore.js";
+import { Highscore } from "./highscore.js";
 import type { HighscoreWinner } from "./highscorewinner.js";
 import { Player } from "./player.js";
 import { MathRandomSource, type RandomSource } from "./randomsource.js";
 import type { ComputerStrategy } from "./strategies/computerstrategytype.js";
 import { Subject } from "./subject.js";
-import { Timer, type TimerRuntime } from "./timer.js";
+import { Timer } from "./timer.js";
+import type { BoardDependencies } from "./types/boarddependencies.js";
+import type { BoardHighscore } from "./types/boardhighscore.js";
+import type { BoardStateSnapshot } from "./types/boardstatesnapshot.js";
+import type { BoardTimer } from "./types/boardtimer.js";
+import type { ScoreStats } from "./types/scorestats.js";
 import { UiFacade } from "./uifacade.js";
 import { Util } from "./util.js";
 
-type ScoreStats = {
-    human: number;
-    computer: number;
-    occupied: number;
-    total: number;
-};
-
-type CellState = {
-    color: string;
-    owner: string;
-    occupied: boolean;
-};
-
-type BoardUiState = {
-    winnerText: string;
-    winnerVisible: boolean;
-    moveInfoText: string;
-    moveInfoVisible: boolean;
-};
-
-export type BoardStateSnapshot = {
-    cells: CellState[][];
-    phase: GamePhaseName;
-    ui: BoardUiState;
-    highscore: {
-        humanWins: number;
-        computerWins: number;
-        draws: number;
-    };
-};
-
-export interface BoardTimer {
-    reset(): void;
-    startTicker(): void;
-    startCounting(): void;
-    stop(): void;
-}
-
-export interface BoardHighscore {
-    recordWin(winner: HighscoreWinner): void;
-    render(humanName: string, computerName: string): void;
-    createSnapshot(): HighscoreSnapshot;
-    restoreSnapshot(snapshot: HighscoreSnapshot): void;
-}
-
-export type BoardDependencies = {
-    timer?: BoardTimer;
-    timerRuntime?: TimerRuntime;
-    highscore?: BoardHighscore;
-    highscoreRepository?: HighscoreRepository;
-    randomSource?: RandomSource;
-};
+export type { BoardDependencies } from "./types/boarddependencies.js";
+export type { BoardHighscore } from "./types/boardhighscore.js";
+export type { BoardStateSnapshot } from "./types/boardstatesnapshot.js";
+export type { BoardTimer } from "./types/boardtimer.js";
 
 export class Board {
     private static instance: Board | null = null;

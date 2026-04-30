@@ -1,10 +1,8 @@
-export type GamePhaseName = "setup" | "inprogress" | "gameover";
+import type { GamePhaseName } from "./types/gamephasename.js";
+import type { IGamePhase } from "./types/igamephase.js";
 
-export interface IGamePhase {
-    readonly name: GamePhaseName;
-    canAcceptMove(): boolean;
-    isOver(): boolean;
-}
+export type { GamePhaseName } from "./types/gamephasename.js";
+export type { IGamePhase } from "./types/igamephase.js";
 
 class SetupPhase implements IGamePhase {
     readonly name = "setup" as const;

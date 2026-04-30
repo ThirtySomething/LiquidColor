@@ -6,17 +6,9 @@ import { Definitions } from "./definitions.js";
 import packageInfo from "./package.json";
 import { Player } from "./player.js";
 import { ScoreObserver } from "./scoreobserver.js";
+import type { LiquidColorAppBindings } from "./types/liquidcolorappbindings.js";
+import type { LiquidColorAppOptions } from "./types/liquidcolorappoptions.js";
 import { WinnerObserver } from "./winnerobserver.js";
-
-type LiquidColorAppBindings = {
-    resetGame: () => void;
-    undoMove: () => void;
-    redoMove: () => void;
-};
-
-type LiquidColorAppOptions = {
-    useSetupComposition?: boolean;
-};
 
 function createBoardBindings(board: Board): LiquidColorAppBindings {
     const commandInvoker = board.getCommandInvoker();

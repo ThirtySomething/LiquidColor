@@ -1,1 +1,1 @@
-export type ComputerStrategy = "minimax" | "greedy";
+export type { ComputerStrategy } from "../types/computerstrategy.js";

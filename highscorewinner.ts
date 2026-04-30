@@ -1,1 +1,1 @@
-export type HighscoreWinner = "human" | "computer" | "draw";
+export type { HighscoreWinner } from "./types/highscorewinner.js";

@@ -1,4 +1,1 @@
-export interface ICommand {
-    execute(): void;
-    undo(): void;
-}
+export type { ICommand } from "../types/icommand.js";

@@ -14,6 +14,7 @@ export default defineConfig({
                 "vitest.config.ts",
                 // TypeScript declaration file
                 "vue-compiler-build.d.ts",
+                "types/**",
                 // Type-only files with no executable runtime code
                 "highscorewinner.ts",
                 "iobserver.ts",

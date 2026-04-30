@@ -1,13 +1,3 @@
-export interface ScoreData {
-    type: 'score';
-    player: string;
-    scoreElementId: string;
-    score: number;
-}
-
-export interface WinnerData {
-    type: 'winner';
-    player: string;
-}
-
-export type ObserverData = ScoreData | WinnerData;
+export type { ObserverData } from "./types/observerdata.js";
+export type { ScoreData } from "./types/scoredata.js";
+export type { WinnerData } from "./types/winnerdata.js";

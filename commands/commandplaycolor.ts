@@ -1,20 +1,7 @@
 import type { Board, BoardStateSnapshot } from "../board.js";
+import type { BoardStateDelta } from "../types/boardstatedelta.js";
+import type { CellDelta } from "../types/celldelta.js";
 import type { ICommand } from "./icommand.js";
-
-type CellDelta = {
-    y: number;
-    x: number;
-    color: string;
-    owner: string;
-    occupied: boolean;
-};
-
-type BoardStateDelta = {
-    cells: CellDelta[];
-    phase?: BoardStateSnapshot["phase"];
-    ui?: BoardStateSnapshot["ui"];
-    highscore?: BoardStateSnapshot["highscore"];
-};
 
 export class CommandPlayColor implements ICommand {
     private board: Board;

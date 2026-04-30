@@ -1,4 +1,1 @@
-export type Offset = {
-    DX: number;
-    DY: number;
-};
+export type { Offset } from "./types/offset.js";

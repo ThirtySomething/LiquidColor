@@ -1,8 +1,11 @@
+import { LocalStorageHighscoreRepository } from "./localstoragehighscorerepository.js";
 import { Util } from "./util.js";
+export { LocalStorageHighscoreRepository } from "./localstoragehighscorerepository.js";
 export class Highscore {
-    static STORAGE_KEY = "liquidcolor-highscore-v1";
     m_Data;
-    constructor() {
+    m_Repository;
+    constructor(repository = new LocalStorageHighscoreRepository()) {
+        this.m_Repository = repository;
         this.m_Data = this.load();
     }
     recordWin(winner) {
@@ -43,25 +46,9 @@ export class Highscore {
     }
     load() {
         const fallback = { humanWins: 0, computerWins: 0, draws: 0 };
-        try {
-            const raw = window.localStorage.getItem(Highscore.STORAGE_KEY);
-            if (!raw) {
-                return fallback;
-            }
-            const parsed = JSON.parse(raw);
-            const humanWins = Number(parsed.humanWins ?? 0);
-            const computerWins = Number(parsed.computerWins ?? 0);
-            const draws = Number(parsed.draws ?? 0);
-            if (Number.isNaN(humanWins) || Number.isNaN(computerWins) || Number.isNaN(draws)) {
-                return fallback;
-            }
-            return { humanWins, computerWins, draws };
-        }
-        catch {
-            return fallback;
-        }
+        return this.m_Repository.load() ?? fallback;
     }
     save() {
-        window.localStorage.setItem(Highscore.STORAGE_KEY, JSON.stringify(this.m_Data));
+        this.m_Repository.save(this.m_Data);
     }
 }

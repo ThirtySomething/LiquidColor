@@ -1,7 +1,9 @@
 import type { HighscoreWinner } from "./highscorewinner.js";
+import { LocalStorageHighscoreRepository } from "./localstoragehighscorerepository.js";
 import { Util } from "./util.js";
 
 export type { HighscoreWinner } from "./highscorewinner.js";
+export { LocalStorageHighscoreRepository } from "./localstoragehighscorerepository.js";
 
 type HighscoreData = {
     humanWins: number;
@@ -11,12 +13,17 @@ type HighscoreData = {
 
 export type HighscoreSnapshot = HighscoreData;
 
+export interface HighscoreRepository {
+    load(): HighscoreSnapshot | null;
+    save(snapshot: HighscoreSnapshot): void;
+}
+
 export class Highscore {
-    private static readonly STORAGE_KEY = "liquidcolor-highscore-v1";
-
     private m_Data: HighscoreData;
+    private m_Repository: HighscoreRepository;
 
-    constructor() {
+    constructor(repository: HighscoreRepository = new LocalStorageHighscoreRepository()) {
+        this.m_Repository = repository;
         this.m_Data = this.load();
     }
 
@@ -62,26 +69,10 @@ export class Highscore {
 
     private load(): HighscoreData {
         const fallback: HighscoreData = { humanWins: 0, computerWins: 0, draws: 0 };
-        try {
-            const raw = window.localStorage.getItem(Highscore.STORAGE_KEY);
-            if (!raw) {
-                return fallback;
-            }
-            const parsed = JSON.parse(raw) as Partial<HighscoreData>;
-            const humanWins = Number(parsed.humanWins ?? 0);
-            const computerWins = Number(parsed.computerWins ?? 0);
-            const draws = Number(parsed.draws ?? 0);
-            if (Number.isNaN(humanWins) || Number.isNaN(computerWins) || Number.isNaN(draws)) {
-                return fallback;
-            }
-            return { humanWins, computerWins, draws };
-        }
-        catch {
-            return fallback;
-        }
+        return this.m_Repository.load() ?? fallback;
     }
 
     private save(): void {
-        window.localStorage.setItem(Highscore.STORAGE_KEY, JSON.stringify(this.m_Data));
+        this.m_Repository.save(this.m_Data);
     }
 }

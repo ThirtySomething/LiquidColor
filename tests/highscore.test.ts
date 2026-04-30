@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { Highscore } from "../highscore";
+import { Highscore, LocalStorageHighscoreRepository, type HighscoreRepository, type HighscoreSnapshot } from "../highscore";
 
-const STORAGE_KEY = "liquidcolor-highscore-v1";
+const STORAGE_KEY = LocalStorageHighscoreRepository.STORAGE_KEY;
 
 const setupDom = (): void => {
     document.body.innerHTML = `
@@ -92,6 +92,35 @@ describe("Highscore", () => {
             humanWins: 0,
             computerWins: 0,
             draws: 0
+        });
+    });
+
+    it("supports custom repository backend via injection", () => {
+        class InMemoryRepository implements HighscoreRepository {
+            private m_Snapshot: HighscoreSnapshot | null;
+
+            constructor(initial: HighscoreSnapshot | null) {
+                this.m_Snapshot = initial;
+            }
+
+            load(): HighscoreSnapshot | null {
+                return this.m_Snapshot;
+            }
+
+            save(snapshot: HighscoreSnapshot): void {
+                this.m_Snapshot = { ...snapshot };
+            }
+        }
+
+        const repository = new InMemoryRepository({ humanWins: 2, computerWins: 1, draws: 3 });
+        const highscore = new Highscore(repository);
+
+        highscore.recordWin("computer");
+
+        expect(highscore.createSnapshot()).toEqual({
+            humanWins: 2,
+            computerWins: 2,
+            draws: 3
         });
     });
 });

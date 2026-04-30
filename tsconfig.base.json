@@ -31,6 +31,7 @@
         "grid.ts",
         "highscorewinner.ts",
         "highscore.ts",
+        "localstoragehighscorerepository.ts",
         "gamephase.ts",
         "player.ts",
         "board.ts",

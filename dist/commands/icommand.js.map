@@ -1,1 +1,0 @@
-{"version":3,"file":"icommand.js","sourceRoot":"","sources":["../../commands/icommand.ts"],"names":[],"mappings":"","sourcesContent":["export interface ICommand {\n    execute(): void;\n    undo(): void;\n}\n"]}

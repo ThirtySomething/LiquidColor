@@ -9,35 +9,35 @@ type HighscoreData = {
     draws: number;
 };
 
-export class Highscore 
+export class Highscore
 {
     private static readonly STORAGE_KEY = "liquidcolor-highscore-v1";
 
     private m_Data: HighscoreData;
 
-    constructor() 
+    constructor()
     {
         this.m_Data = this.load();
     }
 
-    recordWin(winner: HighscoreWinner): void 
+    recordWin(winner: HighscoreWinner): void
     {
-        if (winner === "human") 
+        if (winner === "human")
         {
             this.m_Data.humanWins += 1;
         }
-        else if (winner === "computer") 
+        else if (winner === "computer")
         {
             this.m_Data.computerWins += 1;
         }
-        else 
+        else
         {
             this.m_Data.draws += 1;
         }
         this.save();
     }
 
-    render(humanName: string, computerName: string): void 
+    render(humanName: string, computerName: string): void
     {
         const total = this.m_Data.humanWins + this.m_Data.computerWins + this.m_Data.draws;
         Util.setText("highscore_name_human", humanName);
@@ -48,13 +48,13 @@ export class Highscore
         Util.setText("highscore_total", String(total));
     }
 
-    private load(): HighscoreData 
+    private load(): HighscoreData
     {
         const fallback: HighscoreData = { humanWins: 0, computerWins: 0, draws: 0 };
-        try 
+        try
         {
             const raw = window.localStorage.getItem(Highscore.STORAGE_KEY);
-            if (!raw) 
+            if (!raw)
             {
                 return fallback;
             }
@@ -62,19 +62,19 @@ export class Highscore
             const humanWins = Number(parsed.humanWins ?? 0);
             const computerWins = Number(parsed.computerWins ?? 0);
             const draws = Number(parsed.draws ?? 0);
-            if (Number.isNaN(humanWins) || Number.isNaN(computerWins) || Number.isNaN(draws)) 
+            if (Number.isNaN(humanWins) || Number.isNaN(computerWins) || Number.isNaN(draws))
             {
                 return fallback;
             }
             return { humanWins, computerWins, draws };
         }
-        catch 
+        catch
         {
             return fallback;
         }
     }
 
-    private save(): void 
+    private save(): void
     {
         window.localStorage.setItem(Highscore.STORAGE_KEY, JSON.stringify(this.m_Data));
     }

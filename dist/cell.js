@@ -89,4 +89,3 @@ export class Cell {
         return isBorder;
     }
 }
-//# sourceMappingURL=cell.js.map

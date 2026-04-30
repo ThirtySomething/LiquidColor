@@ -56,4 +56,3 @@ export class Util {
         return Number.isNaN(parsed) ? fallback : parsed;
     }
 }
-//# sourceMappingURL=util.js.map

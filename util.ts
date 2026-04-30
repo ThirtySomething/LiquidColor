@@ -1,12 +1,12 @@
-export class Util 
+export class Util
 {
     static setElementSize(
         element: HTMLCanvasElement | null,
         width: number,
         height: number
-    ): void 
+    ): void
     {
-        if (!element) 
+        if (!element)
         {
             return;
         }
@@ -16,67 +16,67 @@ export class Util
         element.height = height;
     }
 
-    static getInputValue(id: string): string 
+    static getInputValue(id: string): string
     {
         const element = document.getElementById(id) as HTMLInputElement | null;
         return element ? element.value : "";
     }
 
-    static setInputValue(id: string, value: string | number): void 
+    static setInputValue(id: string, value: string | number): void
     {
         const element = document.getElementById(id) as HTMLInputElement | null;
-        if (element) 
+        if (element)
         {
             element.value = String(value);
         }
     }
 
-    static setText(id: string, value: string): void 
+    static setText(id: string, value: string): void
     {
         const element = document.getElementById(id);
-        if (element) 
+        if (element)
         {
             element.textContent = value;
         }
     }
 
-    static show(id: string, displayMode = "block"): void 
+    static show(id: string, displayMode = "block"): void
     {
         const element = document.getElementById(id);
-        if (element) 
+        if (element)
         {
             element.style.display = displayMode;
         }
     }
 
-    static hide(id: string): void 
+    static hide(id: string): void
     {
         const element = document.getElementById(id);
-        if (element) 
+        if (element)
         {
             element.style.display = "none";
         }
     }
 
-    static removeClass(id: string, className: string): void 
+    static removeClass(id: string, className: string): void
     {
         const element = document.getElementById(id);
-        if (element) 
+        if (element)
         {
             element.classList.remove(className);
         }
     }
 
-    static clearChildren(id: string): void 
+    static clearChildren(id: string): void
     {
         const element = document.getElementById(id);
-        if (element) 
+        if (element)
         {
             element.replaceChildren();
         }
     }
 
-    static getCssNumberVar(name: string, fallback = 0): number 
+    static getCssNumberVar(name: string, fallback = 0): number
     {
         const value = getComputedStyle(document.documentElement)
             .getPropertyValue(name)

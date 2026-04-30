@@ -3,9 +3,9 @@ import { CaptureSimulator } from "./capturesimulator.js";
 import type { IComputerStrategy } from "./icomputerstrategy.js";
 import type { StrategyInput } from "./strategyinput.js";
 
-export class StrategyGreedy implements IComputerStrategy 
+export class StrategyGreedy implements IComputerStrategy
 {
-    chooseColor(input: StrategyInput): string 
+    chooseColor(input: StrategyInput): string
     {
         const {
             cells,
@@ -20,19 +20,19 @@ export class StrategyGreedy implements IComputerStrategy
         const humanOwned = new Set<Cell>();
         const allColors = new Set<string>();
 
-        cells.forEach((row) => 
+        cells.forEach((row) =>
         {
-            row.forEach((cell) => 
+            row.forEach((cell) =>
             {
-                if (cell.m_Owner === compPlayerName) 
+                if (cell.m_Owner === compPlayerName)
                 {
                     compOwned.add(cell);
                 }
-                else if (cell.m_Owner === humanPlayerName) 
+                else if (cell.m_Owner === humanPlayerName)
                 {
                     humanOwned.add(cell);
                 }
-                if (!cell.m_Occupied) 
+                if (!cell.m_Occupied)
                 {
                     allColors.add(cell.m_Color);
                 }
@@ -42,15 +42,15 @@ export class StrategyGreedy implements IComputerStrategy
         let bestColor = compCurrentColor;
         let bestGain = -1;
 
-        for (const compColor of allColors) 
+        for (const compColor of allColors)
         {
-            if (compColor === newColorPlayer || compColor === compCurrentColor) 
+            if (compColor === newColorPlayer || compColor === compCurrentColor)
             {
                 continue;
             }
 
             const { gained } = CaptureSimulator.simulate(cells, definitions, compOwned, humanOwned, compColor);
-            if (gained > bestGain) 
+            if (gained > bestGain)
             {
                 bestGain = gained;
                 bestColor = compColor;

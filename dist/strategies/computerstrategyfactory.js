@@ -11,4 +11,3 @@ export class ComputerStrategyFactory {
         return this.create(strategy).chooseColor(input);
     }
 }
-//# sourceMappingURL=computerstrategyfactory.js.map

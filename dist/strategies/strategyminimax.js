@@ -63,4 +63,3 @@ export class StrategyMinimax {
         return bestColor;
     }
 }
-//# sourceMappingURL=strategyminimax.js.map

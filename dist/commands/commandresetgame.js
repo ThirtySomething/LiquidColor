@@ -22,4 +22,3 @@ export class CommandResetGame {
         console.log("Undo reset game");
     }
 }
-//# sourceMappingURL=commandresetgame.js.map

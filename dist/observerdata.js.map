@@ -1,1 +1,0 @@
-{"version":3,"file":"observerdata.js","sourceRoot":"","sources":["../observerdata.ts"],"names":[],"mappings":"","sourcesContent":["export interface ScoreData {\n    type: 'score';\n    player: string;\n    score: number;\n}\n\nexport interface WinnerData {\n    type: 'winner';\n    player: string;\n}\n\nexport type ObserverData = ScoreData | WinnerData;\n"]}

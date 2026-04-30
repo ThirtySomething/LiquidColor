@@ -1,1 +1,0 @@
-{"version":3,"file":"icomputerstrategy.js","sourceRoot":"","sources":["../../strategies/icomputerstrategy.ts"],"names":[],"mappings":"","sourcesContent":["import type { StrategyInput } from \"./strategyinput.js\";\n\nexport interface IComputerStrategy {\n    chooseColor(input: StrategyInput): string;\n}\n"]}

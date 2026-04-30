@@ -34,4 +34,3 @@ export class StrategyGreedy {
         return bestColor;
     }
 }
-//# sourceMappingURL=strategygreedy.js.map

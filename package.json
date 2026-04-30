@@ -1,31 +1,31 @@
 {
-    "name": "liquid-color",
-    "version": "1.0.0",
-    "private": true,
-    "scripts": {
-        "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
-        "build": "npm run build:prod",
-        "build:dev": "tsc -p tsconfig.dev.json && npm run build:bundle:dev",
-        "build:prod": "tsc -p tsconfig.prod.json && npm run build:bundle:prod",
-        "build:bundle:dev": "esbuild liquidcolor.ts --bundle --platform=browser --format=iife --target=es2020 --sourcemap --outfile=dist/liquidcolor.js",
-        "build:bundle:prod": "esbuild liquidcolor.ts --bundle --platform=browser --format=iife --target=es2020 --minify --outfile=dist/liquidcolor.js && node -e \"require('fs').rmSync('dist/liquidcolor.js.map', { force: true })\"",
-        "typecheck": "tsc --noEmit -p tsconfig.dev.json",
-        "lint": "eslint .",
-        "watch": "npm run watch:dev",
-        "watch:ts": "tsc --watch -p tsconfig.dev.json",
-        "watch:bundle": "esbuild liquidcolor.ts --bundle --platform=browser --format=iife --target=es2020 --sourcemap --outfile=dist/liquidcolor.js --watch",
-        "watch:dev": "concurrently -k -n TSC,ESBUILD -c cyan,magenta \"npm:watch:ts\" \"npm:watch:bundle\""
-    },
-    "devDependencies": {
-        "@eslint/js": "^9.39.4",
-        "concurrently": "^9.1.2",
-        "esbuild": "^0.25.3",
-        "eslint": "^9.39.4",
-        "globals": "^17.5.0",
-        "typescript": "^6.0.3",
-        "typescript-eslint": "^8.59.0"
-    },
-    "dependencies": {
-        "vue": "^3.5.33"
-    }
+  "name": "liquid-color",
+  "version": "1.2.0",
+  "private": true,
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "npm run build:prod",
+    "build:dev": "tsc -p tsconfig.dev.json && npm run build:bundle:dev",
+    "build:prod": "tsc -p tsconfig.prod.json && npm run build:bundle:prod",
+    "build:bundle:dev": "esbuild liquidcolor.ts --bundle --platform=browser --format=iife --target=es2020 --sourcemap --outfile=dist/liquidcolor.js",
+    "build:bundle:prod": "esbuild liquidcolor.ts --bundle --platform=browser --format=iife --target=es2020 --minify --outfile=dist/liquidcolor.js && node -e \"require('fs').rmSync('dist/liquidcolor.js.map', { force: true })\"",
+    "typecheck": "tsc --noEmit -p tsconfig.dev.json",
+    "lint": "eslint .",
+    "watch": "npm run watch:dev",
+    "watch:ts": "tsc --watch -p tsconfig.dev.json",
+    "watch:bundle": "esbuild liquidcolor.ts --bundle --platform=browser --format=iife --target=es2020 --sourcemap --outfile=dist/liquidcolor.js --watch",
+    "watch:dev": "concurrently -k -n TSC,ESBUILD -c cyan,magenta \"npm:watch:ts\" \"npm:watch:bundle\""
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "concurrently": "^9.1.2",
+    "esbuild": "^0.25.3",
+    "eslint": "^9.39.4",
+    "globals": "^17.5.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.0"
+  },
+  "dependencies": {
+    "vue": "^3.5.33"
+  }
 }

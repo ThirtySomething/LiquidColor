@@ -1,1 +1,0 @@
-{"version":3,"file":"highscorewinner.js","sourceRoot":"","sources":["../highscorewinner.ts"],"names":[],"mappings":"","sourcesContent":["export type HighscoreWinner = \"human\" | \"computer\" | \"draw\";\n"]}

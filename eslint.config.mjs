@@ -20,5 +20,18 @@ export default tseslint.config(
             "indent": ["error", 4, { "SwitchCase": 1 }],
             "no-tabs": "error"
         }
+    },
+    {
+        files: [
+            "board.ts",
+            "definitions.ts",
+            "liquidcolor.ts",
+            "observerdata.ts",
+            "player.ts",
+            "scoreobserver.ts"
+        ],
+        rules: {
+            "brace-style": ["error", "1tbs", { "allowSingleLine": false }]
+        }
     }
 );

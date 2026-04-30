@@ -37,8 +37,7 @@ export class Definitions {
     static initialize(dimX: number | string, dimY: number | string, cellSize: number | string): void {
         if (!Definitions.instance) {
             Definitions.instance = new Definitions(dimX, dimY, cellSize);
-        }
-        else {
+        } else {
             Definitions.instance.reInit(dimX, dimY, cellSize);
         }
     }

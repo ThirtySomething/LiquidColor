@@ -11,4 +11,3 @@ export class WinnerObserver {
         }
     }
 }
-//# sourceMappingURL=winnerobserver.js.map

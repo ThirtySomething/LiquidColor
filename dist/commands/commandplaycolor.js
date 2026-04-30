@@ -14,4 +14,3 @@ export class CommandPlayColor {
         console.log(`Undo play color: ${this.color}`);
     }
 }
-//# sourceMappingURL=commandplaycolor.js.map

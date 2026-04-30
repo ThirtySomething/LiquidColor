@@ -30,3 +30,21 @@ indent_style = space
 [*.md]
 indent_size = 4
 trim_trailing_whitespace = false
+max_line_length = off
+
+[package.json]
+max_line_length = off
+
+[liquidcolor.ts]
+max_line_length = off
+
+[LICENSE.TXT]
+indent_style = unset
+indent_size = unset
+max_line_length = off
+
+[dist/**]
+ignore = true
+indent_style = unset
+indent_size = unset
+max_line_length = off

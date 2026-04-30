@@ -320,14 +320,12 @@ export class Board {
         if (stats.occupied === stats.total) {
             if (stats.human === stats.computer) {
                 this.endGame("50:50 draw - both players occupy the same number of cells.", "draw");
-            }
-            else if (stats.human > stats.computer) {
+            } else if (stats.human > stats.computer) {
                 this.endGame(
                     `Player [${this.m_PlayerHuman.m_PlayerName}] won the game - more occupied cells at board end.`,
                     "human"
                 );
-            }
-            else {
+            } else {
                 this.endGame(
                     `Player [${this.m_PlayerComputer.m_PlayerName}] won the game - more occupied cells at board end.`,
                     "computer"

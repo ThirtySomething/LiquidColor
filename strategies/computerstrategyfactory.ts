@@ -4,11 +4,11 @@ import { StrategyGreedy } from "./strategygreedy.js";
 import type { StrategyInput } from "./strategyinput.js";
 import { StrategyMinimax } from "./strategyminimax.js";
 
-export class ComputerStrategyFactory 
+export class ComputerStrategyFactory
 {
-    static create(strategy: ComputerStrategy): IComputerStrategy 
+    static create(strategy: ComputerStrategy): IComputerStrategy
     {
-        if (strategy === "greedy") 
+        if (strategy === "greedy")
         {
             return new StrategyGreedy();
         }
@@ -16,7 +16,7 @@ export class ComputerStrategyFactory
         return new StrategyMinimax();
     }
 
-    static chooseComputerColor(strategy: ComputerStrategy, input: StrategyInput): string 
+    static chooseComputerColor(strategy: ComputerStrategy, input: StrategyInput): string
     {
         return this.create(strategy).chooseColor(input);
     }

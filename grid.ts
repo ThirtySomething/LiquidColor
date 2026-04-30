@@ -4,24 +4,24 @@ import type { Player } from "./player.js";
 
 type ColorCountMap = Record<string, number>;
 
-export class Grid 
+export class Grid
 {
     m_Cells: Cell[][];
 
-    constructor() 
+    constructor()
     {
         this.m_Cells = [];
     }
 
-    gridInit(definitions: Definitions, canvasElement: CanvasRenderingContext2D): void 
+    gridInit(definitions: Definitions, canvasElement: CanvasRenderingContext2D): void
     {
         this.m_Cells = [];
 
-        for (let loopY = 0; loopY < definitions.DimensionY; loopY += 1) 
+        for (let loopY = 0; loopY < definitions.DimensionY; loopY += 1)
         {
             const row: Cell[] = [];
             this.m_Cells[loopY] = row;
-            for (let loopX = 0; loopX < definitions.DimensionX; loopX += 1) 
+            for (let loopX = 0; loopX < definitions.DimensionX; loopX += 1)
             {
                 const currentCell = new Cell(loopX, loopY);
                 currentCell.m_Color = currentCell.cellColorRandomGet(definitions.Colors);
@@ -31,26 +31,26 @@ export class Grid
         }
     }
 
-    gridReset(): void 
+    gridReset(): void
     {
-        this.m_Cells.forEach((currentRow) => 
+        this.m_Cells.forEach((currentRow) =>
         {
-            currentRow.forEach((currentCell) => 
+            currentRow.forEach((currentCell) =>
             {
                 currentCell.m_DoRedraw = true;
             });
         });
     }
 
-    getPlayerCells(player: Player): Cell[] 
+    getPlayerCells(player: Player): Cell[]
     {
         const playerCells: Cell[] = [];
 
-        this.m_Cells.forEach((currentRow) => 
+        this.m_Cells.forEach((currentRow) =>
         {
-            currentRow.forEach((currentCell) => 
+            currentRow.forEach((currentCell) =>
             {
-                if (currentCell.m_Owner === player.m_PlayerName) 
+                if (currentCell.m_Owner === player.m_PlayerName)
                 {
                     playerCells.push(currentCell);
                 }
@@ -60,13 +60,13 @@ export class Grid
         return playerCells;
     }
 
-    identifyBorderCells(cells: Cell[], definitions: Definitions): Cell[] 
+    identifyBorderCells(cells: Cell[], definitions: Definitions): Cell[]
     {
         const borderCells: Cell[] = [];
 
-        cells.forEach((currentCell: Cell) => 
+        cells.forEach((currentCell: Cell) =>
         {
-            if (currentCell.isBorderCell(this.m_Cells, definitions)) 
+            if (currentCell.isBorderCell(this.m_Cells, definitions))
             {
                 borderCells.push(currentCell);
             }
@@ -75,40 +75,40 @@ export class Grid
         return borderCells;
     }
 
-    playerColorsGet(cells: Cell[], definitions: Definitions): ColorCountMap 
+    playerColorsGet(cells: Cell[], definitions: Definitions): ColorCountMap
     {
         const playerColors: ColorCountMap = {};
 
-        cells.forEach((currentCell) => 
+        cells.forEach((currentCell) =>
         {
-            definitions.Offsets.forEach((currentOffset) => 
+            definitions.Offsets.forEach((currentOffset) =>
             {
                 const cellPosY = currentCell.m_PosY + currentOffset.DY;
 
-                if (cellPosY < 0 || definitions.DimensionY <= cellPosY) 
+                if (cellPosY < 0 || definitions.DimensionY <= cellPosY)
                 {
                     return;
                 }
 
                 const cellPosX = currentCell.m_PosX + currentOffset.DX;
-                if (cellPosX < 0 || definitions.DimensionX <= cellPosX) 
+                if (cellPosX < 0 || definitions.DimensionX <= cellPosX)
                 {
                     return;
                 }
 
                 const row = this.m_Cells[cellPosY];
-                if (!row) 
+                if (!row)
                 {
                     return;
                 }
 
                 const currentNeighbour = row[cellPosX];
-                if (!currentNeighbour) 
+                if (!currentNeighbour)
                 {
                     return;
                 }
 
-                if (currentNeighbour.m_Occupied) 
+                if (currentNeighbour.m_Occupied)
                 {
                     return;
                 }

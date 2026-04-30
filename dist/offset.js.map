@@ -1,1 +1,0 @@
-{"version":3,"file":"offset.js","sourceRoot":"","sources":["../offset.ts"],"names":[],"mappings":"","sourcesContent":["export type Offset = {\n    DX: number;\n    DY: number;\n};\n"]}

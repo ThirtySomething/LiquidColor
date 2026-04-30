@@ -1,19 +1,19 @@
 import { Util } from "./util.js";
 
-export class Timer 
+export class Timer
 {
     m_IDDuration: string;
     m_StartTimestamp: number | null;
     m_Ticker: number | null;
 
-    constructor(idDuration: string) 
+    constructor(idDuration: string)
     {
         this.m_IDDuration = idDuration;
         this.m_StartTimestamp = null;
         this.m_Ticker = null;
     }
 
-    formatDuration(ms: number): string 
+    formatDuration(ms: number): string
     {
         const totalSeconds = Math.max(0, Math.floor(ms / 1000));
         const minutes = Math.floor(totalSeconds / 60);
@@ -21,7 +21,7 @@ export class Timer
         return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     }
 
-    updateDisplay(): void 
+    updateDisplay(): void
     {
         const elapsedMs = this.m_StartTimestamp === null
             ? 0
@@ -29,22 +29,22 @@ export class Timer
         Util.setText(this.m_IDDuration, `Duration: ${this.formatDuration(elapsedMs)}`);
     }
 
-    startTicker(): void 
+    startTicker(): void
     {
-        if (this.m_Ticker !== null) 
+        if (this.m_Ticker !== null)
         {
             window.clearInterval(this.m_Ticker);
         }
 
-        this.m_Ticker = window.setInterval(() => 
+        this.m_Ticker = window.setInterval(() =>
         {
             this.updateDisplay();
         }, 1000);
     }
 
-    reset(): void 
+    reset(): void
     {
-        if (this.m_Ticker !== null) 
+        if (this.m_Ticker !== null)
         {
             window.clearInterval(this.m_Ticker);
             this.m_Ticker = null;
@@ -54,9 +54,9 @@ export class Timer
         this.updateDisplay();
     }
 
-    startCounting(): void 
+    startCounting(): void
     {
-        if (this.m_StartTimestamp !== null) 
+        if (this.m_StartTimestamp !== null)
         {
             return;
         }
@@ -65,9 +65,9 @@ export class Timer
         this.updateDisplay();
     }
 
-    stop(): void 
+    stop(): void
     {
-        if (this.m_Ticker !== null) 
+        if (this.m_Ticker !== null)
         {
             window.clearInterval(this.m_Ticker);
             this.m_Ticker = null;

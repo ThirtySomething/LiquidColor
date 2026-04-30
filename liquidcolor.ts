@@ -8,46 +8,57 @@ import { Player } from "./player.js";
 import { ScoreObserver } from "./scoreobserver.js";
 import { WinnerObserver } from "./winnerobserver.js";
 
-Definitions.initialize(30, 20, 15);
-const definitions = Definitions.getInstance();
-const human = new Player("Besucher", "name_human", "score_human", () => { });
-const computer = new Player("DerPaul", "name_computer", "score_computer", () => { });
-const boardDependencies = createBoardDependencies();
-Board.initialize(definitions, human, computer, boardDependencies);
+type LiquidColorAppBindings = {
+    resetGame: () => void;
+    undoMove: () => void;
+    redoMove: () => void;
+};
 
-const board = Board.getInstance();
-const appVersion = packageInfo.version;
-human.setNotifyUI(board.getUISubject().notify.bind(board.getUISubject()));
-computer.setNotifyUI(board.getUISubject().notify.bind(board.getUISubject()));
+type LiquidColorAppOptions = {
+    useSetupComposition?: boolean;
+};
 
-board.getUISubject().attach(new ScoreObserver());
-board.getUISubject().attach(new WinnerObserver());
+function createBoardBindings(board: Board): LiquidColorAppBindings {
+    const commandInvoker = board.getCommandInvoker();
 
-createApp({
-    methods: {
+    return {
         resetGame(): void {
-            Board.getInstance().getCommandInvoker().clearHistory();
+            commandInvoker.clearHistory();
             const command = new CommandResetGame(
-                Board.getInstance(),
+                board,
                 "dimx",
                 "dimy",
                 "cellsize",
                 "playername",
                 "computerstrategy"
             );
-            Board.getInstance().getCommandInvoker().execute(command, false);
+            commandInvoker.execute(command, false);
         },
         undoMove(): void {
-            Board.getInstance().getCommandInvoker().undo();
+            commandInvoker.undo();
         },
         redoMove(): void {
-            Board.getInstance().getCommandInvoker().redo();
+            commandInvoker.redo();
         }
-    },
-    mounted(): void {
-        Board.getInstance().init("gamearea", "playbuttons", "winner");
-    },
-    template: `
+    };
+}
+
+export function createLiquidColorAppConfig(
+    board: Board,
+    appVersion: string,
+    options: LiquidColorAppOptions = {}
+): {
+    methods?: LiquidColorAppBindings;
+    setup?: () => LiquidColorAppBindings;
+    mounted: () => void;
+    template: string;
+} {
+    const bindings = createBoardBindings(board);
+    const appConfig = {
+        mounted(): void {
+            board.init("gamearea", "playbuttons", "winner");
+        },
+        template: `
         <div class="liquidcolor-root">
             <main class="app-shell">
                 <h1 class="title">Liquid Color <span class="title-version">(${appVersion})</span></h1>
@@ -140,4 +151,35 @@ createApp({
             </main>
         </div>
     `
-}).mount("#liquidcolor");
+    };
+
+    if (options.useSetupComposition) {
+        return {
+            ...appConfig,
+            setup: () => bindings
+        };
+    }
+
+    return {
+        ...appConfig,
+        methods: bindings
+    };
+}
+
+Definitions.initialize(30, 20, 15);
+const definitions = Definitions.getInstance();
+const human = new Player("Besucher", "name_human", "score_human", () => { });
+const computer = new Player("DerPaul", "name_computer", "score_computer", () => { });
+const boardDependencies = createBoardDependencies();
+Board.initialize(definitions, human, computer, boardDependencies);
+
+const board = Board.getInstance();
+const appVersion = packageInfo.version;
+const uiSubject = board.getUISubject();
+human.setNotifyUI(uiSubject.notify.bind(uiSubject));
+computer.setNotifyUI(uiSubject.notify.bind(uiSubject));
+
+uiSubject.attach(new ScoreObserver());
+uiSubject.attach(new WinnerObserver());
+
+createApp(createLiquidColorAppConfig(board, appVersion)).mount("#liquidcolor");

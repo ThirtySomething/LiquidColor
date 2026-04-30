@@ -70,24 +70,28 @@ export class Player {
         if (!this.m_BaseCell) {
             return;
         }
-        let cellsCollect = [];
-        let cellsWork = this.m_BaseCell.neighboursGet(cells, definitions);
-        do {
-            cellsWork.forEach((currentCell) => {
-                if (!this.m_BaseCell) {
+        const queue = this.m_BaseCell.neighboursGet(cells, definitions);
+        const queued = new Set(queue);
+        while (queue.length > 0) {
+            const currentCell = queue.shift();
+            if (!currentCell) {
+                continue;
+            }
+            queued.delete(currentCell);
+            if (!this.m_BaseCell) {
+                continue;
+            }
+            currentCell.m_Color = this.m_BaseCell.m_Color;
+            currentCell.ownerSet(this.m_PlayerName);
+            currentCell.draw(definitions, canvasElement);
+            currentCell.neighboursGet(cells, definitions).forEach((newCell) => {
+                if (queued.has(newCell)) {
                     return;
                 }
-                currentCell.m_Color = this.m_BaseCell.m_Color;
-                currentCell.ownerSet(this.m_PlayerName);
-                currentCell.draw(definitions, canvasElement);
-                const newNeighbours = currentCell.neighboursGet(cells, definitions);
-                newNeighbours.forEach((newCell) => {
-                    cellsCollect.push(newCell);
-                });
+                queued.add(newCell);
+                queue.push(newCell);
             });
-            cellsWork = cellsCollect.filter((value, index, self) => self.indexOf(value) === index);
-            cellsCollect = [];
-        } while (cellsWork.length > 0);
+        }
         this.counterUpdate(cells, definitions);
     }
     identifyBestColor(cells, definitions, newColorPlayer, opponent, strategy = "minimax", randomSource = MathRandomSource) {

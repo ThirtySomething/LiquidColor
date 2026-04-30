@@ -123,7 +123,7 @@ describe("Player", () => {
         expect(base.m_Color).toBe("fallback");
     });
 
-    it("cellsMarkOwner captures neighbors and deduplicates frontier", () => {
+    it("cellsMarkOwner captures neighbors with queued deduplication", () => {
         Definitions.initialize(2, 2, 10);
         const definitions = Definitions.getInstance();
         const player = new Player("H", "name_h", "score_h", () => undefined);

@@ -101,4 +101,29 @@ describe("Grid", () => {
 
         expect(() => grid.playerColorsGet([source], definitions)).not.toThrow();
     });
+
+    it("playerColorsGet deduplicates shared unoccupied neighbors", () => {
+        Definitions.initialize(2, 2, 10);
+        const definitions = Definitions.getInstance();
+        const grid = new Grid();
+        grid.m_Cells = [
+            [new Cell(0, 0), new Cell(1, 0)],
+            [new Cell(0, 1), new Cell(1, 1)]
+        ];
+
+        const topLeft = grid.m_Cells[0][0];
+        const bottomLeft = grid.m_Cells[1][0];
+        const sharedNeighbour = grid.m_Cells[0][1];
+
+        topLeft.m_Owner = "P";
+        topLeft.m_Occupied = true;
+        bottomLeft.m_Owner = "P";
+        bottomLeft.m_Occupied = true;
+
+        sharedNeighbour.m_Color = "red";
+        sharedNeighbour.m_Occupied = false;
+
+        const colors = grid.playerColorsGet([topLeft, bottomLeft], definitions);
+        expect(colors.red).toBe(1);
+    });
 });

@@ -48,6 +48,7 @@ export class Grid {
     }
     playerColorsGet(cells, definitions) {
         const playerColors = {};
+        const seenNeighbours = new Set();
         cells.forEach((currentCell) => {
             definitions.Offsets.forEach((currentOffset) => {
                 const cellPosY = currentCell.m_PosY + currentOffset.DY;
@@ -69,6 +70,10 @@ export class Grid {
                 if (currentNeighbour.m_Occupied) {
                     return;
                 }
+                if (seenNeighbours.has(currentNeighbour)) {
+                    return;
+                }
+                seenNeighbours.add(currentNeighbour);
                 const valueOld = playerColors[currentNeighbour.m_Color] || 0;
                 playerColors[currentNeighbour.m_Color] = valueOld + 1;
             });

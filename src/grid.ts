@@ -66,6 +66,7 @@ export class Grid {
 
     playerColorsGet(cells: Cell[], definitions: Definitions): ColorCountMap {
         const playerColors: ColorCountMap = {};
+        const seenNeighbours = new Set<Cell>();
 
         cells.forEach((currentCell) => {
             definitions.Offsets.forEach((currentOffset) => {
@@ -93,6 +94,11 @@ export class Grid {
                 if (currentNeighbour.m_Occupied) {
                     return;
                 }
+
+                if (seenNeighbours.has(currentNeighbour)) {
+                    return;
+                }
+                seenNeighbours.add(currentNeighbour);
 
                 const valueOld = playerColors[currentNeighbour.m_Color] || 0;
                 playerColors[currentNeighbour.m_Color] = valueOld + 1;

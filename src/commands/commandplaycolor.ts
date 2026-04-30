@@ -17,6 +17,14 @@ export class CommandPlayColor implements ICommand {
         this.lastKnownSnapshot = null;
     }
 
+    private ensureSnapshotCache(): BoardStateSnapshot {
+        if (!this.lastKnownSnapshot) {
+            this.lastKnownSnapshot = this.board.createStateSnapshot();
+        }
+
+        return this.lastKnownSnapshot;
+    }
+
     private applyDeltaInPlace(base: BoardStateSnapshot, delta: BoardStateDelta): void {
         delta.cells.forEach((cellDelta) => {
             const row = base.cells[cellDelta.y];
@@ -55,11 +63,9 @@ export class CommandPlayColor implements ICommand {
 
     execute(): void {
         if (this.redoDelta) {
-            if (!this.lastKnownSnapshot) {
-                this.lastKnownSnapshot = this.board.createStateSnapshot();
-            }
-            this.applyDeltaInPlace(this.lastKnownSnapshot, this.redoDelta);
-            this.board.restoreStateSnapshot(this.lastKnownSnapshot);
+            const cachedSnapshot = this.ensureSnapshotCache();
+            this.applyDeltaInPlace(cachedSnapshot, this.redoDelta);
+            this.board.restoreStateSnapshot(cachedSnapshot);
             return;
         }
 
@@ -77,11 +83,8 @@ export class CommandPlayColor implements ICommand {
             return;
         }
 
-        if (!this.lastKnownSnapshot) {
-            this.lastKnownSnapshot = this.board.createStateSnapshot();
-        }
-
-        this.applyDeltaInPlace(this.lastKnownSnapshot, this.undoDelta);
-        this.board.restoreStateSnapshot(this.lastKnownSnapshot);
+        const cachedSnapshot = this.ensureSnapshotCache();
+        this.applyDeltaInPlace(cachedSnapshot, this.undoDelta);
+        this.board.restoreStateSnapshot(cachedSnapshot);
     }
 }

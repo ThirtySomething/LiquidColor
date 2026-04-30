@@ -11,6 +11,12 @@ export class CommandPlayColor {
         this.redoDelta = null;
         this.lastKnownSnapshot = null;
     }
+    ensureSnapshotCache() {
+        if (!this.lastKnownSnapshot) {
+            this.lastKnownSnapshot = this.board.createStateSnapshot();
+        }
+        return this.lastKnownSnapshot;
+    }
     applyDeltaInPlace(base, delta) {
         delta.cells.forEach((cellDelta) => {
             const row = base.cells[cellDelta.y];
@@ -46,11 +52,9 @@ export class CommandPlayColor {
     }
     execute() {
         if (this.redoDelta) {
-            if (!this.lastKnownSnapshot) {
-                this.lastKnownSnapshot = this.board.createStateSnapshot();
-            }
-            this.applyDeltaInPlace(this.lastKnownSnapshot, this.redoDelta);
-            this.board.restoreStateSnapshot(this.lastKnownSnapshot);
+            const cachedSnapshot = this.ensureSnapshotCache();
+            this.applyDeltaInPlace(cachedSnapshot, this.redoDelta);
+            this.board.restoreStateSnapshot(cachedSnapshot);
             return;
         }
         const stateBefore = this.board.createStateSnapshot();
@@ -64,10 +68,8 @@ export class CommandPlayColor {
         if (!this.undoDelta) {
             return;
         }
-        if (!this.lastKnownSnapshot) {
-            this.lastKnownSnapshot = this.board.createStateSnapshot();
-        }
-        this.applyDeltaInPlace(this.lastKnownSnapshot, this.undoDelta);
-        this.board.restoreStateSnapshot(this.lastKnownSnapshot);
+        const cachedSnapshot = this.ensureSnapshotCache();
+        this.applyDeltaInPlace(cachedSnapshot, this.undoDelta);
+        this.board.restoreStateSnapshot(cachedSnapshot);
     }
 }

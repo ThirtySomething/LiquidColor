@@ -106,14 +106,24 @@ export class Board {
         return this.m_CommandInvoker;
     }
 
+    private mapCellStates<T>(rows: T[][], mapper: (cell: T) => CellState): CellState[][] {
+        return rows.map((row) => row.map((cell) => mapper(cell)));
+    }
+
     private cloneCellStates(cells: CellState[][]): CellState[][] {
-        return cells.map((row) =>
-            row.map((cell) => ({
-                color: cell.color,
-                owner: cell.owner,
-                occupied: cell.occupied
-            }))
-        );
+        return this.mapCellStates(cells, (cell) => ({
+            color: cell.color,
+            owner: cell.owner,
+            occupied: cell.occupied
+        }));
+    }
+
+    private captureGridCellStates(): CellState[][] {
+        return this.mapCellStates(this.m_Grid.m_Cells, (cell) => ({
+            color: cell.m_Color,
+            owner: cell.m_Owner,
+            occupied: cell.m_Occupied
+        }));
     }
 
     cloneStateSnapshot(snapshot: BoardStateSnapshot): BoardStateSnapshot {
@@ -266,16 +276,8 @@ export class Board {
     createStateSnapshot(): BoardStateSnapshot {
         const metadata = this.createMetadataSnapshot();
 
-        const cells = this.m_Grid.m_Cells.map((row) =>
-            row.map((cell) => ({
-                color: cell.m_Color,
-                owner: cell.m_Owner,
-                occupied: cell.m_Occupied
-            }))
-        );
-
         return {
-            cells,
+            cells: this.captureGridCellStates(),
             phase: metadata.phase,
             ui: metadata.ui,
             highscore: metadata.highscore

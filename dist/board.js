@@ -7,6 +7,7 @@ import { Highscore } from "./highscore.js";
 import { Player } from "./player.js";
 import { Subject } from "./subject.js";
 import { Timer } from "./timer.js";
+import { UiFacade } from "./uifacade.js";
 import { Util } from "./util.js";
 export class Board {
     static instance = null;
@@ -62,8 +63,8 @@ export class Board {
         return this.m_CommandInvoker;
     }
     createStateSnapshot() {
-        const winnerElement = document.getElementById(this.m_IDWinner);
-        const moveInfoElement = document.getElementById("moveinfo");
+        const winnerElement = UiFacade.getElement(this.m_IDWinner);
+        const moveInfoElement = UiFacade.getElement("moveinfo");
         const cells = this.m_Grid.m_Cells.map((row) => row.map((cell) => ({
             color: cell.m_Color,
             owner: cell.m_Owner,
@@ -73,10 +74,10 @@ export class Board {
             cells,
             phase: this.m_Phase.name,
             ui: {
-                winnerText: winnerElement?.textContent ?? "",
-                winnerVisible: winnerElement ? !winnerElement.classList.contains("dspno") : false,
-                moveInfoText: moveInfoElement?.textContent ?? "",
-                moveInfoVisible: moveInfoElement ? moveInfoElement.style.display !== "none" : false
+                winnerText: UiFacade.getText(this.m_IDWinner),
+                winnerVisible: winnerElement ? !UiFacade.hasClass(this.m_IDWinner, "dspno") : false,
+                moveInfoText: UiFacade.getText("moveinfo"),
+                moveInfoVisible: moveInfoElement ? UiFacade.getDisplay("moveinfo") !== "none" : false
             },
             highscore: this.m_Highscore.createSnapshot()
         };
@@ -123,11 +124,8 @@ export class Board {
             Util.show(this.m_IDWinner, "block");
         }
         else {
-            const winnerElement = document.getElementById(this.m_IDWinner);
-            if (winnerElement) {
-                winnerElement.classList.add("dspno");
-                winnerElement.style.display = "none";
-            }
+            UiFacade.addClass(this.m_IDWinner, "dspno");
+            UiFacade.hide(this.m_IDWinner);
         }
         Util.setText("moveinfo", snapshot.ui.moveInfoText);
         if (snapshot.ui.moveInfoVisible) {
@@ -141,12 +139,8 @@ export class Board {
         this.m_IDGameField = gameField;
         this.m_IDButtonField = buttonField;
         this.m_IDWinner = idWinner;
-        const graphics = document.getElementById(this.m_IDGameField);
-        if (graphics?.getContext) {
-            this.m_CanvasElement = graphics.getContext("2d");
-            if (!this.m_CanvasElement) {
-                return;
-            }
+        this.m_CanvasElement = UiFacade.getCanvasContext(this.m_IDGameField);
+        if (this.m_CanvasElement) {
             this.boardInit();
             this.boardButtonsInit(this.m_IDButtonField);
             this.playerInit(this.m_IDWinner);
@@ -187,12 +181,9 @@ export class Board {
         this.m_Phase = GamePhase.InProgress();
         this.m_Timer.reset();
         this.m_Timer.startTicker();
-        const winnerElement = document.getElementById(idWinner);
-        if (winnerElement) {
-            winnerElement.textContent = "";
-            winnerElement.classList.add("dspno");
-            winnerElement.style.display = "";
-        }
+        UiFacade.setText(idWinner, "");
+        UiFacade.addClass(idWinner, "dspno");
+        UiFacade.setDisplay(idWinner, "");
         this.m_Grid.gridReset();
         this.m_PlayerHuman.init(this, 0, this.m_Definitions.DimensionY - 1, idWinner);
         this.m_Grid.gridReset();
@@ -202,7 +193,7 @@ export class Board {
         const boardWidth = this.m_Definitions.DimensionX * this.m_Definitions.CellSize;
         const boardHeight = this.m_Definitions.DimensionY * this.m_Definitions.CellSize;
         Util.setText("moveinfo", "");
-        const canvas = document.getElementById(this.m_IDGameField);
+        const canvas = UiFacade.getCanvasElement(this.m_IDGameField);
         Util.setElementSize(canvas, boardWidth, boardHeight);
         if (!this.m_CanvasElement) {
             return;
@@ -210,7 +201,7 @@ export class Board {
         this.m_Grid.gridInit(this.m_Definitions, this.m_CanvasElement);
     }
     boardButtonsInit(buttonField) {
-        const buttonContainer = document.getElementById(buttonField);
+        const buttonContainer = UiFacade.getElement(buttonField);
         if (!buttonContainer) {
             return;
         }
@@ -222,19 +213,11 @@ export class Board {
             numberOfButtons);
         Util.clearChildren(buttonField);
         this.m_Definitions.Colors.forEach((currentColor) => {
-            const colorButton = document.createElement("button");
-            colorButton.type = "button";
-            colorButton.id = currentColor;
-            colorButton.className = "gamebtn";
-            colorButton.style.backgroundColor = currentColor;
-            colorButton.style.width = `${btnWidth}px`;
-            colorButton.style.height = `${btnHeight}px`;
-            colorButton.setAttribute("aria-label", `Choose ${currentColor} color`);
-            colorButton.addEventListener("click", () => {
+            const colorButton = UiFacade.createColorButton(currentColor, btnWidth, btnHeight, () => {
                 const command = new CommandPlayColor(this, currentColor);
                 this.m_CommandInvoker.execute(command);
             });
-            buttonContainer.appendChild(colorButton);
+            UiFacade.appendChild(buttonContainer, colorButton);
         });
     }
     performMove(newColorPlayer) {

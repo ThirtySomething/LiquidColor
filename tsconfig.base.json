@@ -24,6 +24,7 @@
     "files": [
         "vue-compiler-build.d.ts",
         "util.ts",
+        "uifacade.ts",
         "offset.ts",
         "definitions.ts",
         "cell.ts",

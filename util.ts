@@ -1,87 +1,43 @@
-export class Util
-{
+import { UiFacade } from "./uifacade.js";
+
+export class Util {
     static setElementSize(
         element: HTMLCanvasElement | null,
         width: number,
         height: number
-    ): void
-    {
-        if (!element)
-        {
-            return;
-        }
-        element.style.width = `${width}px`;
-        element.style.height = `${height}px`;
-        element.width = width;
-        element.height = height;
+    ): void {
+        UiFacade.setElementSize(element, width, height);
     }
 
-    static getInputValue(id: string): string
-    {
-        const element = document.getElementById(id) as HTMLInputElement | null;
-        return element ? element.value : "";
+    static getInputValue(id: string): string {
+        return UiFacade.getInputValue(id);
     }
 
-    static setInputValue(id: string, value: string | number): void
-    {
-        const element = document.getElementById(id) as HTMLInputElement | null;
-        if (element)
-        {
-            element.value = String(value);
-        }
+    static setInputValue(id: string, value: string | number): void {
+        UiFacade.setInputValue(id, value);
     }
 
-    static setText(id: string, value: string): void
-    {
-        const element = document.getElementById(id);
-        if (element)
-        {
-            element.textContent = value;
-        }
+    static setText(id: string, value: string): void {
+        UiFacade.setText(id, value);
     }
 
-    static show(id: string, displayMode = "block"): void
-    {
-        const element = document.getElementById(id);
-        if (element)
-        {
-            element.style.display = displayMode;
-        }
+    static show(id: string, displayMode = "block"): void {
+        UiFacade.show(id, displayMode);
     }
 
-    static hide(id: string): void
-    {
-        const element = document.getElementById(id);
-        if (element)
-        {
-            element.style.display = "none";
-        }
+    static hide(id: string): void {
+        UiFacade.hide(id);
     }
 
-    static removeClass(id: string, className: string): void
-    {
-        const element = document.getElementById(id);
-        if (element)
-        {
-            element.classList.remove(className);
-        }
+    static removeClass(id: string, className: string): void {
+        UiFacade.removeClass(id, className);
     }
 
-    static clearChildren(id: string): void
-    {
-        const element = document.getElementById(id);
-        if (element)
-        {
-            element.replaceChildren();
-        }
+    static clearChildren(id: string): void {
+        UiFacade.clearChildren(id);
     }
 
-    static getCssNumberVar(name: string, fallback = 0): number
-    {
-        const value = getComputedStyle(document.documentElement)
-            .getPropertyValue(name)
-            .trim();
-        const parsed = Number.parseInt(value, 10);
-        return Number.isNaN(parsed) ? fallback : parsed;
+    static getCssNumberVar(name: string, fallback = 0): number {
+        return UiFacade.getCssNumberVar(name, fallback);
     }
 }

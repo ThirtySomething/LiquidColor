@@ -1,58 +1,30 @@
+import { UiFacade } from "./uifacade.js";
 export class Util {
     static setElementSize(element, width, height) {
-        if (!element) {
-            return;
-        }
-        element.style.width = `${width}px`;
-        element.style.height = `${height}px`;
-        element.width = width;
-        element.height = height;
+        UiFacade.setElementSize(element, width, height);
     }
     static getInputValue(id) {
-        const element = document.getElementById(id);
-        return element ? element.value : "";
+        return UiFacade.getInputValue(id);
     }
     static setInputValue(id, value) {
-        const element = document.getElementById(id);
-        if (element) {
-            element.value = String(value);
-        }
+        UiFacade.setInputValue(id, value);
     }
     static setText(id, value) {
-        const element = document.getElementById(id);
-        if (element) {
-            element.textContent = value;
-        }
+        UiFacade.setText(id, value);
     }
     static show(id, displayMode = "block") {
-        const element = document.getElementById(id);
-        if (element) {
-            element.style.display = displayMode;
-        }
+        UiFacade.show(id, displayMode);
     }
     static hide(id) {
-        const element = document.getElementById(id);
-        if (element) {
-            element.style.display = "none";
-        }
+        UiFacade.hide(id);
     }
     static removeClass(id, className) {
-        const element = document.getElementById(id);
-        if (element) {
-            element.classList.remove(className);
-        }
+        UiFacade.removeClass(id, className);
     }
     static clearChildren(id) {
-        const element = document.getElementById(id);
-        if (element) {
-            element.replaceChildren();
-        }
+        UiFacade.clearChildren(id);
     }
     static getCssNumberVar(name, fallback = 0) {
-        const value = getComputedStyle(document.documentElement)
-            .getPropertyValue(name)
-            .trim();
-        const parsed = Number.parseInt(value, 10);
-        return Number.isNaN(parsed) ? fallback : parsed;
+        return UiFacade.getCssNumberVar(name, fallback);
     }
 }

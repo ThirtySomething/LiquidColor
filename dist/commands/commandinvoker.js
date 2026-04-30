@@ -30,3 +30,4 @@ export class CommandInvoker {
         return [...this.commands];
     }
 }
+//# sourceMappingURL=commandinvoker.js.map

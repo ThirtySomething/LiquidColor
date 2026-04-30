@@ -51,3 +51,4 @@ export class Timer {
         this.updateDisplay();
     }
 }
+//# sourceMappingURL=timer.js.map

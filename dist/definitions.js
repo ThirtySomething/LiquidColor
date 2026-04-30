@@ -41,3 +41,4 @@ export class Definitions {
         this.Winner = Math.floor((this.DimensionX * this.DimensionY) / 2 + 1);
     }
 }
+//# sourceMappingURL=definitions.js.map

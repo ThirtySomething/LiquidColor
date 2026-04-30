@@ -21,6 +21,7 @@
         "skipLibCheck": true
     },
     "files": [
+        "vue-compiler-build.d.ts",
         "util.ts",
         "offset.ts",
         "definitions.ts",

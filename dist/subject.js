@@ -10,3 +10,4 @@ export class Subject {
         this.observers.forEach(observer => observer.update(data));
     }
 }
+//# sourceMappingURL=subject.js.map

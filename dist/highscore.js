@@ -50,3 +50,4 @@ export class Highscore {
         window.localStorage.setItem(Highscore.STORAGE_KEY, JSON.stringify(this.m_Data));
     }
 }
+//# sourceMappingURL=highscore.js.map

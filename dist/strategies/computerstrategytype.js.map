@@ -1,0 +1,1 @@
+{"version":3,"file":"computerstrategytype.js","sourceRoot":"","sources":["../../strategies/computerstrategytype.ts"],"names":[],"mappings":"","sourcesContent":["export type ComputerStrategy = \"minimax\" | \"greedy\";\n"]}

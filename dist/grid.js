@@ -75,3 +75,4 @@ export class Grid {
         return playerColors;
     }
 }
+//# sourceMappingURL=grid.js.map

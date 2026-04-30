@@ -30,3 +30,4 @@ export class CaptureSimulator {
         return { gained, newOwnedSet: newOwned };
     }
 }
+//# sourceMappingURL=capturesimulator.js.map

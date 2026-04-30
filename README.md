@@ -4,7 +4,25 @@
 
 **LiquidColor** is distributed under the terms of the **GNU LESSER GENERAL PUBLIC LICENSE**, version 3.0. The text of the license is included in the file [`LICENSE.TXT`][url_license] in the project root.
 
-This is a single player game written in JavaScript. It will take advantage of HTML5 canvas.
+This is a single player game written in TypeScript and Vue.js. It takes advantage of HTML5 canvas.
+
+## Local Start
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+1. Build the browser bundle:
+
+```bash
+npm run build:dev
+```
+
+1. Open `index.html` directly in your browser (double-click or use your browser's "Open file" action).
+
+The game does not require a local web server after the bundle has been built.
 
 ## Requirements
 

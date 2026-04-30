@@ -49,15 +49,9 @@ export class Definitions {
         return Math.min(max, Math.max(min, parsed));
     }
     reInit(dimX, dimY, cellSize) {
-        const fallbackDimX = this.DimensionX > 0
-            ? this.DimensionX
-            : Definitions.DEFAULT_DIMENSION_X;
-        const fallbackDimY = this.DimensionY > 0
-            ? this.DimensionY
-            : Definitions.DEFAULT_DIMENSION_Y;
-        const fallbackCellSize = this.CellSize > 0
-            ? this.CellSize
-            : Definitions.DEFAULT_CELL_SIZE;
+        const fallbackDimX = this.DimensionX > 0 ? this.DimensionX : Definitions.DEFAULT_DIMENSION_X;
+        const fallbackDimY = this.DimensionY > 0 ? this.DimensionY : Definitions.DEFAULT_DIMENSION_Y;
+        const fallbackCellSize = this.CellSize > 0 ? this.CellSize : Definitions.DEFAULT_CELL_SIZE;
         this.DimensionX = this.sanitizeInt(dimX, Definitions.MIN_DIMENSION, Definitions.MAX_DIMENSION, fallbackDimX);
         this.DimensionY = this.sanitizeInt(dimY, Definitions.MIN_DIMENSION, Definitions.MAX_DIMENSION, fallbackDimY);
         this.CellSize = this.sanitizeInt(cellSize, Definitions.MIN_CELL_SIZE, Definitions.MAX_CELL_SIZE, fallbackCellSize);

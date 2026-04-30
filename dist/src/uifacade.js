@@ -67,9 +67,7 @@ export class UiFacade {
         }
     }
     static getCssNumberVar(name, fallback = 0) {
-        const value = getComputedStyle(document.documentElement)
-            .getPropertyValue(name)
-            .trim();
+        const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
         const parsed = Number.parseInt(value, 10);
         return Number.isNaN(parsed) ? fallback : parsed;
     }

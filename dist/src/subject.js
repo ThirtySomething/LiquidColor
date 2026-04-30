@@ -4,9 +4,9 @@ export class Subject {
         this.observers.push(observer);
     }
     detach(observer) {
-        this.observers = this.observers.filter(o => o !== observer);
+        this.observers = this.observers.filter((o) => o !== observer);
     }
     notify(data) {
-        this.observers.forEach(observer => observer.update(data));
+        this.observers.forEach((observer) => observer.update(data));
     }
 }

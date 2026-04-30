@@ -34,13 +34,13 @@ export class Player {
             });
         });
         this.m_NotifyUI({
-            type: 'score',
+            type: "score",
             player: this.m_PlayerName,
             scoreElementId: this.m_IDScore,
             score: cellCounter
         });
         if (cellCounter >= definitions.Winner) {
-            this.m_NotifyUI({ type: 'winner', player: this.m_PlayerName });
+            this.m_NotifyUI({ type: "winner", player: this.m_PlayerName });
         }
     }
     init(board, posX, posY, idWinner) {

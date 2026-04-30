@@ -28,9 +28,7 @@ export class Timer {
         return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     }
     updateDisplay() {
-        const elapsedMs = this.m_StartTimestamp === null
-            ? 0
-            : this.m_Runtime.now() - this.m_StartTimestamp;
+        const elapsedMs = this.m_StartTimestamp === null ? 0 : this.m_Runtime.now() - this.m_StartTimestamp;
         Util.setText(this.m_IDDuration, `Duration: ${this.formatDuration(elapsedMs)}`);
     }
     startTicker() {

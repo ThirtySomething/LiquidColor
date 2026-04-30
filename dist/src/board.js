@@ -65,6 +65,30 @@ export class Board {
     getCommandInvoker() {
         return this.m_CommandInvoker;
     }
+    cloneCellStates(cells) {
+        return cells.map((row) => row.map((cell) => ({
+            color: cell.color,
+            owner: cell.owner,
+            occupied: cell.occupied
+        })));
+    }
+    cloneStateSnapshot(snapshot) {
+        return {
+            cells: this.cloneCellStates(snapshot.cells),
+            phase: snapshot.phase,
+            ui: {
+                winnerText: snapshot.ui.winnerText,
+                winnerVisible: snapshot.ui.winnerVisible,
+                moveInfoText: snapshot.ui.moveInfoText,
+                moveInfoVisible: snapshot.ui.moveInfoVisible
+            },
+            highscore: {
+                humanWins: snapshot.highscore.humanWins,
+                computerWins: snapshot.highscore.computerWins,
+                draws: snapshot.highscore.draws
+            }
+        };
+    }
     createStateSnapshot() {
         const winnerElement = UiFacade.getElement(this.m_IDWinner);
         const moveInfoElement = UiFacade.getElement("moveinfo");
@@ -211,8 +235,7 @@ export class Board {
         const btnMargin = Util.getCssNumberVar("--button-gap", 10);
         const numberOfButtons = this.m_Definitions.Colors.length;
         const btnWidth = Math.floor((this.m_Definitions.DimensionX * this.m_Definitions.CellSize) / 5);
-        const btnHeight = Math.floor((this.m_Definitions.DimensionY * this.m_Definitions.CellSize -
-            (numberOfButtons + 1) * btnMargin) /
+        const btnHeight = Math.floor((this.m_Definitions.DimensionY * this.m_Definitions.CellSize - (numberOfButtons + 1) * btnMargin) /
             numberOfButtons);
         Util.clearChildren(buttonField);
         this.m_Definitions.Colors.forEach((currentColor) => {

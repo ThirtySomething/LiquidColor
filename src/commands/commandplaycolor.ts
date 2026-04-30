@@ -8,12 +8,14 @@ export class CommandPlayColor implements ICommand {
     private color: string;
     private undoDelta: BoardStateDelta | null;
     private redoDelta: BoardStateDelta | null;
+    private lastKnownSnapshot: BoardStateSnapshot | null;
 
     constructor(board: Board, color: string) {
         this.board = board;
         this.color = color;
         this.undoDelta = null;
         this.redoDelta = null;
+        this.lastKnownSnapshot = null;
     }
 
     private createDelta(from: BoardStateSnapshot, to: BoardStateSnapshot): BoardStateDelta {
@@ -82,27 +84,7 @@ export class CommandPlayColor implements ICommand {
     }
 
     private applyDelta(base: BoardStateSnapshot, delta: BoardStateDelta): BoardStateSnapshot {
-        const merged: BoardStateSnapshot = {
-            cells: base.cells.map((row) =>
-                row.map((cell) => ({
-                    color: cell.color,
-                    owner: cell.owner,
-                    occupied: cell.occupied
-                }))
-            ),
-            phase: base.phase,
-            ui: {
-                winnerText: base.ui.winnerText,
-                winnerVisible: base.ui.winnerVisible,
-                moveInfoText: base.ui.moveInfoText,
-                moveInfoVisible: base.ui.moveInfoVisible
-            },
-            highscore: {
-                humanWins: base.highscore.humanWins,
-                computerWins: base.highscore.computerWins,
-                draws: base.highscore.draws
-            }
-        };
+        const merged = this.board.cloneStateSnapshot(base);
 
         delta.cells.forEach((cellDelta) => {
             const row = merged.cells[cellDelta.y];
@@ -143,9 +125,12 @@ export class CommandPlayColor implements ICommand {
 
     execute(): void {
         if (this.redoDelta) {
-            const current = this.board.createStateSnapshot();
+            const current = this.lastKnownSnapshot
+                ? this.board.cloneStateSnapshot(this.lastKnownSnapshot)
+                : this.board.createStateSnapshot();
             const next = this.applyDelta(current, this.redoDelta);
             this.board.restoreStateSnapshot(next);
+            this.lastKnownSnapshot = this.board.cloneStateSnapshot(next);
             return;
         }
 
@@ -155,6 +140,7 @@ export class CommandPlayColor implements ICommand {
 
         this.redoDelta = this.createDelta(stateBefore, stateAfter);
         this.undoDelta = this.createDelta(stateAfter, stateBefore);
+        this.lastKnownSnapshot = this.board.cloneStateSnapshot(stateAfter);
     }
 
     undo(): void {
@@ -162,8 +148,11 @@ export class CommandPlayColor implements ICommand {
             return;
         }
 
-        const current = this.board.createStateSnapshot();
+        const current = this.lastKnownSnapshot
+            ? this.board.cloneStateSnapshot(this.lastKnownSnapshot)
+            : this.board.createStateSnapshot();
         const previous = this.applyDelta(current, this.undoDelta);
         this.board.restoreStateSnapshot(previous);
+        this.lastKnownSnapshot = this.board.cloneStateSnapshot(previous);
     }
 }

@@ -14,6 +14,7 @@ import type { BoardDependencies } from "./types/boarddependencies.js";
 import type { BoardHighscore } from "./types/boardhighscore.js";
 import type { BoardStateSnapshot } from "./types/boardstatesnapshot.js";
 import type { BoardTimer } from "./types/boardtimer.js";
+import type { CellState } from "./types/cellstate.js";
 import type { ScoreStats } from "./types/scorestats.js";
 import { UiFacade } from "./uifacade.js";
 import { Util } from "./util.js";
@@ -94,6 +95,34 @@ export class Board {
 
     getCommandInvoker(): CommandInvoker {
         return this.m_CommandInvoker;
+    }
+
+    private cloneCellStates(cells: CellState[][]): CellState[][] {
+        return cells.map((row) =>
+            row.map((cell) => ({
+                color: cell.color,
+                owner: cell.owner,
+                occupied: cell.occupied
+            }))
+        );
+    }
+
+    cloneStateSnapshot(snapshot: BoardStateSnapshot): BoardStateSnapshot {
+        return {
+            cells: this.cloneCellStates(snapshot.cells),
+            phase: snapshot.phase,
+            ui: {
+                winnerText: snapshot.ui.winnerText,
+                winnerVisible: snapshot.ui.winnerVisible,
+                moveInfoText: snapshot.ui.moveInfoText,
+                moveInfoVisible: snapshot.ui.moveInfoVisible
+            },
+            highscore: {
+                humanWins: snapshot.highscore.humanWins,
+                computerWins: snapshot.highscore.computerWins,
+                draws: snapshot.highscore.draws
+            }
+        };
     }
 
     createStateSnapshot(): BoardStateSnapshot {
@@ -269,7 +298,7 @@ export class Board {
         const btnWidth = Math.floor((this.m_Definitions.DimensionX * this.m_Definitions.CellSize) / 5);
         const btnHeight = Math.floor(
             (this.m_Definitions.DimensionY * this.m_Definitions.CellSize - (numberOfButtons + 1) * btnMargin) /
-                numberOfButtons
+            numberOfButtons
         );
 
         Util.clearChildren(buttonField);

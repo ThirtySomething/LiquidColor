@@ -57,9 +57,7 @@ export class StrategyMinimax {
                     bestHumanGain = humanGain;
                 }
             }
-            const score = compGain
-                - bestHumanGain * DENY_WEIGHT
-                + frontierColors.size * DIVERSITY_WEIGHT;
+            const score = compGain - bestHumanGain * DENY_WEIGHT + frontierColors.size * DIVERSITY_WEIGHT;
             if (score > bestScore) {
                 bestScore = score;
                 bestColor = compColor;

@@ -5,6 +5,7 @@ import { CommandPlayColor } from "../src/commands/commandplaycolor";
 
 type BoardStub = {
     createStateSnapshot: ReturnType<typeof vi.fn>;
+    cloneStateSnapshot: ReturnType<typeof vi.fn>;
     performMove: ReturnType<typeof vi.fn>;
     restoreStateSnapshot: ReturnType<typeof vi.fn>;
 };
@@ -37,6 +38,7 @@ const createBoardStub = (): BoardStub => {
             .mockReturnValueOnce(snapshotBefore)
             .mockReturnValueOnce(snapshotAfter)
             .mockReturnValue(snapshotAfter),
+        cloneStateSnapshot: vi.fn((snapshot: BoardStateSnapshot) => structuredClone(snapshot)),
         performMove: vi.fn(),
         restoreStateSnapshot: vi.fn()
     };
@@ -62,6 +64,7 @@ describe("CommandPlayColor", () => {
 
         expect(board.performMove).toHaveBeenCalledTimes(1);
         expect(board.restoreStateSnapshot).toHaveBeenCalledTimes(1);
+        expect(board.createStateSnapshot).toHaveBeenCalledTimes(2);
     });
 
     it("undo restores pre-move state after execution", () => {
@@ -130,6 +133,7 @@ describe("CommandPlayColor", () => {
                 .mockReturnValueOnce(snapshotBefore)
                 .mockReturnValueOnce(snapshotAfter)
                 .mockReturnValue(snapshotAfter),
+            cloneStateSnapshot: vi.fn((snapshot: BoardStateSnapshot) => structuredClone(snapshot)),
             performMove: vi.fn(),
             restoreStateSnapshot: vi.fn()
         };

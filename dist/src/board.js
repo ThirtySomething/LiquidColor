@@ -89,16 +89,10 @@ export class Board {
             }
         };
     }
-    createStateSnapshot() {
+    createMetadataSnapshot() {
         const winnerElement = UiFacade.getElement(this.m_IDWinner);
         const moveInfoElement = UiFacade.getElement("moveinfo");
-        const cells = this.m_Grid.m_Cells.map((row) => row.map((cell) => ({
-            color: cell.m_Color,
-            owner: cell.m_Owner,
-            occupied: cell.m_Occupied
-        })));
         return {
-            cells,
             phase: this.m_Phase.name,
             ui: {
                 winnerText: UiFacade.getText(this.m_IDWinner),
@@ -107,6 +101,78 @@ export class Board {
                 moveInfoVisible: moveInfoElement ? UiFacade.getDisplay("moveinfo") !== "none" : false
             },
             highscore: this.m_Highscore.createSnapshot()
+        };
+    }
+    static createDeltaFromSnapshotParts(metadataFrom, metadataTo, cells) {
+        const delta = { cells };
+        if (metadataFrom.phase !== metadataTo.phase) {
+            delta.phase = metadataTo.phase;
+        }
+        if (metadataFrom.ui.winnerText !== metadataTo.ui.winnerText ||
+            metadataFrom.ui.winnerVisible !== metadataTo.ui.winnerVisible ||
+            metadataFrom.ui.moveInfoText !== metadataTo.ui.moveInfoText ||
+            metadataFrom.ui.moveInfoVisible !== metadataTo.ui.moveInfoVisible) {
+            delta.ui = {
+                winnerText: metadataTo.ui.winnerText,
+                winnerVisible: metadataTo.ui.winnerVisible,
+                moveInfoText: metadataTo.ui.moveInfoText,
+                moveInfoVisible: metadataTo.ui.moveInfoVisible
+            };
+        }
+        if (metadataFrom.highscore.humanWins !== metadataTo.highscore.humanWins ||
+            metadataFrom.highscore.computerWins !== metadataTo.highscore.computerWins ||
+            metadataFrom.highscore.draws !== metadataTo.highscore.draws) {
+            delta.highscore = {
+                humanWins: metadataTo.highscore.humanWins,
+                computerWins: metadataTo.highscore.computerWins,
+                draws: metadataTo.highscore.draws
+            };
+        }
+        return delta;
+    }
+    static mergeCellMutations(target, mutations) {
+        if (!mutations) {
+            return;
+        }
+        mutations.forEach((mutation) => {
+            const key = `${mutation.y}:${mutation.x}`;
+            const existing = target.get(key);
+            if (!existing) {
+                target.set(key, {
+                    y: mutation.y,
+                    x: mutation.x,
+                    before: {
+                        color: mutation.before.color,
+                        owner: mutation.before.owner,
+                        occupied: mutation.before.occupied
+                    },
+                    after: {
+                        color: mutation.after.color,
+                        owner: mutation.after.owner,
+                        occupied: mutation.after.occupied
+                    }
+                });
+                return;
+            }
+            existing.after = {
+                color: mutation.after.color,
+                owner: mutation.after.owner,
+                occupied: mutation.after.occupied
+            };
+        });
+    }
+    createStateSnapshot() {
+        const metadata = this.createMetadataSnapshot();
+        const cells = this.m_Grid.m_Cells.map((row) => row.map((cell) => ({
+            color: cell.m_Color,
+            owner: cell.m_Owner,
+            occupied: cell.m_Occupied
+        })));
+        return {
+            cells,
+            phase: metadata.phase,
+            ui: metadata.ui,
+            highscore: metadata.highscore
         };
     }
     restoreStateSnapshot(snapshot) {
@@ -246,31 +312,85 @@ export class Board {
             UiFacade.appendChild(buttonContainer, colorButton);
         });
     }
-    performMove(newColorPlayer) {
+    performMoveWithDelta(newColorPlayer) {
+        const metadataBefore = this.createMetadataSnapshot();
+        const mutations = new Map();
         if (!this.m_Phase.canAcceptMove() || !this.m_PlayerHuman.m_BaseCell || !this.m_PlayerComputer.m_BaseCell) {
-            return;
+            const metadataAfter = this.createMetadataSnapshot();
+            return {
+                redoDelta: Board.createDeltaFromSnapshotParts(metadataBefore, metadataAfter, []),
+                undoDelta: Board.createDeltaFromSnapshotParts(metadataAfter, metadataBefore, [])
+            };
         }
         Util.hide("moveinfo");
         if (newColorPlayer === this.m_PlayerHuman.m_BaseCell.m_Color) {
             Util.setText("moveinfo", "You cannot select the color of yourself.");
             Util.show("moveinfo", "block");
-            return;
+            const metadataAfter = this.createMetadataSnapshot();
+            return {
+                redoDelta: Board.createDeltaFromSnapshotParts(metadataBefore, metadataAfter, []),
+                undoDelta: Board.createDeltaFromSnapshotParts(metadataAfter, metadataBefore, [])
+            };
         }
         if (newColorPlayer === this.m_PlayerComputer.m_BaseCell.m_Color) {
             Util.setText("moveinfo", "You cannot select the color of your opponent.");
             Util.show("moveinfo", "block");
-            return;
+            const metadataAfter = this.createMetadataSnapshot();
+            return {
+                redoDelta: Board.createDeltaFromSnapshotParts(metadataBefore, metadataAfter, []),
+                undoDelta: Board.createDeltaFromSnapshotParts(metadataAfter, metadataBefore, [])
+            };
         }
         this.m_Timer.startCounting();
         this.m_Grid.gridReset();
-        this.m_PlayerHuman.move(this.m_Grid.m_Cells, [newColorPlayer], this.m_Definitions, this.m_CanvasElement, this.m_RandomSource);
+        Board.mergeCellMutations(mutations, this.m_PlayerHuman.move(this.m_Grid.m_Cells, [newColorPlayer], this.m_Definitions, this.m_CanvasElement, this.m_RandomSource));
         if (this.evaluateGameState()) {
-            return;
+            const redoCells = Array.from(mutations.values()).map((mutation) => ({
+                y: mutation.y,
+                x: mutation.x,
+                color: mutation.after.color,
+                owner: mutation.after.owner,
+                occupied: mutation.after.occupied
+            }));
+            const undoCells = Array.from(mutations.values()).map((mutation) => ({
+                y: mutation.y,
+                x: mutation.x,
+                color: mutation.before.color,
+                owner: mutation.before.owner,
+                occupied: mutation.before.occupied
+            }));
+            const metadataAfter = this.createMetadataSnapshot();
+            return {
+                redoDelta: Board.createDeltaFromSnapshotParts(metadataBefore, metadataAfter, redoCells),
+                undoDelta: Board.createDeltaFromSnapshotParts(metadataAfter, metadataBefore, undoCells)
+            };
         }
         const newColorComputer = this.m_PlayerComputer.identifyBestColor(this.m_Grid.m_Cells, this.m_Definitions, newColorPlayer, this.m_PlayerHuman, this.m_ComputerStrategy, this.m_RandomSource);
         this.m_Grid.gridReset();
-        this.m_PlayerComputer.move(this.m_Grid.m_Cells, [newColorComputer], this.m_Definitions, this.m_CanvasElement, this.m_RandomSource);
+        Board.mergeCellMutations(mutations, this.m_PlayerComputer.move(this.m_Grid.m_Cells, [newColorComputer], this.m_Definitions, this.m_CanvasElement, this.m_RandomSource));
         this.evaluateGameState();
+        const redoCells = Array.from(mutations.values()).map((mutation) => ({
+            y: mutation.y,
+            x: mutation.x,
+            color: mutation.after.color,
+            owner: mutation.after.owner,
+            occupied: mutation.after.occupied
+        }));
+        const undoCells = Array.from(mutations.values()).map((mutation) => ({
+            y: mutation.y,
+            x: mutation.x,
+            color: mutation.before.color,
+            owner: mutation.before.owner,
+            occupied: mutation.before.occupied
+        }));
+        const metadataAfter = this.createMetadataSnapshot();
+        return {
+            redoDelta: Board.createDeltaFromSnapshotParts(metadataBefore, metadataAfter, redoCells),
+            undoDelta: Board.createDeltaFromSnapshotParts(metadataAfter, metadataBefore, undoCells)
+        };
+    }
+    performMove(newColorPlayer) {
+        this.performMoveWithDelta(newColorPlayer);
     }
     getScoreStats() {
         let human = 0;

@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { Board, BoardStateSnapshot } from "../src/board";
+import type { Board, BoardMoveDeltas, BoardStateSnapshot } from "../src/board";
 import { CommandPlayColor } from "../src/commands/commandplaycolor";
 
 type BoardStub = {
     createStateSnapshot: ReturnType<typeof vi.fn>;
-    cloneStateSnapshot: ReturnType<typeof vi.fn>;
+    performMoveWithDelta: ReturnType<typeof vi.fn>;
     performMove: ReturnType<typeof vi.fn>;
     restoreStateSnapshot: ReturnType<typeof vi.fn>;
 };
@@ -32,13 +32,23 @@ const createBoardStub = (): BoardStub => {
         phase: "gameover"
     };
 
+    const deltas: BoardMoveDeltas = {
+        redoDelta: {
+            cells: [],
+            phase: "gameover"
+        },
+        undoDelta: {
+            cells: [],
+            phase: "inprogress"
+        }
+    };
+
     return {
         createStateSnapshot: vi
             .fn()
             .mockReturnValueOnce(snapshotBefore)
-            .mockReturnValueOnce(snapshotAfter)
             .mockReturnValue(snapshotAfter),
-        cloneStateSnapshot: vi.fn((snapshot: BoardStateSnapshot) => structuredClone(snapshot)),
+        performMoveWithDelta: vi.fn(() => deltas),
         performMove: vi.fn(),
         restoreStateSnapshot: vi.fn()
     };
@@ -51,8 +61,8 @@ describe("CommandPlayColor", () => {
 
         command.execute();
 
-        expect(board.createStateSnapshot).toHaveBeenCalledTimes(2);
-        expect(board.performMove).toHaveBeenCalledWith("red");
+        expect(board.createStateSnapshot).toHaveBeenCalledTimes(1);
+        expect(board.performMoveWithDelta).toHaveBeenCalledWith("red");
     });
 
     it("restores cached post-state on repeated execute", () => {
@@ -62,9 +72,9 @@ describe("CommandPlayColor", () => {
         command.execute();
         command.execute();
 
-        expect(board.performMove).toHaveBeenCalledTimes(1);
+        expect(board.performMoveWithDelta).toHaveBeenCalledTimes(1);
         expect(board.restoreStateSnapshot).toHaveBeenCalledTimes(1);
-        expect(board.createStateSnapshot).toHaveBeenCalledTimes(2);
+        expect(board.createStateSnapshot).toHaveBeenCalledTimes(1);
     });
 
     it("undo restores pre-move state after execution", () => {
@@ -84,15 +94,15 @@ describe("CommandPlayColor", () => {
         command.undo();
 
         expect(board.restoreStateSnapshot).not.toHaveBeenCalled();
-        expect(board.performMove).not.toHaveBeenCalled();
+        expect(board.performMoveWithDelta).not.toHaveBeenCalled();
     });
 
-    it("accepts invalid color payloads and forwards them to performMove", () => {
+    it("accepts invalid color payloads and forwards them to performMoveWithDelta", () => {
         const board = createBoardStub();
         const command = new CommandPlayColor(board as unknown as Board, "" as unknown as string);
 
         expect(() => command.execute()).not.toThrow();
-        expect(board.performMove).toHaveBeenCalledWith("");
+        expect(board.performMoveWithDelta).toHaveBeenCalledWith("");
     });
 
     it("stores compact deltas with only changed cells", () => {
@@ -131,9 +141,15 @@ describe("CommandPlayColor", () => {
             createStateSnapshot: vi
                 .fn()
                 .mockReturnValueOnce(snapshotBefore)
-                .mockReturnValueOnce(snapshotAfter)
                 .mockReturnValue(snapshotAfter),
-            cloneStateSnapshot: vi.fn((snapshot: BoardStateSnapshot) => structuredClone(snapshot)),
+            performMoveWithDelta: vi.fn(() => ({
+                redoDelta: {
+                    cells: [{ y: 0, x: 0, color: "green", owner: "Human", occupied: true }]
+                },
+                undoDelta: {
+                    cells: [{ y: 0, x: 0, color: "red", owner: "", occupied: false }]
+                }
+            })),
             performMove: vi.fn(),
             restoreStateSnapshot: vi.fn()
         };

@@ -24,6 +24,34 @@ export class Player {
     setNotifyUI(notifyUI) {
         this.m_NotifyUI = notifyUI;
     }
+    static captureCellState(cell) {
+        return {
+            color: cell.m_Color,
+            owner: cell.m_Owner,
+            occupied: cell.m_Occupied
+        };
+    }
+    static trackMutationStart(cell, mutations) {
+        const key = `${cell.m_PosY}:${cell.m_PosX}`;
+        if (mutations.has(key)) {
+            return;
+        }
+        const state = Player.captureCellState(cell);
+        mutations.set(key, {
+            y: cell.m_PosY,
+            x: cell.m_PosX,
+            before: state,
+            after: state
+        });
+    }
+    static trackMutationEnd(cell, mutations) {
+        const key = `${cell.m_PosY}:${cell.m_PosX}`;
+        const mutation = mutations.get(key);
+        if (!mutation) {
+            return;
+        }
+        mutation.after = Player.captureCellState(cell);
+    }
     counterUpdate(cells, definitions) {
         let cellCounter = 0;
         cells.forEach((currentRow) => {
@@ -60,13 +88,19 @@ export class Player {
     }
     move(cells, colors, definitions, canvasElement, randomSource = MathRandomSource) {
         if (!this.m_BaseCell || !canvasElement) {
-            return;
+            return [];
         }
+        const mutations = new Map();
+        Player.trackMutationStart(this.m_BaseCell, mutations);
         this.m_BaseCell.m_Color = this.m_BaseCell.cellColorRandomGet(colors, randomSource);
         this.m_BaseCell.draw(definitions, canvasElement);
-        this.cellsMarkOwner(cells, definitions, canvasElement);
+        Player.trackMutationEnd(this.m_BaseCell, mutations);
+        this.cellsMarkOwner(cells, definitions, canvasElement, mutations);
+        return Array.from(mutations.values()).filter((mutation) => mutation.before.color !== mutation.after.color ||
+            mutation.before.owner !== mutation.after.owner ||
+            mutation.before.occupied !== mutation.after.occupied);
     }
-    cellsMarkOwner(cells, definitions, canvasElement) {
+    cellsMarkOwner(cells, definitions, canvasElement, mutations) {
         if (!this.m_BaseCell) {
             return;
         }
@@ -81,9 +115,15 @@ export class Player {
             if (!this.m_BaseCell) {
                 continue;
             }
+            if (mutations) {
+                Player.trackMutationStart(currentCell, mutations);
+            }
             currentCell.m_Color = this.m_BaseCell.m_Color;
             currentCell.ownerSet(this.m_PlayerName);
             currentCell.draw(definitions, canvasElement);
+            if (mutations) {
+                Player.trackMutationEnd(currentCell, mutations);
+            }
             currentCell.neighboursGet(cells, definitions).forEach((newCell) => {
                 if (queued.has(newCell)) {
                     return;

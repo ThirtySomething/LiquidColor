@@ -5,7 +5,15 @@ import type { ObserverData } from "./observerdata.js";
 import { type RandomSource, MathRandomSource } from "./randomsource.js";
 import { ComputerStrategyFactory } from "./strategies/computerstrategyfactory.js";
 import type { ComputerStrategy } from "./strategies/computerstrategytype.js";
+import type { CellState } from "./types/cellstate.js";
 import { Util } from "./util.js";
+
+export type CellMutation = {
+    y: number;
+    x: number;
+    before: CellState;
+    after: CellState;
+};
 
 export class Player {
     m_PlayerName: string;
@@ -28,6 +36,39 @@ export class Player {
 
     setNotifyUI(notifyUI: (data: ObserverData) => void): void {
         this.m_NotifyUI = notifyUI;
+    }
+
+    private static captureCellState(cell: Cell): CellState {
+        return {
+            color: cell.m_Color,
+            owner: cell.m_Owner,
+            occupied: cell.m_Occupied
+        };
+    }
+
+    private static trackMutationStart(cell: Cell, mutations: Map<string, CellMutation>): void {
+        const key = `${cell.m_PosY}:${cell.m_PosX}`;
+        if (mutations.has(key)) {
+            return;
+        }
+
+        const state = Player.captureCellState(cell);
+        mutations.set(key, {
+            y: cell.m_PosY,
+            x: cell.m_PosX,
+            before: state,
+            after: state
+        });
+    }
+
+    private static trackMutationEnd(cell: Cell, mutations: Map<string, CellMutation>): void {
+        const key = `${cell.m_PosY}:${cell.m_PosX}`;
+        const mutation = mutations.get(key);
+        if (!mutation) {
+            return;
+        }
+
+        mutation.after = Player.captureCellState(cell);
     }
 
     counterUpdate(cells: Cell[][], definitions: Definitions): void {
@@ -76,17 +117,34 @@ export class Player {
         definitions: Definitions,
         canvasElement: CanvasRenderingContext2D | null,
         randomSource: RandomSource = MathRandomSource
-    ): void {
+    ): CellMutation[] {
         if (!this.m_BaseCell || !canvasElement) {
-            return;
+            return [];
         }
 
+        const mutations = new Map<string, CellMutation>();
+
+        Player.trackMutationStart(this.m_BaseCell, mutations);
         this.m_BaseCell.m_Color = this.m_BaseCell.cellColorRandomGet(colors, randomSource);
         this.m_BaseCell.draw(definitions, canvasElement);
-        this.cellsMarkOwner(cells, definitions, canvasElement);
+        Player.trackMutationEnd(this.m_BaseCell, mutations);
+
+        this.cellsMarkOwner(cells, definitions, canvasElement, mutations);
+
+        return Array.from(mutations.values()).filter(
+            (mutation) =>
+                mutation.before.color !== mutation.after.color ||
+                mutation.before.owner !== mutation.after.owner ||
+                mutation.before.occupied !== mutation.after.occupied
+        );
     }
 
-    cellsMarkOwner(cells: Cell[][], definitions: Definitions, canvasElement: CanvasRenderingContext2D): void {
+    cellsMarkOwner(
+        cells: Cell[][],
+        definitions: Definitions,
+        canvasElement: CanvasRenderingContext2D,
+        mutations?: Map<string, CellMutation>
+    ): void {
         if (!this.m_BaseCell) {
             return;
         }
@@ -105,9 +163,15 @@ export class Player {
                 continue;
             }
 
+            if (mutations) {
+                Player.trackMutationStart(currentCell, mutations);
+            }
             currentCell.m_Color = this.m_BaseCell.m_Color;
             currentCell.ownerSet(this.m_PlayerName);
             currentCell.draw(definitions, canvasElement);
+            if (mutations) {
+                Player.trackMutationEnd(currentCell, mutations);
+            }
 
             currentCell.neighboursGet(cells, definitions).forEach((newCell) => {
                 if (queued.has(newCell)) {

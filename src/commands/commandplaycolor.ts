@@ -1,6 +1,5 @@
-import type { Board, BoardStateSnapshot } from "../board.js";
+import type { Board, BoardMoveDeltas, BoardStateSnapshot } from "../board.js";
 import type { BoardStateDelta } from "../types/boardstatedelta.js";
-import type { CellDelta } from "../types/celldelta.js";
 import type { ICommand } from "./icommand.js";
 
 export class CommandPlayColor implements ICommand {
@@ -18,76 +17,9 @@ export class CommandPlayColor implements ICommand {
         this.lastKnownSnapshot = null;
     }
 
-    private createDelta(from: BoardStateSnapshot, to: BoardStateSnapshot): BoardStateDelta {
-        const cells: CellDelta[] = [];
-
-        const rowCount = Math.max(from.cells.length, to.cells.length);
-        for (let y = 0; y < rowCount; y += 1) {
-            const fromRow = from.cells[y] ?? [];
-            const toRow = to.cells[y] ?? [];
-            const colCount = Math.max(fromRow.length, toRow.length);
-
-            for (let x = 0; x < colCount; x += 1) {
-                const fromCell = fromRow[x];
-                const toCell = toRow[x];
-                if (!toCell) {
-                    continue;
-                }
-
-                if (
-                    !fromCell ||
-                    fromCell.color !== toCell.color ||
-                    fromCell.owner !== toCell.owner ||
-                    fromCell.occupied !== toCell.occupied
-                ) {
-                    cells.push({
-                        y,
-                        x,
-                        color: toCell.color,
-                        owner: toCell.owner,
-                        occupied: toCell.occupied
-                    });
-                }
-            }
-        }
-
-        const delta: BoardStateDelta = { cells };
-        if (from.phase !== to.phase) {
-            delta.phase = to.phase;
-        }
-        if (
-            from.ui.winnerText !== to.ui.winnerText ||
-            from.ui.winnerVisible !== to.ui.winnerVisible ||
-            from.ui.moveInfoText !== to.ui.moveInfoText ||
-            from.ui.moveInfoVisible !== to.ui.moveInfoVisible
-        ) {
-            delta.ui = {
-                winnerText: to.ui.winnerText,
-                winnerVisible: to.ui.winnerVisible,
-                moveInfoText: to.ui.moveInfoText,
-                moveInfoVisible: to.ui.moveInfoVisible
-            };
-        }
-        if (
-            from.highscore.humanWins !== to.highscore.humanWins ||
-            from.highscore.computerWins !== to.highscore.computerWins ||
-            from.highscore.draws !== to.highscore.draws
-        ) {
-            delta.highscore = {
-                humanWins: to.highscore.humanWins,
-                computerWins: to.highscore.computerWins,
-                draws: to.highscore.draws
-            };
-        }
-
-        return delta;
-    }
-
-    private applyDelta(base: BoardStateSnapshot, delta: BoardStateDelta): BoardStateSnapshot {
-        const merged = this.board.cloneStateSnapshot(base);
-
+    private applyDeltaInPlace(base: BoardStateSnapshot, delta: BoardStateDelta): void {
         delta.cells.forEach((cellDelta) => {
-            const row = merged.cells[cellDelta.y];
+            const row = base.cells[cellDelta.y];
             if (!row) {
                 return;
             }
@@ -102,10 +34,10 @@ export class CommandPlayColor implements ICommand {
         });
 
         if (delta.phase) {
-            merged.phase = delta.phase;
+            base.phase = delta.phase;
         }
         if (delta.ui) {
-            merged.ui = {
+            base.ui = {
                 winnerText: delta.ui.winnerText,
                 winnerVisible: delta.ui.winnerVisible,
                 moveInfoText: delta.ui.moveInfoText,
@@ -113,34 +45,31 @@ export class CommandPlayColor implements ICommand {
             };
         }
         if (delta.highscore) {
-            merged.highscore = {
+            base.highscore = {
                 humanWins: delta.highscore.humanWins,
                 computerWins: delta.highscore.computerWins,
                 draws: delta.highscore.draws
             };
         }
-
-        return merged;
     }
 
     execute(): void {
         if (this.redoDelta) {
-            const current = this.lastKnownSnapshot
-                ? this.board.cloneStateSnapshot(this.lastKnownSnapshot)
-                : this.board.createStateSnapshot();
-            const next = this.applyDelta(current, this.redoDelta);
-            this.board.restoreStateSnapshot(next);
-            this.lastKnownSnapshot = this.board.cloneStateSnapshot(next);
+            if (!this.lastKnownSnapshot) {
+                this.lastKnownSnapshot = this.board.createStateSnapshot();
+            }
+            this.applyDeltaInPlace(this.lastKnownSnapshot, this.redoDelta);
+            this.board.restoreStateSnapshot(this.lastKnownSnapshot);
             return;
         }
 
         const stateBefore = this.board.createStateSnapshot();
-        this.board.performMove(this.color);
-        const stateAfter = this.board.createStateSnapshot();
+        const deltas: BoardMoveDeltas = this.board.performMoveWithDelta(this.color);
 
-        this.redoDelta = this.createDelta(stateBefore, stateAfter);
-        this.undoDelta = this.createDelta(stateAfter, stateBefore);
-        this.lastKnownSnapshot = this.board.cloneStateSnapshot(stateAfter);
+        this.redoDelta = deltas.redoDelta;
+        this.undoDelta = deltas.undoDelta;
+        this.lastKnownSnapshot = stateBefore;
+        this.applyDeltaInPlace(this.lastKnownSnapshot, this.redoDelta);
     }
 
     undo(): void {
@@ -148,11 +77,11 @@ export class CommandPlayColor implements ICommand {
             return;
         }
 
-        const current = this.lastKnownSnapshot
-            ? this.board.cloneStateSnapshot(this.lastKnownSnapshot)
-            : this.board.createStateSnapshot();
-        const previous = this.applyDelta(current, this.undoDelta);
-        this.board.restoreStateSnapshot(previous);
-        this.lastKnownSnapshot = this.board.cloneStateSnapshot(previous);
+        if (!this.lastKnownSnapshot) {
+            this.lastKnownSnapshot = this.board.createStateSnapshot();
+        }
+
+        this.applyDeltaInPlace(this.lastKnownSnapshot, this.undoDelta);
+        this.board.restoreStateSnapshot(this.lastKnownSnapshot);
     }
 }

@@ -80,9 +80,7 @@ export class UiFacade {
     }
 
     static getCssNumberVar(name: string, fallback = 0): number {
-        const value = getComputedStyle(document.documentElement)
-            .getPropertyValue(name)
-            .trim();
+        const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
         const parsed = Number.parseInt(value, 10);
         return Number.isNaN(parsed) ? fallback : parsed;
     }
@@ -109,12 +107,7 @@ export class UiFacade {
         return canvas.getContext("2d");
     }
 
-    static createColorButton(
-        color: string,
-        width: number,
-        height: number,
-        onClick: () => void
-    ): HTMLButtonElement {
+    static createColorButton(color: string, width: number, height: number, onClick: () => void): HTMLButtonElement {
         const colorButton = document.createElement("button");
         colorButton.type = "button";
         colorButton.id = color;

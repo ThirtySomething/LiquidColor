@@ -42,13 +42,13 @@ export class Player {
         });
 
         this.m_NotifyUI({
-            type: 'score',
+            type: "score",
             player: this.m_PlayerName,
             scoreElementId: this.m_IDScore,
             score: cellCounter
         });
         if (cellCounter >= definitions.Winner) {
-            this.m_NotifyUI({ type: 'winner', player: this.m_PlayerName });
+            this.m_NotifyUI({ type: "winner", player: this.m_PlayerName });
         }
     }
 
@@ -66,11 +66,7 @@ export class Player {
 
         if (board.m_CanvasElement) {
             this.m_BaseCell.draw(board.m_Definitions, board.m_CanvasElement);
-            this.cellsMarkOwner(
-                board.m_Grid.m_Cells,
-                board.m_Definitions,
-                board.m_CanvasElement
-            );
+            this.cellsMarkOwner(board.m_Grid.m_Cells, board.m_Definitions, board.m_CanvasElement);
         }
     }
 
@@ -90,11 +86,7 @@ export class Player {
         this.cellsMarkOwner(cells, definitions, canvasElement);
     }
 
-    cellsMarkOwner(
-        cells: Cell[][],
-        definitions: Definitions,
-        canvasElement: CanvasRenderingContext2D
-    ): void {
+    cellsMarkOwner(cells: Cell[][], definitions: Definitions, canvasElement: CanvasRenderingContext2D): void {
         if (!this.m_BaseCell) {
             return;
         }
@@ -142,14 +134,18 @@ export class Player {
             return newColorPlayer;
         }
 
-        return ComputerStrategyFactory.chooseComputerColor(strategy, {
-            cells,
-            definitions,
-            newColorPlayer,
-            compPlayerName: this.m_PlayerName,
-            humanPlayerName: opponent.m_PlayerName,
-            compCurrentColor: this.m_BaseCell.m_Color,
-            humanCurrentColor: opponent.m_BaseCell.m_Color
-        }, randomSource);
+        return ComputerStrategyFactory.chooseComputerColor(
+            strategy,
+            {
+                cells,
+                definitions,
+                newColorPlayer,
+                compPlayerName: this.m_PlayerName,
+                humanPlayerName: opponent.m_PlayerName,
+                compCurrentColor: this.m_BaseCell.m_Color,
+                humanCurrentColor: opponent.m_BaseCell.m_Color
+            },
+            randomSource
+        );
     }
 }

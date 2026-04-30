@@ -3,7 +3,7 @@ import type { ObserverData, ScoreData } from "./observerdata.js";
 
 export class ScoreObserver implements IObserver {
     update(data: ObserverData): void {
-        if (data.type === 'score') {
+        if (data.type === "score") {
             const d = data as ScoreData;
             const element = document.getElementById(d.scoreElementId);
             if (element) {

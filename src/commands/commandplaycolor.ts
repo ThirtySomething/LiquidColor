@@ -83,11 +83,13 @@ export class CommandPlayColor implements ICommand {
 
     private applyDelta(base: BoardStateSnapshot, delta: BoardStateDelta): BoardStateSnapshot {
         const merged: BoardStateSnapshot = {
-            cells: base.cells.map((row) => row.map((cell) => ({
-                color: cell.color,
-                owner: cell.owner,
-                occupied: cell.occupied
-            }))),
+            cells: base.cells.map((row) =>
+                row.map((cell) => ({
+                    color: cell.color,
+                    owner: cell.owner,
+                    occupied: cell.occupied
+                }))
+            ),
             phase: base.phase,
             ui: {
                 winnerText: base.ui.winnerText,

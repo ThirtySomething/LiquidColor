@@ -19,8 +19,7 @@ export class LocalStorageHighscoreRepository implements HighscoreRepository {
             }
 
             return { humanWins, computerWins, draws };
-        }
-        catch {
+        } catch {
             return null;
         }
     }
@@ -28,8 +27,7 @@ export class LocalStorageHighscoreRepository implements HighscoreRepository {
     save(snapshot: HighscoreSnapshot): void {
         try {
             window.localStorage.setItem(LocalStorageHighscoreRepository.STORAGE_KEY, JSON.stringify(snapshot));
-        }
-        catch {
+        } catch {
             // Ignore storage errors to avoid breaking gameplay when storage is unavailable.
         }
     }

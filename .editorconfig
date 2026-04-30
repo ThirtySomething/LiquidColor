@@ -15,6 +15,11 @@ indent_size = 4
 indent_style = space
 curly_bracket_newline = true
 
+[src/**.{ts,tsx,js,jsx}]
+indent_size = 4
+indent_style = space
+curly_bracket_newline = true
+
 [*.{json,yml,yaml}]
 indent_size = 2
 indent_style = space
@@ -35,7 +40,7 @@ max_line_length = off
 [package.json]
 max_line_length = off
 
-[liquidcolor.ts]
+[src/liquidcolor.ts]
 max_line_length = off
 
 [LICENSE.TXT]

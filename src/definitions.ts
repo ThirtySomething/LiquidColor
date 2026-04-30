@@ -49,12 +49,7 @@ export class Definitions {
         return Definitions.instance;
     }
 
-    private sanitizeInt(
-        value: number | string,
-        min: number,
-        max: number,
-        fallback: number
-    ): number {
+    private sanitizeInt(value: number | string, min: number, max: number, fallback: number): number {
         const parsed = Number.parseInt(String(value), 10);
         if (Number.isNaN(parsed)) {
             return fallback;
@@ -64,28 +59,12 @@ export class Definitions {
     }
 
     reInit(dimX: number | string, dimY: number | string, cellSize: number | string): void {
-        const fallbackDimX = this.DimensionX > 0
-            ? this.DimensionX
-            : Definitions.DEFAULT_DIMENSION_X;
-        const fallbackDimY = this.DimensionY > 0
-            ? this.DimensionY
-            : Definitions.DEFAULT_DIMENSION_Y;
-        const fallbackCellSize = this.CellSize > 0
-            ? this.CellSize
-            : Definitions.DEFAULT_CELL_SIZE;
+        const fallbackDimX = this.DimensionX > 0 ? this.DimensionX : Definitions.DEFAULT_DIMENSION_X;
+        const fallbackDimY = this.DimensionY > 0 ? this.DimensionY : Definitions.DEFAULT_DIMENSION_Y;
+        const fallbackCellSize = this.CellSize > 0 ? this.CellSize : Definitions.DEFAULT_CELL_SIZE;
 
-        this.DimensionX = this.sanitizeInt(
-            dimX,
-            Definitions.MIN_DIMENSION,
-            Definitions.MAX_DIMENSION,
-            fallbackDimX
-        );
-        this.DimensionY = this.sanitizeInt(
-            dimY,
-            Definitions.MIN_DIMENSION,
-            Definitions.MAX_DIMENSION,
-            fallbackDimY
-        );
+        this.DimensionX = this.sanitizeInt(dimX, Definitions.MIN_DIMENSION, Definitions.MAX_DIMENSION, fallbackDimX);
+        this.DimensionY = this.sanitizeInt(dimY, Definitions.MIN_DIMENSION, Definitions.MAX_DIMENSION, fallbackDimY);
         this.CellSize = this.sanitizeInt(
             cellSize,
             Definitions.MIN_CELL_SIZE,

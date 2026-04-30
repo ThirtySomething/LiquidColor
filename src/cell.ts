@@ -24,12 +24,7 @@ export class Cell {
             const cellPosY = definitions.CellSize * this.m_PosY;
 
             canvasElement.beginPath();
-            canvasElement.rect(
-                cellPosX,
-                cellPosY,
-                definitions.CellSize,
-                definitions.CellSize
-            );
+            canvasElement.rect(cellPosX, cellPosY, definitions.CellSize, definitions.CellSize);
             canvasElement.fillStyle = this.m_Color;
             canvasElement.fill();
             canvasElement.stroke();

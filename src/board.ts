@@ -100,11 +100,13 @@ export class Board {
         const winnerElement = UiFacade.getElement(this.m_IDWinner);
         const moveInfoElement = UiFacade.getElement("moveinfo");
 
-        const cells = this.m_Grid.m_Cells.map((row) => row.map((cell) => ({
-            color: cell.m_Color,
-            owner: cell.m_Owner,
-            occupied: cell.m_Occupied
-        })));
+        const cells = this.m_Grid.m_Cells.map((row) =>
+            row.map((cell) => ({
+                color: cell.m_Color,
+                owner: cell.m_Owner,
+                occupied: cell.m_Occupied
+            }))
+        );
 
         return {
             cells,
@@ -185,7 +187,6 @@ export class Board {
         this.m_IDWinner = idWinner;
         this.m_CanvasElement = UiFacade.getCanvasContext(this.m_IDGameField);
         if (this.m_CanvasElement) {
-
             this.boardInit();
             this.boardButtonsInit(this.m_IDButtonField);
             this.playerInit(this.m_IDWinner);
@@ -198,13 +199,7 @@ export class Board {
         }
     }
 
-    reInit(
-        idDimX: string,
-        idDimY: string,
-        idCellSize: string,
-        idPlayerName: string,
-        idComputerStrategy: string
-    ): void {
+    reInit(idDimX: string, idDimY: string, idCellSize: string, idPlayerName: string, idComputerStrategy: string): void {
         const dimX = Util.getInputValue(idDimX);
         const dimY = Util.getInputValue(idDimY);
         const cellSize = Util.getInputValue(idCellSize);
@@ -244,20 +239,10 @@ export class Board {
         UiFacade.setDisplay(idWinner, "");
 
         this.m_Grid.gridReset();
-        this.m_PlayerHuman.init(
-            this,
-            0,
-            this.m_Definitions.DimensionY - 1,
-            idWinner
-        );
+        this.m_PlayerHuman.init(this, 0, this.m_Definitions.DimensionY - 1, idWinner);
 
         this.m_Grid.gridReset();
-        this.m_PlayerComputer.init(
-            this,
-            this.m_Definitions.DimensionX - 1,
-            0,
-            idWinner
-        );
+        this.m_PlayerComputer.init(this, this.m_Definitions.DimensionX - 1, 0, idWinner);
     }
 
     boardInit(): void {
@@ -283,9 +268,8 @@ export class Board {
         const numberOfButtons = this.m_Definitions.Colors.length;
         const btnWidth = Math.floor((this.m_Definitions.DimensionX * this.m_Definitions.CellSize) / 5);
         const btnHeight = Math.floor(
-            (this.m_Definitions.DimensionY * this.m_Definitions.CellSize -
-                (numberOfButtons + 1) * btnMargin) /
-            numberOfButtons
+            (this.m_Definitions.DimensionY * this.m_Definitions.CellSize - (numberOfButtons + 1) * btnMargin) /
+                numberOfButtons
         );
 
         Util.clearChildren(buttonField);

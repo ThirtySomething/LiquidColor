@@ -23,11 +23,9 @@ export class Highscore {
     recordWin(winner: HighscoreWinner): void {
         if (winner === "human") {
             this.m_Data.humanWins += 1;
-        }
-        else if (winner === "computer") {
+        } else if (winner === "computer") {
             this.m_Data.computerWins += 1;
-        }
-        else {
+        } else {
             this.m_Data.draws += 1;
         }
         this.save();

@@ -36,9 +36,7 @@ export class Timer {
     }
 
     updateDisplay(): void {
-        const elapsedMs = this.m_StartTimestamp === null
-            ? 0
-            : this.m_Runtime.now() - this.m_StartTimestamp;
+        const elapsedMs = this.m_StartTimestamp === null ? 0 : this.m_Runtime.now() - this.m_StartTimestamp;
         Util.setText(this.m_IDDuration, `Duration: ${this.formatDuration(elapsedMs)}`);
     }
 

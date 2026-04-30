@@ -16,14 +16,7 @@ function createBoardBindings(board: Board): LiquidColorAppBindings {
     return {
         resetGame(): void {
             commandInvoker.clearHistory();
-            const command = new CommandResetGame(
-                board,
-                "dimx",
-                "dimy",
-                "cellsize",
-                "playername",
-                "computerstrategy"
-            );
+            const command = new CommandResetGame(board, "dimx", "dimy", "cellsize", "playername", "computerstrategy");
             commandInvoker.execute(command, false);
         },
         undoMove(): void {
@@ -160,8 +153,8 @@ export function createLiquidColorAppConfig(
 
 Definitions.initialize(30, 20, 15);
 const definitions = Definitions.getInstance();
-const human = new Player("Besucher", "name_human", "score_human", () => { });
-const computer = new Player("DerPaul", "name_computer", "score_computer", () => { });
+const human = new Player("Besucher", "name_human", "score_human", () => {});
+const computer = new Player("DerPaul", "name_computer", "score_computer", () => {});
 const boardDependencies = createBoardDependencies();
 Board.initialize(definitions, human, computer, boardDependencies);
 

@@ -32,8 +32,7 @@ export class StrategyMinimax implements IComputerStrategy {
             row.forEach((cell) => {
                 if (cell.m_Owner === compPlayerName) {
                     compOwned.add(cell);
-                }
-                else if (cell.m_Owner === humanPlayerName) {
+                } else if (cell.m_Owner === humanPlayerName) {
                     humanOwned.add(cell);
                 }
                 if (!cell.m_Occupied) {
@@ -50,8 +49,13 @@ export class StrategyMinimax implements IComputerStrategy {
                 continue;
             }
 
-            const { gained: compGain, newOwnedSet: compOwned2 } =
-                CaptureSimulator.simulate(cells, definitions, compOwned, humanOwned, compColor);
+            const { gained: compGain, newOwnedSet: compOwned2 } = CaptureSimulator.simulate(
+                cells,
+                definitions,
+                compOwned,
+                humanOwned,
+                compColor
+            );
 
             const frontierColors = new Set<string>();
             for (const cell of compOwned2) {
@@ -74,23 +78,24 @@ export class StrategyMinimax implements IComputerStrategy {
                     continue;
                 }
 
-                const { gained: humanGain } =
-                    CaptureSimulator.simulate(cells, definitions, humanOwned, compOwned2, humanColor);
+                const { gained: humanGain } = CaptureSimulator.simulate(
+                    cells,
+                    definitions,
+                    humanOwned,
+                    compOwned2,
+                    humanColor
+                );
                 if (humanGain > bestHumanGain) {
                     bestHumanGain = humanGain;
                 }
             }
 
-            const score =
-                compGain
-                - bestHumanGain * DENY_WEIGHT
-                + frontierColors.size * DIVERSITY_WEIGHT;
+            const score = compGain - bestHumanGain * DENY_WEIGHT + frontierColors.size * DIVERSITY_WEIGHT;
 
             if (score > bestScore) {
                 bestScore = score;
                 bestColor = compColor;
-            }
-            else if (score === bestScore && this.m_RandomSource.next() >= 0.5) {
+            } else if (score === bestScore && this.m_RandomSource.next() >= 0.5) {
                 bestColor = compColor;
             }
         }

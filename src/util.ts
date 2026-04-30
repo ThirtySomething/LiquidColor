@@ -1,11 +1,7 @@
 import { UiFacade } from "./uifacade.js";
 
 export class Util {
-    static setElementSize(
-        element: HTMLCanvasElement | null,
-        width: number,
-        height: number
-    ): void {
+    static setElementSize(element: HTMLCanvasElement | null, width: number, height: number): void {
         UiFacade.setElementSize(element, width, height);
     }
 

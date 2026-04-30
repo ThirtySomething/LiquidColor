@@ -12,14 +12,7 @@ export class StrategyGreedy implements IComputerStrategy {
     }
 
     chooseColor(input: StrategyInput): string {
-        const {
-            cells,
-            definitions,
-            newColorPlayer,
-            compPlayerName,
-            humanPlayerName,
-            compCurrentColor
-        } = input;
+        const { cells, definitions, newColorPlayer, compPlayerName, humanPlayerName, compCurrentColor } = input;
 
         const compOwned = new Set<Cell>();
         const humanOwned = new Set<Cell>();
@@ -29,8 +22,7 @@ export class StrategyGreedy implements IComputerStrategy {
             row.forEach((cell) => {
                 if (cell.m_Owner === compPlayerName) {
                     compOwned.add(cell);
-                }
-                else if (cell.m_Owner === humanPlayerName) {
+                } else if (cell.m_Owner === humanPlayerName) {
                     humanOwned.add(cell);
                 }
                 if (!cell.m_Occupied) {
@@ -51,8 +43,7 @@ export class StrategyGreedy implements IComputerStrategy {
             if (gained > bestGain) {
                 bestGain = gained;
                 bestColor = compColor;
-            }
-            else if (gained === bestGain && this.m_RandomSource.next() >= 0.5) {
+            } else if (gained === bestGain && this.m_RandomSource.next() >= 0.5) {
                 bestColor = compColor;
             }
         }

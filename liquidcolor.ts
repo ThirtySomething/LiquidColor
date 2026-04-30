@@ -2,6 +2,7 @@ import { createApp } from "vue/dist/vue.esm-bundler.js";
 import { Board } from "./board.js";
 import { CommandResetGame } from "./commands/commandresetgame.js";
 import { Definitions } from "./definitions.js";
+import packageInfo from "./package.json";
 import { Player } from "./player.js";
 import { ScoreObserver } from "./scoreobserver.js";
 import { WinnerObserver } from "./winnerobserver.js";
@@ -13,6 +14,7 @@ const computer = new Player("DerPaul", "name_computer", "score_computer", () => 
 Board.initialize(definitions, human, computer);
 
 const board = Board.getInstance();
+const appVersion = packageInfo.version;
 human.setNotifyUI(board.getUISubject().notify.bind(board.getUISubject()));
 computer.setNotifyUI(board.getUISubject().notify.bind(board.getUISubject()));
 
@@ -39,7 +41,7 @@ createApp({
     template: `
         <div class="liquidcolor-root">
             <main class="app-shell">
-                <h1 class="title">Liquid Color</h1>
+                <h1 class="title">Liquid Color <span class="title-version">(${appVersion})</span></h1>
 
                 <section id="gameinfo" class="gameinfo" aria-label="Game instructions">
                     This is Liquid Color, a simple strategy game. The goal is to occupy as many cells as possible in one

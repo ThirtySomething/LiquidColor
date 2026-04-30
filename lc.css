@@ -6,11 +6,11 @@
     --accent-soft: #d5eef2;
     --border: #25313d;
     --radius: 10px;
-    --space-1: 8px;
-    --space-2: 12px;
-    --space-3: 18px;
-    --space-4: 24px;
-    --button-gap: 10px;
+    --space-1: 6px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --button-gap: 6px;
 }
 
 .liquidcolor-root,
@@ -39,7 +39,7 @@
 .app-shell {
     max-width: 1120px;
     margin: 0 auto;
-    padding: var(--space-4);
+    padding: var(--space-3);
     display: grid;
     grid-template-areas:
         "title title"
@@ -47,15 +47,19 @@
         "setup setup"
         "playground highscore"
         "messages messages";
-    gap: var(--space-3);
+    gap: var(--space-2);
 }
 
 .title {
     margin: 0;
     letter-spacing: 0.04em;
-    font-size: clamp(1.6rem, 2.2vw, 2.2rem);
+    font-size: clamp(1.4rem, 2vw, 1.9rem);
     color: var(--accent);
     grid-area: title;
+}
+
+.title-version {
+    font-size: 0.5em;
 }
 
 .gameinfo,
@@ -66,14 +70,15 @@
     background: var(--card-bg);
     border: 1px solid color-mix(in srgb, var(--border) 65%, white);
     border-radius: var(--radius);
-    box-shadow: 0 8px 24px rgb(0 0 0 / 8%);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 7%);
 }
 
 .gameinfo,
 .setup,
 .messages {
-    padding: var(--space-3);
-    line-height: 1.45;
+    padding: var(--space-2);
+    line-height: 1.35;
+    font-size: 0.94rem;
 }
 
 .gameinfo {
@@ -105,12 +110,12 @@
 .form-row-group {
     display: flex;
     gap: var(--space-2);
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-1);
 }
 
 .form-row {
     display: grid;
-    gap: 6px;
+    gap: 4px;
     flex: 1;
 }
 
@@ -120,7 +125,7 @@
 
 .form-row input {
     width: 100%;
-    padding: 8px 10px;
+    padding: 6px 8px;
     border: 1px solid #9ea8af;
     border-radius: 8px;
     background-color: #fff;
@@ -128,7 +133,7 @@
 
 .form-row select {
     width: 100%;
-    padding: 8px 10px;
+    padding: 6px 8px;
     border: 1px solid #9ea8af;
     border-radius: 8px;
     background-color: #fff;
@@ -140,7 +145,7 @@
 }
 
 #btn_reset {
-    padding: 10px 16px;
+    padding: 8px 12px;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: var(--accent-soft);
@@ -153,16 +158,16 @@
 }
 
 .playground {
-    padding: var(--space-3);
+    padding: var(--space-2);
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3);
+    gap: var(--space-2);
     align-items: flex-start;
 }
 
 .highscore-panel {
-    min-width: 210px;
-    padding: var(--space-3);
+    min-width: 180px;
+    padding: var(--space-2);
     display: grid;
     gap: var(--space-1);
 }
@@ -178,7 +183,7 @@
     display: flex;
     justify-content: space-between;
     gap: var(--space-2);
-    padding: 6px 0;
+    padding: 4px 0;
     border-bottom: 1px dashed color-mix(in srgb, var(--border) 25%, white);
     font-weight: 600;
 }
@@ -195,7 +200,7 @@
 
 .board-wrap {
     display: grid;
-    gap: var(--space-2);
+    gap: var(--space-1);
 }
 
 #gamearea {
@@ -213,14 +218,14 @@
     margin: var(--button-gap);
     padding: 0;
     border: 1px solid #161616;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
 }
 
 .score-row {
     display: flex;
     justify-content: space-between;
-    gap: var(--space-2);
+    gap: var(--space-1);
 }
 
 .score-box {
@@ -230,7 +235,7 @@
 }
 
 .gamestatus {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .dspno {
@@ -239,11 +244,11 @@
 
 @media (max-width: 760px) {
     .app-shell {
-        padding: var(--space-2);
+        padding: var(--space-1);
     }
 
     .playground {
-        padding: var(--space-2);
+        padding: var(--space-1);
     }
 
     .highscore-panel {
@@ -257,6 +262,6 @@
     }
 
     .gamebtn {
-        margin: 6px;
+        margin: 4px;
     }
 }

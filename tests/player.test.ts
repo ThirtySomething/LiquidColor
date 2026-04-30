@@ -4,15 +4,7 @@ import type { Board } from "../src/board";
 import { Cell } from "../src/cell";
 import { Definitions } from "../src/definitions";
 import { Player } from "../src/player";
-
-const getCanvasCtx = (): CanvasRenderingContext2D =>
-    ({
-        beginPath: vi.fn(),
-        rect: vi.fn(),
-        fill: vi.fn(),
-        stroke: vi.fn(),
-        fillStyle: ""
-    }) as unknown as CanvasRenderingContext2D;
+import { createMockCanvasContext } from "./test-utils";
 
 const buildCells = (): Cell[][] => {
     return [
@@ -70,7 +62,7 @@ describe("Player", () => {
         const board = {
             m_Grid: { m_Cells: buildCells() },
             m_Definitions: definitions,
-            m_CanvasElement: getCanvasCtx()
+            m_CanvasElement: createMockCanvasContext()
         } as unknown as Board;
 
         player.init(board, 0, 0, "winner");
@@ -87,7 +79,7 @@ describe("Player", () => {
         const board = {
             m_Grid: { m_Cells: [[new Cell(0, 0)]] },
             m_Definitions: definitions,
-            m_CanvasElement: getCanvasCtx()
+            m_CanvasElement: createMockCanvasContext()
         } as unknown as Board;
 
         player.init(board, 1, 1, "winner");
@@ -105,7 +97,7 @@ describe("Player", () => {
 
         player.m_BaseCell = cells[0][0];
         const markSpy = vi.spyOn(player, "cellsMarkOwner");
-        player.move(cells, ["red"], definitions, getCanvasCtx());
+        player.move(cells, ["red"], definitions, createMockCanvasContext());
 
         expect(markSpy).toHaveBeenCalled();
     });
@@ -119,7 +111,7 @@ describe("Player", () => {
         base.m_Color = "fallback";
         player.m_BaseCell = base;
 
-        player.move(cells, ["red", "green"], definitions, getCanvasCtx(), { next: () => Number.NaN });
+        player.move(cells, ["red", "green"], definitions, createMockCanvasContext(), { next: () => Number.NaN });
 
         expect(base.m_Color).toBe("fallback");
     });
@@ -141,7 +133,7 @@ describe("Player", () => {
         player.m_BaseCell = base;
         const counterSpy = vi.spyOn(player, "counterUpdate");
 
-        player.cellsMarkOwner(cells, definitions, getCanvasCtx());
+        player.cellsMarkOwner(cells, definitions, createMockCanvasContext());
 
         expect(cells[0][1].m_Owner).toBe("H");
         expect(cells[1][0].m_Owner).toBe("H");
@@ -154,7 +146,7 @@ describe("Player", () => {
         const player = new Player("H", "name_h", "score_h", () => undefined);
         const cells = buildCells();
 
-        expect(() => player.cellsMarkOwner(cells, definitions, getCanvasCtx())).not.toThrow();
+        expect(() => player.cellsMarkOwner(cells, definitions, createMockCanvasContext())).not.toThrow();
 
         const base = cells[0][0];
         const next = cells[0][1];
@@ -164,7 +156,7 @@ describe("Player", () => {
             return [next];
         });
 
-        expect(() => player.cellsMarkOwner(cells, definitions, getCanvasCtx())).not.toThrow();
+        expect(() => player.cellsMarkOwner(cells, definitions, createMockCanvasContext())).not.toThrow();
     });
 
     it("identifyBestColor falls back when base cells are missing", () => {

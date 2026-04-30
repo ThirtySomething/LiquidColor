@@ -4,15 +4,7 @@ import { Cell } from "../src/cell";
 import { Definitions } from "../src/definitions";
 import { Grid } from "../src/grid";
 import type { Player } from "../src/player";
-
-const getCanvasCtx = (): CanvasRenderingContext2D =>
-    ({
-        beginPath: vi.fn(),
-        rect: vi.fn(),
-        fill: vi.fn(),
-        stroke: vi.fn(),
-        fillStyle: ""
-    }) as unknown as CanvasRenderingContext2D;
+import { createMockCanvasContext } from "./test-utils";
 
 describe("Grid", () => {
     it("gridInit creates configured dimensions and assigns colors", () => {
@@ -21,7 +13,7 @@ describe("Grid", () => {
         const grid = new Grid();
 
         vi.spyOn(Math, "random").mockReturnValue(0);
-        grid.gridInit(definitions, getCanvasCtx());
+        grid.gridInit(definitions, createMockCanvasContext());
 
         expect(grid.m_Cells).toHaveLength(3);
         expect(grid.m_Cells[0]).toHaveLength(2);

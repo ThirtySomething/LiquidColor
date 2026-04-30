@@ -6,15 +6,7 @@ import { Definitions } from "../src/definitions";
 import { GamePhase } from "../src/gamephase";
 import { Player } from "../src/player";
 import type { RandomSource } from "../src/randomsource";
-
-const mockCtx = (): CanvasRenderingContext2D =>
-    ({
-        beginPath: vi.fn(),
-        rect: vi.fn(),
-        fill: vi.fn(),
-        stroke: vi.fn(),
-        fillStyle: ""
-    }) as unknown as CanvasRenderingContext2D;
+import { createMockCanvasContext } from "./test-utils";
 
 const setupDom = (): HTMLCanvasElement => {
     document.body.innerHTML = `
@@ -41,7 +33,7 @@ const setupDom = (): HTMLCanvasElement => {
     `;
 
     const canvas = document.getElementById("gamearea") as HTMLCanvasElement;
-    (canvas as unknown as { getContext: () => CanvasRenderingContext2D }).getContext = () => mockCtx();
+    (canvas as unknown as { getContext: () => CanvasRenderingContext2D }).getContext = () => createMockCanvasContext();
     return canvas;
 };
 

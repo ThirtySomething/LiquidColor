@@ -2,15 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Cell } from "../src/cell";
 import { Definitions } from "../src/definitions";
-
-const getCanvasCtx = (): CanvasRenderingContext2D =>
-    ({
-        beginPath: vi.fn(),
-        rect: vi.fn(),
-        fill: vi.fn(),
-        stroke: vi.fn(),
-        fillStyle: ""
-    }) as unknown as CanvasRenderingContext2D;
+import { createMockCanvasContext } from "./test-utils";
 
 describe("Cell", () => {
     it("draw paints only when m_DoRedraw is true", () => {
@@ -18,7 +10,7 @@ describe("Cell", () => {
         const definitions = Definitions.getInstance();
         const cell = new Cell(1, 1);
         cell.m_Color = "red";
-        const ctx = getCanvasCtx();
+        const ctx = createMockCanvasContext();
 
         cell.draw(definitions, ctx);
         expect((ctx.beginPath as unknown as ReturnType<typeof vi.fn>).mock.calls.length).toBe(1);

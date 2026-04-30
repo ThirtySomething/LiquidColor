@@ -27,6 +27,7 @@ export class Board {
     m_RandomSource;
     m_UISubject;
     m_CommandInvoker;
+    m_ScoreStatsCache;
     constructor(definitions, playerHuman, playerComputer, dependencies = {}) {
         this.m_CanvasElement = null;
         this.m_Definitions = definitions;
@@ -43,6 +44,7 @@ export class Board {
         this.m_RandomSource = dependencies.randomSource ?? MathRandomSource;
         this.m_UISubject = new Subject();
         this.m_CommandInvoker = new CommandInvoker();
+        this.m_ScoreStatsCache = null;
     }
     sanitizePlayerName(playerName) {
         const trimmed = playerName.trim();
@@ -161,6 +163,38 @@ export class Board {
             };
         });
     }
+    applyMutationsToStats(base, mutations) {
+        if (!mutations) {
+            return base;
+        }
+        const next = {
+            human: base.human,
+            computer: base.computer,
+            occupied: base.occupied,
+            total: base.total
+        };
+        mutations.forEach((mutation) => {
+            if (mutation.before.occupied && !mutation.after.occupied) {
+                next.occupied -= 1;
+            }
+            if (!mutation.before.occupied && mutation.after.occupied) {
+                next.occupied += 1;
+            }
+            if (mutation.before.owner === this.m_PlayerHuman.m_PlayerName) {
+                next.human -= 1;
+            }
+            if (mutation.after.owner === this.m_PlayerHuman.m_PlayerName) {
+                next.human += 1;
+            }
+            if (mutation.before.owner === this.m_PlayerComputer.m_PlayerName) {
+                next.computer -= 1;
+            }
+            if (mutation.after.owner === this.m_PlayerComputer.m_PlayerName) {
+                next.computer += 1;
+            }
+        });
+        return next;
+    }
     createStateSnapshot() {
         const metadata = this.createMetadataSnapshot();
         const cells = this.m_Grid.m_Cells.map((row) => row.map((cell) => ({
@@ -208,6 +242,7 @@ export class Board {
         this.m_Phase = GamePhase.from(snapshot.phase);
         this.m_Highscore.restoreSnapshot(snapshot.highscore);
         this.m_Highscore.render(this.m_PlayerHuman.m_PlayerName, this.m_PlayerComputer.m_PlayerName);
+        this.m_ScoreStatsCache = null;
         const stats = this.getScoreStats();
         Util.setText(this.m_PlayerHuman.m_IDScore, String(stats.human));
         Util.setText(this.m_PlayerComputer.m_IDScore, String(stats.computer));
@@ -292,6 +327,7 @@ export class Board {
             return;
         }
         this.m_Grid.gridInit(this.m_Definitions, this.m_CanvasElement, this.m_RandomSource);
+        this.m_ScoreStatsCache = null;
     }
     boardButtonsInit(buttonField) {
         const buttonContainer = UiFacade.getElement(buttonField);
@@ -342,9 +378,13 @@ export class Board {
             };
         }
         this.m_Timer.startCounting();
+        let stats = this.getScoreStats();
         this.m_Grid.gridReset();
-        Board.mergeCellMutations(mutations, this.m_PlayerHuman.move(this.m_Grid.m_Cells, [newColorPlayer], this.m_Definitions, this.m_CanvasElement, this.m_RandomSource));
-        if (this.evaluateGameState()) {
+        const humanMutations = this.m_PlayerHuman.move(this.m_Grid.m_Cells, [newColorPlayer], this.m_Definitions, this.m_CanvasElement, this.m_RandomSource);
+        Board.mergeCellMutations(mutations, humanMutations);
+        stats = this.applyMutationsToStats(stats, humanMutations);
+        this.m_ScoreStatsCache = stats;
+        if (this.evaluateGameState(stats)) {
             const redoCells = Array.from(mutations.values()).map((mutation) => ({
                 y: mutation.y,
                 x: mutation.x,
@@ -367,8 +407,11 @@ export class Board {
         }
         const newColorComputer = this.m_PlayerComputer.identifyBestColor(this.m_Grid.m_Cells, this.m_Definitions, newColorPlayer, this.m_PlayerHuman, this.m_ComputerStrategy, this.m_RandomSource);
         this.m_Grid.gridReset();
-        Board.mergeCellMutations(mutations, this.m_PlayerComputer.move(this.m_Grid.m_Cells, [newColorComputer], this.m_Definitions, this.m_CanvasElement, this.m_RandomSource));
-        this.evaluateGameState();
+        const computerMutations = this.m_PlayerComputer.move(this.m_Grid.m_Cells, [newColorComputer], this.m_Definitions, this.m_CanvasElement, this.m_RandomSource);
+        Board.mergeCellMutations(mutations, computerMutations);
+        stats = this.applyMutationsToStats(stats, computerMutations);
+        this.m_ScoreStatsCache = stats;
+        this.evaluateGameState(stats);
         const redoCells = Array.from(mutations.values()).map((mutation) => ({
             y: mutation.y,
             x: mutation.x,
@@ -393,6 +436,14 @@ export class Board {
         this.performMoveWithDelta(newColorPlayer);
     }
     getScoreStats() {
+        if (this.m_ScoreStatsCache) {
+            return {
+                human: this.m_ScoreStatsCache.human,
+                computer: this.m_ScoreStatsCache.computer,
+                occupied: this.m_ScoreStatsCache.occupied,
+                total: this.m_ScoreStatsCache.total
+            };
+        }
         let human = 0;
         let computer = 0;
         let occupied = 0;
@@ -409,12 +460,14 @@ export class Board {
                 }
             });
         });
-        return {
+        const stats = {
             human,
             computer,
             occupied,
             total: this.m_Definitions.DimensionX * this.m_Definitions.DimensionY
         };
+        this.m_ScoreStatsCache = stats;
+        return stats;
     }
     endGame(message, winner) {
         this.m_Phase = GamePhase.GameOver();
@@ -425,8 +478,7 @@ export class Board {
         Util.removeClass(this.m_IDWinner, "dspno");
         Util.show(this.m_IDWinner, "block");
     }
-    evaluateGameState() {
-        const stats = this.getScoreStats();
+    evaluateGameState(stats = this.getScoreStats()) {
         if (stats.human >= this.m_Definitions.Winner) {
             this.endGame(`Player [${this.m_PlayerHuman.m_PlayerName}] won the game - has more than the half cells occupied.`, "human");
             return true;

@@ -8,6 +8,8 @@ export class Player {
     m_PlayerName;
     m_BaseCell;
     m_Offsets;
+    m_CellCounter;
+    m_HasScoreBaseline;
     m_IDName;
     m_IDScore;
     m_IDWinner;
@@ -16,6 +18,8 @@ export class Player {
         this.m_PlayerName = playerName;
         this.m_BaseCell = null;
         this.m_Offsets = [];
+        this.m_CellCounter = 0;
+        this.m_HasScoreBaseline = false;
         this.m_IDName = idName;
         this.m_IDScore = idScore;
         this.m_IDWinner = "";
@@ -52,22 +56,40 @@ export class Player {
         }
         mutation.after = Player.captureCellState(cell);
     }
-    counterUpdate(cells, definitions) {
-        let cellCounter = 0;
-        cells.forEach((currentRow) => {
-            currentRow.forEach((currentCell) => {
-                if (currentCell.m_Occupied && this.m_PlayerName === currentCell.m_Owner) {
-                    cellCounter += 1;
-                }
-            });
+    computeScoreDelta(mutations) {
+        let delta = 0;
+        mutations.forEach((mutation) => {
+            const beforeOwned = mutation.before.occupied && mutation.before.owner === this.m_PlayerName;
+            const afterOwned = mutation.after.occupied && mutation.after.owner === this.m_PlayerName;
+            if (beforeOwned === afterOwned) {
+                return;
+            }
+            delta += afterOwned ? 1 : -1;
         });
+        return delta;
+    }
+    counterUpdate(cells, definitions, scoreDelta) {
+        if (scoreDelta !== undefined && this.m_HasScoreBaseline) {
+            this.m_CellCounter = Math.max(0, this.m_CellCounter + scoreDelta);
+        }
+        else {
+            this.m_CellCounter = 0;
+            cells.forEach((currentRow) => {
+                currentRow.forEach((currentCell) => {
+                    if (currentCell.m_Occupied && this.m_PlayerName === currentCell.m_Owner) {
+                        this.m_CellCounter += 1;
+                    }
+                });
+            });
+            this.m_HasScoreBaseline = true;
+        }
         this.m_NotifyUI({
             type: "score",
             player: this.m_PlayerName,
             scoreElementId: this.m_IDScore,
-            score: cellCounter
+            score: this.m_CellCounter
         });
-        if (cellCounter >= definitions.Winner) {
+        if (this.m_CellCounter >= definitions.Winner) {
             this.m_NotifyUI({ type: "winner", player: this.m_PlayerName });
         }
     }
@@ -132,7 +154,8 @@ export class Player {
                 queue.push(newCell);
             });
         }
-        this.counterUpdate(cells, definitions);
+        const scoreDelta = mutations ? this.computeScoreDelta(mutations) : undefined;
+        this.counterUpdate(cells, definitions, scoreDelta);
     }
     identifyBestColor(cells, definitions, newColorPlayer, opponent, strategy = "minimax", randomSource = MathRandomSource) {
         if (!this.m_BaseCell || !opponent.m_BaseCell) {

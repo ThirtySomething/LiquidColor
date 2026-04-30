@@ -291,6 +291,29 @@ describe("Board", () => {
         expect(evaluateSpy).toHaveBeenCalledTimes(2);
     });
 
+    it("performMove computes score stats once and reuses them across evaluations", () => {
+        const board = createBoard();
+        if (board.m_PlayerHuman.m_BaseCell) {
+            board.m_PlayerHuman.m_BaseCell.m_Color = "red";
+        }
+        if (board.m_PlayerComputer.m_BaseCell) {
+            board.m_PlayerComputer.m_BaseCell.m_Color = "blue";
+        }
+
+        const getScoreStatsSpy = vi.spyOn(board, "getScoreStats");
+        const evaluateSpy = vi.spyOn(board, "evaluateGameState").mockReturnValueOnce(false).mockReturnValueOnce(false);
+        vi.spyOn(board.m_PlayerHuman, "move").mockImplementation(() => []);
+        vi.spyOn(board.m_PlayerComputer, "move").mockImplementation(() => []);
+        vi.spyOn(board.m_PlayerComputer, "identifyBestColor").mockReturnValue("green");
+
+        board.performMove("green");
+
+        expect(getScoreStatsSpy).toHaveBeenCalledTimes(1);
+        expect(evaluateSpy).toHaveBeenCalledTimes(2);
+        expect(evaluateSpy.mock.calls[0]?.[0]).toBeDefined();
+        expect(evaluateSpy.mock.calls[1]?.[0]).toBeDefined();
+    });
+
     it("readComputerStrategy accepts greedy and defaults to minimax", () => {
         const board = createBoard();
         expect(board.readComputerStrategy("greedy")).toBe("greedy");

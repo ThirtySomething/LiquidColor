@@ -49,6 +49,7 @@ export class Board {
     m_RandomSource: RandomSource;
     m_UISubject: Subject;
     m_CommandInvoker: CommandInvoker;
+    m_ScoreStatsCache: ScoreStats | null;
 
     private constructor(
         definitions: Definitions,
@@ -71,6 +72,7 @@ export class Board {
         this.m_RandomSource = dependencies.randomSource ?? MathRandomSource;
         this.m_UISubject = new Subject();
         this.m_CommandInvoker = new CommandInvoker();
+        this.m_ScoreStatsCache = null;
     }
 
     private sanitizePlayerName(playerName: string): string {
@@ -223,6 +225,44 @@ export class Board {
         });
     }
 
+    private applyMutationsToStats(base: ScoreStats, mutations: CellMutation[] | undefined): ScoreStats {
+        if (!mutations) {
+            return base;
+        }
+
+        const next: ScoreStats = {
+            human: base.human,
+            computer: base.computer,
+            occupied: base.occupied,
+            total: base.total
+        };
+
+        mutations.forEach((mutation) => {
+            if (mutation.before.occupied && !mutation.after.occupied) {
+                next.occupied -= 1;
+            }
+            if (!mutation.before.occupied && mutation.after.occupied) {
+                next.occupied += 1;
+            }
+
+            if (mutation.before.owner === this.m_PlayerHuman.m_PlayerName) {
+                next.human -= 1;
+            }
+            if (mutation.after.owner === this.m_PlayerHuman.m_PlayerName) {
+                next.human += 1;
+            }
+
+            if (mutation.before.owner === this.m_PlayerComputer.m_PlayerName) {
+                next.computer -= 1;
+            }
+            if (mutation.after.owner === this.m_PlayerComputer.m_PlayerName) {
+                next.computer += 1;
+            }
+        });
+
+        return next;
+    }
+
     createStateSnapshot(): BoardStateSnapshot {
         const metadata = this.createMetadataSnapshot();
 
@@ -281,6 +321,7 @@ export class Board {
         this.m_Highscore.restoreSnapshot(snapshot.highscore);
         this.m_Highscore.render(this.m_PlayerHuman.m_PlayerName, this.m_PlayerComputer.m_PlayerName);
 
+        this.m_ScoreStatsCache = null;
         const stats = this.getScoreStats();
         Util.setText(this.m_PlayerHuman.m_IDScore, String(stats.human));
         Util.setText(this.m_PlayerComputer.m_IDScore, String(stats.computer));
@@ -378,6 +419,7 @@ export class Board {
             return;
         }
         this.m_Grid.gridInit(this.m_Definitions, this.m_CanvasElement, this.m_RandomSource);
+        this.m_ScoreStatsCache = null;
     }
 
     boardButtonsInit(buttonField: string): void {
@@ -437,15 +479,21 @@ export class Board {
 
         this.m_Timer.startCounting();
 
+        let stats = this.getScoreStats();
+
         this.m_Grid.gridReset();
-        Board.mergeCellMutations(mutations, this.m_PlayerHuman.move(
+        const humanMutations = this.m_PlayerHuman.move(
             this.m_Grid.m_Cells,
             [newColorPlayer],
             this.m_Definitions,
             this.m_CanvasElement,
             this.m_RandomSource
-        ));
-        if (this.evaluateGameState()) {
+        );
+        Board.mergeCellMutations(mutations, humanMutations);
+        stats = this.applyMutationsToStats(stats, humanMutations);
+        this.m_ScoreStatsCache = stats;
+
+        if (this.evaluateGameState(stats)) {
             const redoCells = Array.from(mutations.values()).map((mutation) => ({
                 y: mutation.y,
                 x: mutation.x,
@@ -477,15 +525,18 @@ export class Board {
         );
 
         this.m_Grid.gridReset();
-        Board.mergeCellMutations(mutations, this.m_PlayerComputer.move(
+        const computerMutations = this.m_PlayerComputer.move(
             this.m_Grid.m_Cells,
             [newColorComputer],
             this.m_Definitions,
             this.m_CanvasElement,
             this.m_RandomSource
-        ));
+        );
+        Board.mergeCellMutations(mutations, computerMutations);
+        stats = this.applyMutationsToStats(stats, computerMutations);
+        this.m_ScoreStatsCache = stats;
 
-        this.evaluateGameState();
+        this.evaluateGameState(stats);
 
         const redoCells = Array.from(mutations.values()).map((mutation) => ({
             y: mutation.y,
@@ -514,6 +565,15 @@ export class Board {
     }
 
     getScoreStats(): ScoreStats {
+        if (this.m_ScoreStatsCache) {
+            return {
+                human: this.m_ScoreStatsCache.human,
+                computer: this.m_ScoreStatsCache.computer,
+                occupied: this.m_ScoreStatsCache.occupied,
+                total: this.m_ScoreStatsCache.total
+            };
+        }
+
         let human = 0;
         let computer = 0;
         let occupied = 0;
@@ -532,12 +592,15 @@ export class Board {
             });
         });
 
-        return {
+        const stats: ScoreStats = {
             human,
             computer,
             occupied,
             total: this.m_Definitions.DimensionX * this.m_Definitions.DimensionY
         };
+
+        this.m_ScoreStatsCache = stats;
+        return stats;
     }
 
     endGame(message: string, winner: HighscoreWinner): void {
@@ -550,8 +613,7 @@ export class Board {
         Util.show(this.m_IDWinner, "block");
     }
 
-    evaluateGameState(): boolean {
-        const stats = this.getScoreStats();
+    evaluateGameState(stats: ScoreStats = this.getScoreStats()): boolean {
 
         if (stats.human >= this.m_Definitions.Winner) {
             this.endGame(

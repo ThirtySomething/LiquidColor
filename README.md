@@ -24,93 +24,96 @@ The current codebase applies several patterns:
 
 ### Entry + Composition
 
-- `liquidcolor.ts`
+- `src/liquidcolor.ts`
   : App entrypoint. Creates `Definitions`, players, board dependencies, wires observers, mounts Vue, and binds Reset/Undo/Redo actions.
 
-- `boarddependencies.ts`
+- `src/boarddependencies.ts`
   : Central composition helper for default runtime dependencies (`BrowserTimerRuntime`, `LocalStorageHighscoreRepository`, `MathRandomSource`).
 
 ### Core Game Domain
 
-- `board.ts`
+- `src/board.ts`
   : Main orchestrator of gameplay and UI updates. Handles initialization, moves, game-state evaluation, snapshots/restore, and command invoker integration.
 
-- `definitions.ts`
+- `src/definitions.ts`
   : Board/game configuration (dimensions, cell size, winner threshold) with sanitization/clamping.
 
-- `gamephase.ts`
+- `src/gamephase.ts`
   : State objects for phase-specific behavior (`canAcceptMove`, `isOver`).
 
-- `grid.ts`
+- `src/grid.ts`
   : Grid creation/reset, player cell discovery, border analysis, and available-color counting.
 
-- `cell.ts`
+- `src/cell.ts`
   : Cell state, drawing, neighborhood traversal logic, border detection, random color pick.
 
-- `player.ts`
+- `src/player.ts`
   : Player actions (init/move), flood-capture propagation, scoring updates, AI color decision delegation.
 
 ### Commands (Undo/Redo)
 
-- `commands/commandinvoker.ts`
+- `src/commands/commandinvoker.ts`
   : Executes commands and maintains undo/redo stacks.
 
-- `commands/commandplaycolor.ts`
+- `src/commands/commandplaycolor.ts`
   : Color-move command with **delta-based** undo/redo payloads (changed cells + changed metadata) instead of full snapshots.
 
-- `commands/commandresetgame.ts`
+- `src/commands/commandresetgame.ts`
   : Reset command delegating to board re-initialization.
 
 ### AI Strategies
 
-- `strategies/computerstrategyfactory.ts`
+- `src/strategies/computerstrategyfactory.ts`
   : Strategy selection and delegation.
 
-- `strategies/strategygreedy.ts`
+- `src/strategies/strategygreedy.ts`
   : Chooses best immediate gain.
 
-- `strategies/strategyminimax.ts`
+- `src/strategies/strategyminimax.ts`
   : Two-ply style evaluation with deny/diversity weighting.
 
-- `strategies/capturesimulator.ts`
+- `src/strategies/capturesimulator.ts`
   : Shared simulation utility used by both strategies.
 
 ### UI + Infrastructure
 
-- `uifacade.ts`
+- `src/uifacade.ts`
   : Single facade for DOM queries/updates and UI element creation.
 
-- `util.ts`
+- `src/util.ts`
   : Thin utility wrappers delegating to UI facade.
 
-- `timer.ts`
+- `src/timer.ts`
   : Game timer logic with injectable runtime (`now`, interval scheduler).
 
-- `subject.ts`, `scoreobserver.ts`, `winnerobserver.ts`, `iobserver.ts`, `observerdata.ts`
+- `src/subject.ts`, `src/scoreobserver.ts`, `src/winnerobserver.ts`, `src/iobserver.ts`, `src/observerdata.ts`
   : Observer pipeline for UI notifications.
 
 ### Persistence
 
-- `highscore.ts`
+- `src/highscore.ts`
   : Highscore domain model and repository abstraction.
 
-- `localstoragehighscorerepository.ts`
+- `src/localstoragehighscorerepository.ts`
   : LocalStorage implementation of highscore persistence.
 
 ### Types / Supporting Files
 
-- `highscorewinner.ts`, `offset.ts`, `randomsource.ts`
-  : Shared domain types and injectable random source interface.
+- `src/types/*`
+  : Shared domain and application type definitions (state snapshots, strategy input, observer payloads, and DI contracts).
+
+- `src/highscorewinner.ts`, `src/offset.ts`, `src/randomsource.ts`
+  : Compatibility re-export modules for key shared types.
 
 ## Architecture Diagram
 
 ![LiquidColor Architecture](doc/LiquidColor%20Architecture.png)
 
-> Source: [`doc/architecture.puml`](doc/architecture.puml)
+> Source: [`doc/LiquidColor Architecture.puml`](doc/LiquidColor%20Architecture.puml)
 
 ## Runtime Flow
 
-1. App bootstraps in `liquidcolor.ts` and initializes board dependencies.
+1. App bootstraps in `src/liquidcolor.ts` and initializes board dependencies.
 2. `board.init()` creates canvas/grid, buttons, player setup, timer, and highscore rendering.
 3. A color button click executes `CommandPlayColor` through `CommandInvoker`.
 4. Board validates move, applies human move, computes AI move through selected strategy, and evaluates win/draw conditions.

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { Highscore, LocalStorageHighscoreRepository, type HighscoreRepository, type HighscoreSnapshot } from "../highscore";
+import { Highscore, LocalStorageHighscoreRepository, type HighscoreRepository, type HighscoreSnapshot } from "../src/highscore";
 
 const STORAGE_KEY = LocalStorageHighscoreRepository.STORAGE_KEY;
 

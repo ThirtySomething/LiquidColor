@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Definitions } from "../definitions";
+import { Definitions } from "../src/definitions";
 
 describe("Definitions", () => {
     it("throws when getInstance is called before initialization", () => {

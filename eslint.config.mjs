@@ -23,12 +23,12 @@ export default tseslint.config(
     },
     {
         files: [
-            "board.ts",
-            "definitions.ts",
-            "liquidcolor.ts",
-            "observerdata.ts",
-            "player.ts",
-            "scoreobserver.ts"
+            "src/board.ts",
+            "src/definitions.ts",
+            "src/liquidcolor.ts",
+            "src/observerdata.ts",
+            "src/player.ts",
+            "src/scoreobserver.ts"
         ],
         rules: {
             "brace-style": ["error", "1tbs", { "allowSingleLine": false }]

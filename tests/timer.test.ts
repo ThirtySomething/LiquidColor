@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { type TimerRuntime, Timer } from "../timer";
+import { type TimerRuntime, Timer } from "../src/timer";
 
 const setupDom = (): void => {
     document.body.innerHTML = '<div id="gameduration"></div>';

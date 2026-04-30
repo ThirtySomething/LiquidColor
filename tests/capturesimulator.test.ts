@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { Cell } from "../cell";
-import { Definitions } from "../definitions";
-import { CaptureSimulator } from "../strategies/capturesimulator";
+import { Cell } from "../src/cell";
+import { Definitions } from "../src/definitions";
+import { CaptureSimulator } from "../src/strategies/capturesimulator";
 
 const buildCells = (dimensionX: number, dimensionY: number, color: string): Cell[][] => {
     const cells: Cell[][] = [];

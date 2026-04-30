@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { CommandInvoker } from "../commands/commandinvoker";
-import type { ICommand } from "../commands/icommand";
+import { CommandInvoker } from "../src/commands/commandinvoker";
+import type { ICommand } from "../src/commands/icommand";
 
 const makeCommand = (): ICommand & { executeSpy: ReturnType<typeof vi.fn>; undoSpy: ReturnType<typeof vi.fn> } => {
     const executeSpy = vi.fn();

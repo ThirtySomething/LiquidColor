@@ -23,19 +23,19 @@
     },
     "files": [
         "vue-compiler-build.d.ts",
-        "util.ts",
-        "uifacade.ts",
-        "offset.ts",
-        "definitions.ts",
-        "cell.ts",
-        "grid.ts",
-        "highscorewinner.ts",
-        "highscore.ts",
-        "localstoragehighscorerepository.ts",
-        "gamephase.ts",
-        "player.ts",
-        "board.ts",
-        "boarddependencies.ts",
-        "liquidcolor.ts"
+        "src/util.ts",
+        "src/uifacade.ts",
+        "src/offset.ts",
+        "src/definitions.ts",
+        "src/cell.ts",
+        "src/grid.ts",
+        "src/highscorewinner.ts",
+        "src/highscore.ts",
+        "src/localstoragehighscorerepository.ts",
+        "src/gamephase.ts",
+        "src/player.ts",
+        "src/board.ts",
+        "src/boarddependencies.ts",
+        "src/liquidcolor.ts"
     ]
 }

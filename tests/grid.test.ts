@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { Cell } from "../cell";
-import { Definitions } from "../definitions";
-import { Grid } from "../grid";
-import type { Player } from "../player";
+import { Cell } from "../src/cell";
+import { Definitions } from "../src/definitions";
+import { Grid } from "../src/grid";
+import type { Player } from "../src/player";
 
 const getCanvasCtx = (): CanvasRenderingContext2D => ({
     beginPath: vi.fn(),

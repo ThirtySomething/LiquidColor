@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { type BoardHighscore, type BoardTimer, Board } from "../board";
-import { Cell } from "../cell";
-import { Definitions } from "../definitions";
-import { GamePhase } from "../gamephase";
-import { Player } from "../player";
-import type { RandomSource } from "../randomsource";
+import { type BoardHighscore, type BoardTimer, Board } from "../src/board";
+import { Cell } from "../src/cell";
+import { Definitions } from "../src/definitions";
+import { GamePhase } from "../src/gamephase";
+import { Player } from "../src/player";
+import type { RandomSource } from "../src/randomsource";
 
 const mockCtx = (): CanvasRenderingContext2D => ({
     beginPath: vi.fn(),

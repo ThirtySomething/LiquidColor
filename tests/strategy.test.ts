@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { Cell } from "../cell";
-import { Definitions } from "../definitions";
-import type { RandomSource } from "../randomsource";
-import { CaptureSimulator } from "../strategies/capturesimulator";
-import { ComputerStrategyFactory } from "../strategies/computerstrategyfactory";
-import { StrategyGreedy } from "../strategies/strategygreedy";
-import type { StrategyInput } from "../strategies/strategyinput";
-import { StrategyMinimax } from "../strategies/strategyminimax";
+import { Cell } from "../src/cell";
+import { Definitions } from "../src/definitions";
+import type { RandomSource } from "../src/randomsource";
+import { CaptureSimulator } from "../src/strategies/capturesimulator";
+import { ComputerStrategyFactory } from "../src/strategies/computerstrategyfactory";
+import { StrategyGreedy } from "../src/strategies/strategygreedy";
+import type { StrategyInput } from "../src/strategies/strategyinput";
+import { StrategyMinimax } from "../src/strategies/strategyminimax";
 
 const buildOwnedGrid = (): { input: StrategyInput; colors: string[] } => {
     Definitions.initialize(3, 2, 10);

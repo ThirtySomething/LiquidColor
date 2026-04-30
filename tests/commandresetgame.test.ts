@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { Board } from "../board";
-import { CommandResetGame } from "../commands/commandresetgame";
+import type { Board } from "../src/board";
+import { CommandResetGame } from "../src/commands/commandresetgame";
 
 describe("CommandResetGame", () => {
     it("execute calls board.reInit with configured ids", () => {

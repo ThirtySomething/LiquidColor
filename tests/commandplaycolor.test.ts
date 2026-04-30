@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { Board, BoardStateSnapshot } from "../board";
-import { CommandPlayColor } from "../commands/commandplaycolor";
+import type { Board, BoardStateSnapshot } from "../src/board";
+import { CommandPlayColor } from "../src/commands/commandplaycolor";
 
 type BoardStub = {
     createStateSnapshot: ReturnType<typeof vi.fn>;

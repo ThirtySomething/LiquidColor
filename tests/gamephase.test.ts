@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { GamePhase } from "../gamephase";
+import { GamePhase } from "../src/gamephase";
 
 describe("GamePhase", () => {
     it("SetupPhase cannot accept moves and is not over", () => {

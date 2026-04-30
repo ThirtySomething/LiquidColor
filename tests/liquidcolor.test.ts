@@ -57,19 +57,19 @@ vi.mock("vue/dist/vue.esm-bundler.js", () => ({
     createApp: createAppMock
 }));
 
-vi.mock("../board", () => ({
+vi.mock("../src/board", () => ({
     Board: boardStatic
 }));
 
-vi.mock("../commands/commandresetgame", () => ({
+vi.mock("../src/commands/commandresetgame", () => ({
     CommandResetGame: commandResetGameMock
 }));
 
-vi.mock("../definitions", () => ({
+vi.mock("../src/definitions", () => ({
     Definitions: definitionsStatic
 }));
 
-vi.mock("../player", () => ({
+vi.mock("../src/player", () => ({
     Player: PlayerMock
 }));
 
@@ -92,7 +92,7 @@ describe("liquidcolor bootstrap", () => {
     });
 
     it("wires board, observers and vue app methods", async () => {
-        const module = await import("../liquidcolor");
+        const module = await import("../src/liquidcolor");
 
         expect(definitionsStatic.initialize).toHaveBeenCalled();
         expect(boardStatic.initialize).toHaveBeenCalled();

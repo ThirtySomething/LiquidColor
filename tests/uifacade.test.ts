@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { UiFacade } from "../uifacade";
+import { UiFacade } from "../src/uifacade";
 
 describe("UiFacade", () => {
     it("handles text/display/class operations and missing elements", () => {

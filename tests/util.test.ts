@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Util } from "../util";
+import { Util } from "../src/util";
 
 describe("Util", () => {
     it("setElementSize updates style and canvas dimensions", () => {

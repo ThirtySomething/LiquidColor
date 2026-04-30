@@ -30,59 +30,60 @@ skinparam note {
 ' ─────────────────────────────────────────────────────────────────────
 
 package "Vue Shell" as Shell {
-  [liquidcolor.ts] <<Entry Point>>
+  [src/liquidcolor.ts] <<Entry Point>>
 }
 
 package "Composition" as Comp {
-  [boarddependencies.ts] <<DI Helper>>
+  [src/boarddependencies.ts] <<DI Helper>>
 }
 
 package "Core Domain" as Domain {
-  [board.ts]       <<Singleton>>
-  [player.ts]
-  [grid.ts]
-  [cell.ts]
-  [gamephase.ts]   <<State Pattern>>
-  [definitions.ts]
+  [src/board.ts]       <<Singleton>>
+  [src/player.ts]
+  [src/grid.ts]
+  [src/cell.ts]
+  [src/gamephase.ts]   <<State Pattern>>
+  [src/definitions.ts]
 }
 
 package "Commands" as Cmds {
-  [commandinvoker.ts]  <<Invoker>>
-  [commandplaycolor.ts] <<Concrete Command\n(delta-based undo)>>
-  [commandresetgame.ts] <<Concrete Command>>
-  [icommand.ts]         <<interface>>
+  [src/commands/commandinvoker.ts]  <<Invoker>>
+  [src/commands/commandplaycolor.ts] <<Concrete Command\n(delta-based undo)>>
+  [src/commands/commandresetgame.ts] <<Concrete Command>>
+  [src/commands/icommand.ts]         <<interface>>
 }
 
 package "AI Strategies" as Strat {
-  [computerstrategyfactory.ts] <<Factory>>
-  [strategygreedy.ts]          <<Strategy>>
-  [strategyminimax.ts]         <<Strategy>>
-  [capturesimulator.ts]        <<Helper>>
-  [icomputerstrategy.ts]       <<interface>>
-  [computerstrategytype.ts]    <<enum/type>>
-  [strategyinput.ts]           <<type>>
+  [src/strategies/computerstrategyfactory.ts] <<Factory>>
+  [src/strategies/strategygreedy.ts]          <<Strategy>>
+  [src/strategies/strategyminimax.ts]         <<Strategy>>
+  [src/strategies/capturesimulator.ts]        <<Helper>>
+  [src/strategies/icomputerstrategy.ts]       <<interface>>
+  [src/strategies/computerstrategytype.ts]    <<enum/type>>
+  [src/strategies/strategyinput.ts]           <<type>>
 }
 
 package "Infrastructure / UI" as Infra {
-  [uifacade.ts]       <<Facade>>
-  [util.ts]           <<Delegating Wrapper>>
-  [timer.ts]          <<Timer + Runtime>>
-  [subject.ts]        <<Observable>>
-  [scoreobserver.ts]  <<Observer>>
-  [winnerobserver.ts] <<Observer>>
-  [iobserver.ts]      <<interface>>
-  [observerdata.ts]   <<Data Types>>
+  [src/uifacade.ts]       <<Facade>>
+  [src/util.ts]           <<Delegating Wrapper>>
+  [src/timer.ts]          <<Timer + Runtime>>
+  [src/subject.ts]        <<Observable>>
+  [src/scoreobserver.ts]  <<Observer>>
+  [src/winnerobserver.ts] <<Observer>>
+  [src/iobserver.ts]      <<interface>>
+  [src/observerdata.ts]   <<Data Types>>
 }
 
 package "Persistence" as Persist {
-  [highscore.ts]                    <<Domain + Interface>>
-  [localstoragehighscorerepository.ts] <<Repository Impl>>
-  [highscorewinner.ts]              <<Value Type>>
+  [src/highscore.ts]                    <<Domain + Interface>>
+  [src/localstoragehighscorerepository.ts] <<Repository Impl>>
+  [src/highscorewinner.ts]              <<Value Type>>
 }
 
 package "Shared Types" as Types {
-  [randomsource.ts]  <<DI / Interface>>
-  [offset.ts]        <<Value Type>>
+  [src/randomsource.ts]  <<DI / Interface>>
+  [src/offset.ts]        <<Value Type>>
+  [src/types/*]          <<Type Definitions>>
 }
 
 ' ─────────────────────────────────────────────────────────────────────
@@ -90,96 +91,96 @@ package "Shared Types" as Types {
 ' ─────────────────────────────────────────────────────────────────────
 
 ' Shell → everything it composes at startup
-[liquidcolor.ts] --> [board.ts]               : creates Board
-[liquidcolor.ts] --> [boarddependencies.ts]   : createBoardDependencies()
-[liquidcolor.ts] --> [commandresetgame.ts]    : registers reset command
-[liquidcolor.ts] --> [player.ts]              : creates human/computer
-[liquidcolor.ts] --> [definitions.ts]         : game config
-[liquidcolor.ts] --> [scoreobserver.ts]       : attaches observer
-[liquidcolor.ts] --> [winnerobserver.ts]      : attaches observer
+[src/liquidcolor.ts] --> [src/board.ts]               : creates Board
+[src/liquidcolor.ts] --> [src/boarddependencies.ts]   : createBoardDependencies()
+[src/liquidcolor.ts] --> [src/commands/commandresetgame.ts]    : registers reset command
+[src/liquidcolor.ts] --> [src/player.ts]              : creates human/computer
+[src/liquidcolor.ts] --> [src/definitions.ts]         : game config
+[src/liquidcolor.ts] --> [src/scoreobserver.ts]       : attaches observer
+[src/liquidcolor.ts] --> [src/winnerobserver.ts]      : attaches observer
 
 ' Composition helper → infrastructure dependencies it wires
-[boarddependencies.ts] --> [localstoragehighscorerepository.ts] : default repo
-[boarddependencies.ts] --> [randomsource.ts]  : MathRandomSource
-[boarddependencies.ts] --> [timer.ts]         : BrowserTimerRuntime
+[src/boarddependencies.ts] --> [src/localstoragehighscorerepository.ts] : default repo
+[src/boarddependencies.ts] --> [src/randomsource.ts]  : MathRandomSource
+[src/boarddependencies.ts] --> [src/timer.ts]         : BrowserTimerRuntime
 
 ' Core Domain – Board orchestrates everything
-[board.ts] --> [commandinvoker.ts]    : executes commands
-[board.ts] --> [commandplaycolor.ts]  : creates commands
-[board.ts] --> [player.ts]            : human + computer
-[board.ts] --> [grid.ts]              : game board cells
-[board.ts] --> [gamephase.ts]         : phase transitions
-[board.ts] --> [definitions.ts]       : config
-[board.ts] --> [highscore.ts]         : persist scores
-[board.ts] --> [timer.ts]             : game timer
-[board.ts] --> [uifacade.ts]          : DOM updates
-[board.ts] --> [util.ts]              : helper DOM ops
-[board.ts] --> [subject.ts]           : notifies observers
-[board.ts] --> [randomsource.ts]      : injectable random
+[src/board.ts] --> [src/commands/commandinvoker.ts]    : executes commands
+[src/board.ts] --> [src/commands/commandplaycolor.ts]  : creates commands
+[src/board.ts] --> [src/player.ts]            : human + computer
+[src/board.ts] --> [src/grid.ts]              : game board cells
+[src/board.ts] --> [src/gamephase.ts]         : phase transitions
+[src/board.ts] --> [src/definitions.ts]       : config
+[src/board.ts] --> [src/highscore.ts]         : persist scores
+[src/board.ts] --> [src/timer.ts]             : game timer
+[src/board.ts] --> [src/uifacade.ts]          : DOM updates
+[src/board.ts] --> [src/util.ts]              : helper DOM ops
+[src/board.ts] --> [src/subject.ts]           : notifies observers
+[src/board.ts] --> [src/randomsource.ts]      : injectable random
 
 ' Player uses strategies and triggers observers
-[player.ts] --> [computerstrategyfactory.ts] : gets AI strategy
-[player.ts] --> [cell.ts]                    : reads board cells
-[player.ts] --> [definitions.ts]             : config
-[player.ts] --> [observerdata.ts]            : score events
-[player.ts] --> [util.ts]                    : UI helper
-[player.ts] --> [randomsource.ts]            : injectable random
+[src/player.ts] --> [src/strategies/computerstrategyfactory.ts] : gets AI strategy
+[src/player.ts] --> [src/cell.ts]                    : reads board cells
+[src/player.ts] --> [src/definitions.ts]             : config
+[src/player.ts] --> [src/observerdata.ts]            : score events
+[src/player.ts] --> [src/util.ts]                    : UI helper
+[src/player.ts] --> [src/randomsource.ts]            : injectable random
 
 ' Grid and Cell
-[grid.ts] --> [cell.ts]          : contains cells
-[grid.ts] --> [definitions.ts]   : grid dimensions
-[grid.ts] --> [randomsource.ts]  : injectable random
-[cell.ts] --> [definitions.ts]   : color list
-[cell.ts] --> [randomsource.ts]  : injectable random
+[src/grid.ts] --> [src/cell.ts]          : contains cells
+[src/grid.ts] --> [src/definitions.ts]   : grid dimensions
+[src/grid.ts] --> [src/randomsource.ts]  : injectable random
+[src/cell.ts] --> [src/definitions.ts]   : color list
+[src/cell.ts] --> [src/randomsource.ts]  : injectable random
 
 ' Commands
-[commandinvoker.ts]   --> [icommand.ts]
-[commandplaycolor.ts] --> [board.ts]     : snapshot + restore
-[commandplaycolor.ts] --> [icommand.ts]
-[commandresetgame.ts] --> [board.ts]     : resets game state
-[commandresetgame.ts] --> [icommand.ts]
+[src/commands/commandinvoker.ts]   --> [src/commands/icommand.ts]
+[src/commands/commandplaycolor.ts] --> [src/board.ts]     : snapshot + restore
+[src/commands/commandplaycolor.ts] --> [src/commands/icommand.ts]
+[src/commands/commandresetgame.ts] --> [src/board.ts]     : resets game state
+[src/commands/commandresetgame.ts] --> [src/commands/icommand.ts]
 
 ' AI Strategies
-[computerstrategyfactory.ts] --> [strategygreedy.ts]    : creates
-[computerstrategyfactory.ts] --> [strategyminimax.ts]   : creates
-[computerstrategyfactory.ts] --> [icomputerstrategy.ts]
-[computerstrategyfactory.ts] --> [computerstrategytype.ts]
-[computerstrategyfactory.ts] --> [randomsource.ts]
-[strategygreedy.ts]   --> [capturesimulator.ts]
-[strategygreedy.ts]   --> [icomputerstrategy.ts]
-[strategygreedy.ts]   --> [strategyinput.ts]
-[strategygreedy.ts]   --> [cell.ts]
-[strategygreedy.ts]   --> [randomsource.ts]
-[strategyminimax.ts]  --> [capturesimulator.ts]
-[strategyminimax.ts]  --> [icomputerstrategy.ts]
-[strategyminimax.ts]  --> [strategyinput.ts]
-[strategyminimax.ts]  --> [cell.ts]
-[strategyminimax.ts]  --> [randomsource.ts]
-[capturesimulator.ts] --> [cell.ts]
-[capturesimulator.ts] --> [definitions.ts]
-[icomputerstrategy.ts] --> [strategyinput.ts]
+[src/strategies/computerstrategyfactory.ts] --> [src/strategies/strategygreedy.ts]    : creates
+[src/strategies/computerstrategyfactory.ts] --> [src/strategies/strategyminimax.ts]   : creates
+[src/strategies/computerstrategyfactory.ts] --> [src/strategies/icomputerstrategy.ts]
+[src/strategies/computerstrategyfactory.ts] --> [src/strategies/computerstrategytype.ts]
+[src/strategies/computerstrategyfactory.ts] --> [src/randomsource.ts]
+[src/strategies/strategygreedy.ts]   --> [src/strategies/capturesimulator.ts]
+[src/strategies/strategygreedy.ts]   --> [src/strategies/icomputerstrategy.ts]
+[src/strategies/strategygreedy.ts]   --> [src/strategies/strategyinput.ts]
+[src/strategies/strategygreedy.ts]   --> [src/cell.ts]
+[src/strategies/strategygreedy.ts]   --> [src/randomsource.ts]
+[src/strategies/strategyminimax.ts]  --> [src/strategies/capturesimulator.ts]
+[src/strategies/strategyminimax.ts]  --> [src/strategies/icomputerstrategy.ts]
+[src/strategies/strategyminimax.ts]  --> [src/strategies/strategyinput.ts]
+[src/strategies/strategyminimax.ts]  --> [src/cell.ts]
+[src/strategies/strategyminimax.ts]  --> [src/randomsource.ts]
+[src/strategies/capturesimulator.ts] --> [src/cell.ts]
+[src/strategies/capturesimulator.ts] --> [src/definitions.ts]
+[src/strategies/icomputerstrategy.ts] --> [src/strategies/strategyinput.ts]
 
 ' Infrastructure – Observer chain
-[subject.ts]        --> [iobserver.ts]
-[subject.ts]        --> [observerdata.ts]
-[scoreobserver.ts]  --> [iobserver.ts]
-[scoreobserver.ts]  --> [observerdata.ts]
-[winnerobserver.ts] --> [iobserver.ts]
-[winnerobserver.ts] --> [observerdata.ts]
-[iobserver.ts]      --> [observerdata.ts]
-[timer.ts]          --> [util.ts]
+[src/subject.ts]        --> [src/iobserver.ts]
+[src/subject.ts]        --> [src/observerdata.ts]
+[src/scoreobserver.ts]  --> [src/iobserver.ts]
+[src/scoreobserver.ts]  --> [src/observerdata.ts]
+[src/winnerobserver.ts] --> [src/iobserver.ts]
+[src/winnerobserver.ts] --> [src/observerdata.ts]
+[src/iobserver.ts]      --> [src/observerdata.ts]
+[src/timer.ts]          --> [src/util.ts]
 
 ' UI Facade chain
-[util.ts] --> [uifacade.ts] : delegates all DOM ops
+[src/util.ts] --> [src/uifacade.ts] : delegates all DOM ops
 
 ' Persistence chain
-[highscore.ts]                      --> [highscorewinner.ts]
-[highscore.ts]                      --> [localstoragehighscorerepository.ts]
-[highscore.ts]                      --> [util.ts]
-[localstoragehighscorerepository.ts] --> [highscore.ts] : implements HighscoreRepository
+[src/highscore.ts]                      --> [src/highscorewinner.ts]
+[src/highscore.ts]                      --> [src/localstoragehighscorerepository.ts]
+[src/highscore.ts]                      --> [src/util.ts]
+[src/localstoragehighscorerepository.ts] --> [src/highscore.ts] : implements HighscoreRepository
 
 ' Shared Types
-[definitions.ts] --> [offset.ts]
+[src/definitions.ts] --> [src/offset.ts]
 
 ' ─────────────────────────────────────────────────────────────────────
 ' PATTERN LEGEND
@@ -188,11 +189,11 @@ package "Shared Types" as Types {
 legend right
   Design Patterns Used
   ─────────────────────────────
-  State        gamephase.ts
-  Command      commands/ package
+  State        src/gamephase.ts
+  Command      src/commands/ package
   Observer     subject, *observer
-  Strategy     strategies/ package
-  Facade       uifacade.ts
+  Strategy     src/strategies/ package
+  Facade       src/uifacade.ts
   Repository   HighscoreRepository
   Singleton    Board
   Factory      ComputerStrategyFactory

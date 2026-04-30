@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { LocalStorageHighscoreRepository } from "../localstoragehighscorerepository";
+import { LocalStorageHighscoreRepository } from "../src/localstoragehighscorerepository";
 
 describe("LocalStorageHighscoreRepository", () => {
     it("load returns null when payload is missing, malformed or invalid", () => {

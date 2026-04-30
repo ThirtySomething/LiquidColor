@@ -1,9 +1,9 @@
 import { createApp } from "vue/dist/vue.esm-bundler.js";
+import packageInfo from "../package.json";
 import { Board } from "./board.js";
 import { createBoardDependencies } from "./boarddependencies.js";
 import { CommandResetGame } from "./commands/commandresetgame.js";
 import { Definitions } from "./definitions.js";
-import packageInfo from "./package.json";
 import { Player } from "./player.js";
 import { ScoreObserver } from "./scoreobserver.js";
 import type { LiquidColorAppBindings } from "./types/liquidcolorappbindings.js";

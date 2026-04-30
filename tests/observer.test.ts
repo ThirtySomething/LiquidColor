@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import type { IObserver } from "../iobserver";
-import type { ObserverData } from "../observerdata";
-import { ScoreObserver } from "../scoreobserver";
-import { Subject } from "../subject";
-import { WinnerObserver } from "../winnerobserver";
+import type { IObserver } from "../src/iobserver";
+import type { ObserverData } from "../src/observerdata";
+import { ScoreObserver } from "../src/scoreobserver";
+import { Subject } from "../src/subject";
+import { WinnerObserver } from "../src/winnerobserver";
 
 describe("Observers and Subject", () => {
     it("subject attaches, notifies and detaches observers", () => {

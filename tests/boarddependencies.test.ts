@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { createBoardDependencies } from "../boarddependencies";
-import type { HighscoreRepository, HighscoreSnapshot } from "../highscore";
-import type { RandomSource } from "../randomsource";
-import type { TimerRuntime } from "../timer";
+import { createBoardDependencies } from "../src/boarddependencies";
+import type { HighscoreRepository, HighscoreSnapshot } from "../src/highscore";
+import type { RandomSource } from "../src/randomsource";
+import type { TimerRuntime } from "../src/timer";
 
 describe("createBoardDependencies", () => {
     it("provides default runtime, storage repository, and randomness", () => {

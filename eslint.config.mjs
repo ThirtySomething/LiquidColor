@@ -16,7 +16,7 @@ export default tseslint.config(
     {
         files: ["**/*.ts"],
         rules: {
-            "brace-style": ["error", "allman", { "allowSingleLine": false }],
+            "brace-style": "off",
             "indent": ["error", 4, { "SwitchCase": 1 }],
             "no-tabs": "error"
         }

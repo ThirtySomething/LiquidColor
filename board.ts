@@ -1,14 +1,14 @@
+import { CommandInvoker } from "./commands/commandinvoker.js";
+import { CommandPlayColor } from "./commands/commandplaycolor.js";
 import { Definitions } from "./definitions.js";
 import { Grid } from "./grid.js";
 import { Highscore } from "./highscore.js";
 import type { HighscoreWinner } from "./highscorewinner.js";
-import { Subject } from "./subject.js";
 import { Player } from "./player.js";
 import type { ComputerStrategy } from "./strategies/computerstrategytype.js";
+import { Subject } from "./subject.js";
 import { Timer } from "./timer.js";
 import { Util } from "./util.js";
-import { CommandInvoker } from "./commands/commandinvoker.js";
-import { CommandPlayColor } from "./commands/commandplaycolor.js";
 
 type ScoreStats = {
     human: number;
@@ -50,6 +50,11 @@ export class Board {
         this.m_Highscore = new Highscore();
         this.m_UISubject = new Subject();
         this.m_CommandInvoker = new CommandInvoker();
+    }
+
+    private sanitizePlayerName(playerName: string): string {
+        const trimmed = playerName.trim();
+        return trimmed.length > 0 ? trimmed : "Besucher";
     }
 
     static initialize(definitions: Definitions, playerHuman: Player, playerComputer: Player): void {
@@ -110,8 +115,15 @@ export class Board {
         const computerStrategy = Util.getInputValue(idComputerStrategy);
 
         this.m_Definitions.reInit(dimX, dimY, cellSize);
-        this.m_PlayerHuman.m_PlayerName = playerName;
+        this.m_PlayerHuman.m_PlayerName = this.sanitizePlayerName(playerName);
         this.m_ComputerStrategy = this.readComputerStrategy(computerStrategy);
+
+        Util.setInputValue(idDimX, this.m_Definitions.DimensionX);
+        Util.setInputValue(idDimY, this.m_Definitions.DimensionY);
+        Util.setInputValue(idCellSize, this.m_Definitions.CellSize);
+        Util.setInputValue(idPlayerName, this.m_PlayerHuman.m_PlayerName);
+        Util.setInputValue(idComputerStrategy, this.m_ComputerStrategy);
+
         this.m_Highscore.render(this.m_PlayerHuman.m_PlayerName, this.m_PlayerComputer.m_PlayerName);
 
         this.boardInit();

@@ -1,5 +1,12 @@
 export class Definitions {
     static instance = null;
+    static DEFAULT_DIMENSION_X = 30;
+    static DEFAULT_DIMENSION_Y = 20;
+    static DEFAULT_CELL_SIZE = 15;
+    static MIN_DIMENSION = 2;
+    static MAX_DIMENSION = 200;
+    static MIN_CELL_SIZE = 2;
+    static MAX_CELL_SIZE = 80;
     DimensionX;
     DimensionY;
     CellSize;
@@ -34,11 +41,26 @@ export class Definitions {
         }
         return Definitions.instance;
     }
+    sanitizeInt(value, min, max, fallback) {
+        const parsed = Number.parseInt(String(value), 10);
+        if (Number.isNaN(parsed)) {
+            return fallback;
+        }
+        return Math.min(max, Math.max(min, parsed));
+    }
     reInit(dimX, dimY, cellSize) {
-        this.DimensionX = Number.parseInt(String(dimX), 10);
-        this.DimensionY = Number.parseInt(String(dimY), 10);
-        this.CellSize = Number.parseInt(String(cellSize), 10);
+        const fallbackDimX = this.DimensionX > 0
+            ? this.DimensionX
+            : Definitions.DEFAULT_DIMENSION_X;
+        const fallbackDimY = this.DimensionY > 0
+            ? this.DimensionY
+            : Definitions.DEFAULT_DIMENSION_Y;
+        const fallbackCellSize = this.CellSize > 0
+            ? this.CellSize
+            : Definitions.DEFAULT_CELL_SIZE;
+        this.DimensionX = this.sanitizeInt(dimX, Definitions.MIN_DIMENSION, Definitions.MAX_DIMENSION, fallbackDimX);
+        this.DimensionY = this.sanitizeInt(dimY, Definitions.MIN_DIMENSION, Definitions.MAX_DIMENSION, fallbackDimY);
+        this.CellSize = this.sanitizeInt(cellSize, Definitions.MIN_CELL_SIZE, Definitions.MAX_CELL_SIZE, fallbackCellSize);
         this.Winner = Math.floor((this.DimensionX * this.DimensionY) / 2 + 1);
     }
 }
-//# sourceMappingURL=definitions.js.map

@@ -32,7 +32,12 @@ export class Player {
                 }
             });
         });
-        this.m_NotifyUI({ type: 'score', player: this.m_PlayerName, score: cellCounter });
+        this.m_NotifyUI({
+            type: 'score',
+            player: this.m_PlayerName,
+            scoreElementId: this.m_IDScore,
+            score: cellCounter
+        });
         if (cellCounter >= definitions.Winner) {
             this.m_NotifyUI({ type: 'winner', player: this.m_PlayerName });
         }
@@ -99,4 +104,3 @@ export class Player {
         });
     }
 }
-//# sourceMappingURL=player.js.map

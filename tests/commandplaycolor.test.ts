@@ -81,4 +81,12 @@ describe("CommandPlayColor", () => {
         expect(board.restoreStateSnapshot).not.toHaveBeenCalled();
         expect(board.performMove).not.toHaveBeenCalled();
     });
+
+    it("accepts invalid color payloads and forwards them to performMove", () => {
+        const board = createBoardStub();
+        const command = new CommandPlayColor(board as unknown as Board, "" as unknown as string);
+
+        expect(() => command.execute()).not.toThrow();
+        expect(board.performMove).toHaveBeenCalledWith("");
+    });
 });

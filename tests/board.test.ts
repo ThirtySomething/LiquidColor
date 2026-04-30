@@ -117,6 +117,37 @@ describe("Board", () => {
         expect(board.m_ComputerStrategy).toBe("minimax");
     });
 
+    it("reInit clamps out-of-range numeric values from input fields", () => {
+        const board = createBoard();
+
+        (document.getElementById("dimx") as HTMLInputElement).value = "1";
+        (document.getElementById("dimy") as HTMLInputElement).value = "999";
+        (document.getElementById("cellsize") as HTMLInputElement).value = "-10";
+
+        board.reInit("dimx", "dimy", "cellsize", "playername", "computerstrategy");
+
+        expect(board.m_Definitions.DimensionX).toBe(2);
+        expect(board.m_Definitions.DimensionY).toBe(200);
+        expect(board.m_Definitions.CellSize).toBe(2);
+    });
+
+    it("reInit with missing field ids keeps dimensions and applies safe defaults", () => {
+        const board = createBoard();
+        const previous = {
+            x: board.m_Definitions.DimensionX,
+            y: board.m_Definitions.DimensionY,
+            size: board.m_Definitions.CellSize
+        };
+
+        board.reInit("missing-x", "missing-y", "missing-size", "missing-name", "missing-strategy");
+
+        expect(board.m_Definitions.DimensionX).toBe(previous.x);
+        expect(board.m_Definitions.DimensionY).toBe(previous.y);
+        expect(board.m_Definitions.CellSize).toBe(previous.size);
+        expect(board.m_PlayerHuman.m_PlayerName).toBe("Besucher");
+        expect(board.m_ComputerStrategy).toBe("minimax");
+    });
+
     it("performMove shows validation messages for illegal colors", () => {
         const board = createBoard();
         if (board.m_PlayerHuman.m_BaseCell) {
@@ -265,6 +296,7 @@ describe("Board", () => {
         const board = createBoard();
         expect(board.readComputerStrategy("greedy")).toBe("greedy");
         expect(board.readComputerStrategy("x")).toBe("minimax");
+        expect(board.readComputerStrategy("GREEDY")).toBe("minimax");
     });
 
     it("getUISubject returns the board's subject", () => {

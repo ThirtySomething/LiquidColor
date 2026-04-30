@@ -109,6 +109,20 @@ describe("Player", () => {
         expect(markSpy).toHaveBeenCalled();
     });
 
+    it("move keeps current color when random source returns invalid index inputs", () => {
+        Definitions.initialize(2, 2, 10);
+        const definitions = Definitions.getInstance();
+        const player = new Player("H", "name_h", "score_h", () => undefined);
+        const cells = buildCells();
+        const base = cells[0][0];
+        base.m_Color = "fallback";
+        player.m_BaseCell = base;
+
+        player.move(cells, ["red", "green"], definitions, getCanvasCtx(), { next: () => Number.NaN });
+
+        expect(base.m_Color).toBe("fallback");
+    });
+
     it("cellsMarkOwner captures neighbors and deduplicates frontier", () => {
         Definitions.initialize(2, 2, 10);
         const definitions = Definitions.getInstance();
@@ -174,6 +188,29 @@ describe("Player", () => {
         opponent.m_BaseCell.m_Color = "blue";
 
         const color = player.identifyBestColor(cells, definitions, "green", opponent, "minimax");
+        expect(typeof color).toBe("string");
+    });
+
+    it("identifyBestColor tolerates invalid strategy values via fallback factory path", () => {
+        Definitions.initialize(2, 2, 10);
+        const definitions = Definitions.getInstance();
+        const player = new Player("CPU", "name_c", "score_c", () => undefined);
+        const opponent = new Player("H", "name_h", "score_h", () => undefined);
+        const cells = buildCells();
+
+        player.m_BaseCell = cells[0][0];
+        opponent.m_BaseCell = cells[1][1];
+        player.m_BaseCell.m_Color = "red";
+        opponent.m_BaseCell.m_Color = "blue";
+
+        const color = player.identifyBestColor(
+            cells,
+            definitions,
+            "green",
+            opponent,
+            "invalid" as unknown as "minimax"
+        );
+
         expect(typeof color).toBe("string");
     });
 });

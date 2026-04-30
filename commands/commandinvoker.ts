@@ -1,12 +1,21 @@
 import type { ICommand } from "./icommand.js";
 
 export class CommandInvoker {
+    private static readonly MAX_HISTORY = 15;
+
     private commands: ICommand[] = [];
     private undoStack: ICommand[] = [];
 
-    execute(command: ICommand): void {
+    execute(command: ICommand, trackHistory = true): void {
         command.execute();
+        if (!trackHistory) {
+            return;
+        }
+
         this.commands.push(command);
+        if (this.commands.length > CommandInvoker.MAX_HISTORY) {
+            this.commands.shift();
+        }
         this.undoStack = [];
     }
 
@@ -36,5 +45,10 @@ export class CommandInvoker {
 
     getCommandHistory(): ICommand[] {
         return [...this.commands];
+    }
+
+    clearHistory(): void {
+        this.commands = [];
+        this.undoStack = [];
     }
 }

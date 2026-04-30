@@ -26,6 +26,21 @@ export class Highscore {
         Util.setText("highscore_draws", String(this.m_Data.draws));
         Util.setText("highscore_total", String(total));
     }
+    createSnapshot() {
+        return {
+            humanWins: this.m_Data.humanWins,
+            computerWins: this.m_Data.computerWins,
+            draws: this.m_Data.draws
+        };
+    }
+    restoreSnapshot(snapshot) {
+        this.m_Data = {
+            humanWins: snapshot.humanWins,
+            computerWins: snapshot.computerWins,
+            draws: snapshot.draws
+        };
+        this.save();
+    }
     load() {
         const fallback = { humanWins: 0, computerWins: 0, draws: 0 };
         try {

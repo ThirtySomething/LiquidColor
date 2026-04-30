@@ -142,6 +142,9 @@
 .actions {
     grid-column: 1 / -1;
     align-self: flex-end;
+    display: flex;
+    gap: var(--space-1);
+    flex-wrap: wrap;
 }
 
 #btn_reset {
@@ -149,6 +152,16 @@
     border: 1px solid var(--border);
     border-radius: 8px;
     background: var(--accent-soft);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#btn_undo,
+#btn_redo {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #f4f3ef;
     font-weight: 600;
     cursor: pointer;
 }

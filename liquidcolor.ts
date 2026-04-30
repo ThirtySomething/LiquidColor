@@ -24,6 +24,7 @@ board.getUISubject().attach(new WinnerObserver());
 createApp({
     methods: {
         resetGame(): void {
+            Board.getInstance().getCommandInvoker().clearHistory();
             const command = new CommandResetGame(
                 Board.getInstance(),
                 "dimx",
@@ -32,7 +33,13 @@ createApp({
                 "playername",
                 "computerstrategy"
             );
-            Board.getInstance().getCommandInvoker().execute(command);
+            Board.getInstance().getCommandInvoker().execute(command, false);
+        },
+        undoMove(): void {
+            Board.getInstance().getCommandInvoker().undo();
+        },
+        redoMove(): void {
+            Board.getInstance().getCommandInvoker().redo();
         }
     },
     mounted(): void {
@@ -79,6 +86,8 @@ createApp({
                         </div>
                         <div class="actions">
                             <button id="btn_reset" type="button" @click="resetGame">Reset</button>
+                            <button id="btn_undo" type="button" @click="undoMove">Undo</button>
+                            <button id="btn_redo" type="button" @click="redoMove">Redo</button>
                         </div>
                     </div>
                 </section>

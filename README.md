@@ -32,6 +32,11 @@ To run this game you need a internet browser supporting JavaScript and HTML5. At
 
 You can test this game on [GitHub][url_github_liquidcolor].
 
+## Undo/Redo
+
+The game supports undo and redo for color moves with a maximum history depth of 15 moves. When the limit is
+reached, the oldest move is dropped from the history.
+
 ## Supported Platforms
 
 The game is developed on Google Chrome. If you get problems, please report the used browser. As fallback you can use Google Chrome.

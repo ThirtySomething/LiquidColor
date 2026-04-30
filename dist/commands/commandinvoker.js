@@ -1,9 +1,16 @@
 export class CommandInvoker {
+    static MAX_HISTORY = 15;
     commands = [];
     undoStack = [];
-    execute(command) {
+    execute(command, trackHistory = true) {
         command.execute();
+        if (!trackHistory) {
+            return;
+        }
         this.commands.push(command);
+        if (this.commands.length > CommandInvoker.MAX_HISTORY) {
+            this.commands.shift();
+        }
         this.undoStack = [];
     }
     undo() {
@@ -28,5 +35,9 @@ export class CommandInvoker {
     }
     getCommandHistory() {
         return [...this.commands];
+    }
+    clearHistory() {
+        this.commands = [];
+        this.undoStack = [];
     }
 }

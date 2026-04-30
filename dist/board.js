@@ -60,6 +60,82 @@ export class Board {
     getCommandInvoker() {
         return this.m_CommandInvoker;
     }
+    createStateSnapshot() {
+        const winnerElement = document.getElementById(this.m_IDWinner);
+        const moveInfoElement = document.getElementById("moveinfo");
+        const cells = this.m_Grid.m_Cells.map((row) => row.map((cell) => ({
+            color: cell.m_Color,
+            owner: cell.m_Owner,
+            occupied: cell.m_Occupied
+        })));
+        return {
+            cells,
+            gameOver: this.m_GameOver,
+            ui: {
+                winnerText: winnerElement?.textContent ?? "",
+                winnerVisible: winnerElement ? !winnerElement.classList.contains("dspno") : false,
+                moveInfoText: moveInfoElement?.textContent ?? "",
+                moveInfoVisible: moveInfoElement ? moveInfoElement.style.display !== "none" : false
+            },
+            highscore: this.m_Highscore.createSnapshot()
+        };
+    }
+    restoreStateSnapshot(snapshot) {
+        snapshot.cells.forEach((row, y) => {
+            const currentRow = this.m_Grid.m_Cells[y];
+            if (!currentRow) {
+                return;
+            }
+            row.forEach((cellState, x) => {
+                const cell = currentRow[x];
+                if (!cell) {
+                    return;
+                }
+                cell.m_Color = cellState.color;
+                cell.m_Owner = cellState.owner;
+                cell.m_Occupied = cellState.occupied;
+                cell.m_DoRedraw = true;
+            });
+        });
+        if (this.m_CanvasElement) {
+            this.m_Grid.m_Cells.forEach((row) => {
+                row.forEach((cell) => {
+                    cell.draw(this.m_Definitions, this.m_CanvasElement);
+                });
+            });
+        }
+        const humanBaseRow = this.m_Grid.m_Cells[this.m_Definitions.DimensionY - 1];
+        this.m_PlayerHuman.m_BaseCell = humanBaseRow ? (humanBaseRow[0] ?? null) : null;
+        const computerBaseRow = this.m_Grid.m_Cells[0];
+        this.m_PlayerComputer.m_BaseCell = computerBaseRow
+            ? (computerBaseRow[this.m_Definitions.DimensionX - 1] ?? null)
+            : null;
+        this.m_GameOver = snapshot.gameOver;
+        this.m_Highscore.restoreSnapshot(snapshot.highscore);
+        this.m_Highscore.render(this.m_PlayerHuman.m_PlayerName, this.m_PlayerComputer.m_PlayerName);
+        const stats = this.getScoreStats();
+        Util.setText(this.m_PlayerHuman.m_IDScore, String(stats.human));
+        Util.setText(this.m_PlayerComputer.m_IDScore, String(stats.computer));
+        Util.setText(this.m_IDWinner, snapshot.ui.winnerText);
+        if (snapshot.ui.winnerVisible) {
+            Util.removeClass(this.m_IDWinner, "dspno");
+            Util.show(this.m_IDWinner, "block");
+        }
+        else {
+            const winnerElement = document.getElementById(this.m_IDWinner);
+            if (winnerElement) {
+                winnerElement.classList.add("dspno");
+                winnerElement.style.display = "none";
+            }
+        }
+        Util.setText("moveinfo", snapshot.ui.moveInfoText);
+        if (snapshot.ui.moveInfoVisible) {
+            Util.show("moveinfo", "block");
+        }
+        else {
+            Util.hide("moveinfo");
+        }
+    }
     init(gameField, buttonField, idWinner) {
         this.m_IDGameField = gameField;
         this.m_IDButtonField = buttonField;
